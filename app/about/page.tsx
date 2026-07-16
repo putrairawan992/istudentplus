@@ -74,17 +74,19 @@ export default function AboutPage() {
         <section className="py-14">
           <div className="mx-auto grid max-w-5xl gap-4.5 px-7 sm:grid-cols-3">
             {OFFICES.map((office) => (
-              <div key={office.city} className="relative rounded-2xl border border-line bg-card p-7">
-                {office.status && (
-                  <span className="absolute right-5 top-5 rounded-full bg-sky-ink px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-sky">
-                    {office.status}
-                  </span>
-                )}
+              <div key={office.city} className="rounded-2xl border border-line bg-card p-7">
                 <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
                   Office
                 </div>
                 <h3 className="text-2xl font-extrabold">{office.city}</h3>
-                <p className="text-muted">{office.country}</p>
+                <div className="flex flex-wrap items-center justify-between gap-1.5">
+                  <p className="text-muted">{office.country}</p>
+                  {office.status && (
+                    <span className="rounded-full bg-sky-ink px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-sky">
+                      {office.status}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>

@@ -56,17 +56,19 @@ export default function ContactPage() {
 
               <div className="grid gap-3 sm:grid-cols-3">
                 {OFFICES.map((office) => (
-                  <div key={office.city} className="relative rounded-2xl border border-line bg-card p-5">
-                    {office.status && (
-                      <span className="absolute right-4 top-4 rounded-full bg-sky-ink px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-sky">
-                        {office.status}
-                      </span>
-                    )}
+                  <div key={office.city} className="rounded-2xl border border-line bg-card p-5">
                     <div className="mb-1 text-xs font-bold uppercase tracking-widest text-accent">
                       Office
                     </div>
                     <div className="text-lg font-extrabold">{office.city}</div>
-                    <div className="text-sm text-muted">{office.country}</div>
+                    <div className="flex flex-wrap items-center justify-between gap-1.5">
+                      <div className="text-sm text-muted">{office.country}</div>
+                      {office.status && (
+                        <span className="rounded-full bg-sky-ink px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-sky">
+                          {office.status}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
