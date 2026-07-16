@@ -82,7 +82,6 @@ export default function Footer() {
         <div className="stub mb-6" />
         <div className="flex flex-wrap justify-between gap-2.5 font-mono text-[12.5px] text-muted">
           <span>© 2026 iStudentPlus</span>
-          <span>Built with Next.js · Optimized for SEO &amp; Generative Engines</span>
         </div>
       </div>
     </footer>
