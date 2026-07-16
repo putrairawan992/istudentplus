@@ -2,11 +2,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { WHATSAPP_URL } from "./Header";
 
+const SOCIALS = [
+  { label: "Instagram", href: "#" },
+  { label: "Facebook", href: "#" },
+  { label: "WhatsApp", href: WHATSAPP_URL },
+];
+
 export default function Footer() {
   return (
     <footer className="mt-5 border-t border-line py-14">
       <div className="mx-auto max-w-6xl px-7">
-        <div className="mb-10 grid gap-9 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="mb-10 grid gap-9 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
           <div>
             <Image
               src="/icon-istudentplus.png"
@@ -16,22 +22,36 @@ export default function Footer() {
               className="mb-3 h-8 w-auto"
             />
             <p className="max-w-xs text-[13.5px] leading-relaxed text-muted">
-              A global student network and media agency — offices in Sydney, Australia and
-              Makassar, Indonesia, supporting students across 15+ countries.
+              Your Global Student Network and Media Agency — offices in Pangkalpinang and
+              Makassar, Indonesia (Jakarta coming soon).
             </p>
           </div>
           <div>
             <h5 className="mb-3.5 text-xs font-semibold uppercase tracking-wide text-muted">
               Study Abroad
             </h5>
+            <Link href="/study-abroad/australia" className="mb-2.5 block text-[13.5px] hover:text-accent">
+              Australia
+            </Link>
+            <Link href="/study-abroad/uk" className="mb-2.5 block text-[13.5px] hover:text-accent">
+              UK
+            </Link>
             <Link href="/study-abroad" className="mb-2.5 block text-[13.5px] hover:text-accent">
-              Destinations
+              All destinations
             </Link>
-            <Link href="/study-abroad#programs" className="mb-2.5 block text-[13.5px] hover:text-accent">
+          </div>
+          <div>
+            <h5 className="mb-3.5 text-xs font-semibold uppercase tracking-wide text-muted">
               Programs
+            </h5>
+            <Link href="/services" className="mb-2.5 block text-[13.5px] hover:text-accent">
+              Services
             </Link>
-            <Link href="/study-abroad#vet" className="mb-2.5 block text-[13.5px] hover:text-accent">
-              VET Courses
+            <Link href="/courses" className="mb-2.5 block text-[13.5px] hover:text-accent">
+              Courses &amp; Universities
+            </Link>
+            <Link href="/language-programs" className="mb-2.5 block text-[13.5px] hover:text-accent">
+              Language Programs
             </Link>
           </div>
           <div>
@@ -45,19 +65,18 @@ export default function Footer() {
               Blog
             </Link>
             <Link href="/contact" className="mb-2.5 block text-[13.5px] hover:text-accent">
-              Contact
+              Contact Us
             </Link>
           </div>
           <div>
             <h5 className="mb-3.5 text-xs font-semibold uppercase tracking-wide text-muted">
-              Contact
+              Social
             </h5>
-            <a href={WHATSAPP_URL} className="mb-2.5 block text-[13.5px] hover:text-accent">
-              WhatsApp
-            </a>
-            <Link href="/contact" className="mb-2.5 block text-[13.5px] hover:text-accent">
-              Free Consultation
-            </Link>
+            {SOCIALS.map((s) => (
+              <a key={s.label} href={s.href} className="mb-2.5 block text-[13.5px] hover:text-accent">
+                {s.label}
+              </a>
+            ))}
           </div>
         </div>
         <div className="stub mb-6" />

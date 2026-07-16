@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -7,18 +8,28 @@ export const metadata: Metadata = {
   description: "Visa updates, study tips, and student stories from the iStudentPlus team.",
 };
 
+const CATEGORIES = [
+  { slug: "recent-news", label: "Recent News" },
+  { slug: "immigration", label: "Immigration" },
+  { slug: "student-life", label: "Student Life" },
+  { slug: "study-tips", label: "Study Tips" },
+];
+
 const ARTICLES = [
   {
     title: "2024 AU Education Evolves: 2024 Visa Updates Explained",
     excerpt: "What changed in Australia's student visa policy and what it means for your application.",
+    category: "immigration",
   },
   {
     title: "Understanding the Genuine Student Requirement (GSR)",
     excerpt: "The Genuine Student Requirement (GSR) is a key part of every Australian visa assessment.",
+    category: "immigration",
   },
   {
     title: "Australian Visa Medical Check-Up Locations in Indonesia",
     excerpt: "If you're an Indonesian student planning to study in Australia, here's where to complete your medical exam.",
+    category: "immigration",
   },
 ];
 
@@ -28,7 +39,14 @@ const VIDEO_SERIES = [
   { series: "Scholarships", title: "Beasiswa Tiongkok 2025", duration: "—" },
 ];
 
-export default function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string }>;
+}) {
+  const { category } = await searchParams;
+  const filtered = category ? ARTICLES.filter((a) => a.category === category) : ARTICLES;
+
   return (
     <>
       <Header />
@@ -46,18 +64,46 @@ export default function BlogPage() {
 
         <section className="pb-16">
           <div className="mx-auto max-w-4xl px-7">
-            <div className="flex flex-col gap-4.5">
-              {ARTICLES.map((article) => (
-                <a
-                  key={article.title}
-                  href="#"
-                  className="block rounded-2xl border border-line bg-card p-6.5 transition-colors hover:border-accent/40"
+            <div className="mb-7 flex flex-wrap gap-2">
+              <Link
+                href="/blog"
+                className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${
+                  !category ? "bg-ink text-white" : "border border-line text-muted hover:bg-paper-raise"
+                }`}
+              >
+                All
+              </Link>
+              {CATEGORIES.map((c) => (
+                <Link
+                  key={c.slug}
+                  href={`/blog?category=${c.slug}`}
+                  className={`rounded-full px-4 py-1.5 text-[13px] font-semibold ${
+                    category === c.slug ? "bg-ink text-white" : "border border-line text-muted hover:bg-paper-raise"
+                  }`}
                 >
-                  <h2 className="mb-2 text-lg font-extrabold">{article.title}</h2>
-                  <p className="text-[14.5px] leading-relaxed text-muted">{article.excerpt}</p>
-                </a>
+                  {c.label}
+                </Link>
               ))}
             </div>
+
+            {filtered.length > 0 ? (
+              <div className="flex flex-col gap-4.5">
+                {filtered.map((article) => (
+                  <a
+                    key={article.title}
+                    href="#"
+                    className="block rounded-2xl border border-line bg-card p-6.5 transition-colors hover:border-accent/40"
+                  >
+                    <h2 className="mb-2 text-lg font-extrabold">{article.title}</h2>
+                    <p className="text-[14.5px] leading-relaxed text-muted">{article.excerpt}</p>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-2xl border border-dashed border-line p-6.5 text-sm text-muted">
+                No articles in this category yet — check back soon.
+              </p>
+            )}
           </div>
         </section>
 

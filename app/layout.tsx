@@ -1,16 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const siteUrl = "https://www.istudentplus.com";
 
@@ -27,7 +16,7 @@ export const metadata: Metadata = {
     siteName: "iStudentPlus",
     title: "iStudentPlus — Study Abroad Counseling, 100+ Partner Universities",
     description:
-      "A global student network and media agency with offices in Sydney and Makassar, guiding students from application to arrival across 100+ partner universities.",
+      "A global student network and media agency with offices in Pangkalpinang and Makassar, guiding students from application to arrival across 100+ partner universities.",
     url: siteUrl,
   },
   twitter: {
@@ -45,7 +34,7 @@ const organizationJsonLd = {
   name: "iStudentPlus",
   url: siteUrl,
   description:
-    "Global student network and media agency offering education counseling, visa application support, student accommodation, and pre-departure services. Offices in Sydney, Australia and Makassar, Indonesia.",
+    "Global student network and media agency offering education counseling, visa application support, student accommodation, and pre-departure services. Offices in Pangkalpinang and Makassar, Indonesia.",
   areaServed: "Worldwide",
   sameAs: [] as string[],
 };
@@ -56,10 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className="h-full antialiased">
       <head>
         <script
           type="application/ld+json"

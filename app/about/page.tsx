@@ -5,12 +5,32 @@ import Footer from "../components/Footer";
 export const metadata: Metadata = {
   title: "About Us",
   description:
-    "iStudentPlus is a global student network and media agency with offices in Sydney, Australia and Makassar, Indonesia — promoting inclusivity and empowering students worldwide.",
+    "iStudentPlus is a global student network and media agency with offices in Pangkalpinang and Makassar, Indonesia — promoting inclusivity and empowering students worldwide.",
 };
 
 const OFFICES = [
-  { city: "Sydney", country: "Australia" },
-  { city: "Makassar", country: "Indonesia" },
+  { city: "Pangkalpinang", country: "Indonesia", status: null },
+  { city: "Makassar", country: "Indonesia", status: null },
+  { city: "Jakarta", country: "Indonesia", status: "Coming Soon" },
+];
+
+const TEAM = [
+  {
+    name: "Cindy Christella",
+    role: "CEO & Education Consultant",
+    bio: null,
+  },
+  {
+    name: "Nur Fadillah",
+    role: "Education Consultant",
+    bio:
+      "An Education Consultant with more than two years of experience assisting international " +
+      "students in choosing the right study pathways abroad. Provides personalized guidance on " +
+      "course selection, visa processes, and applications to educational institutions, with a " +
+      "strong understanding of international education systems and student visa regulations. " +
+      "Has supported students from diverse backgrounds while maintaining effective communication " +
+      "with partner institutions and ensuring smooth application processes.",
+  },
 ];
 
 const CLIENT_COUNTRIES = [
@@ -52,9 +72,14 @@ export default function AboutPage() {
         </section>
 
         <section className="py-14">
-          <div className="mx-auto grid max-w-5xl gap-4.5 px-7 sm:grid-cols-2">
+          <div className="mx-auto grid max-w-5xl gap-4.5 px-7 sm:grid-cols-3">
             {OFFICES.map((office) => (
-              <div key={office.city} className="rounded-2xl border border-line bg-card p-7">
+              <div key={office.city} className="relative rounded-2xl border border-line bg-card p-7">
+                {office.status && (
+                  <span className="absolute right-5 top-5 rounded-full bg-sky-ink px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-sky">
+                    {office.status}
+                  </span>
+                )}
                 <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
                   Office
                 </div>
@@ -62,6 +87,37 @@ export default function AboutPage() {
                 <p className="text-muted">{office.country}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="py-16">
+          <div className="mx-auto max-w-5xl px-7">
+            <h2 className="mb-3 text-3xl font-extrabold tracking-tight">Our Team</h2>
+            <p className="mb-8 max-w-xl text-[15.5px] leading-relaxed text-muted">
+              The counselors behind your application.
+            </p>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {TEAM.map((member) => (
+                <div key={member.name} className="rounded-2xl border border-line bg-card p-7">
+                  <div className="mb-4 flex items-center gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-paper-raise text-lg font-extrabold text-muted">
+                      {member.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-extrabold">{member.name}</h3>
+                      <p className="text-sm text-accent">{member.role}</p>
+                    </div>
+                  </div>
+                  {member.bio ? (
+                    <p className="text-[13.5px] leading-relaxed text-muted">{member.bio}</p>
+                  ) : (
+                    <p className="text-[13.5px] italic leading-relaxed text-muted/70">
+                      Photo and bio coming soon.
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 

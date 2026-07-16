@@ -1,5 +1,6 @@
-import Header, { WHATSAPP_URL } from "./components/Header";
+import Header from "./components/Header";
 import Footer from "./components/Footer";
+import ConsultationForm from "./components/ConsultationForm";
 
 const STATS = [
   { value: "9.3K", label: "Enrolled" },
@@ -8,11 +9,11 @@ const STATS = [
 ];
 
 const DEPARTURES = [
-  { city: "Seoul", program: "Language + University", intake: "Mar", status: "Open" as const },
   { city: "Melbourne", program: "VET + Bachelor", intake: "Feb", status: "Open" as const },
   { city: "Toronto", program: "Undergraduate", intake: "Sep", status: "3 Seats" as const },
   { city: "Osaka", program: "Language School", intake: "Apr", status: "Open" as const },
   { city: "London", program: "Postgraduate", intake: "Sep", status: "Open" as const },
+  { city: "Beijing", program: "Language + University", intake: "Mar", status: "Open" as const },
 ];
 
 const PARTNER_ALUMNI = ["KAIST", "Seoul Nat'l Univ", "U. Toronto", "UCL", "UBC"];
@@ -25,18 +26,26 @@ const SERVICES = [
 ];
 
 const JOURNEY_STEPS = [
-  { title: "Discover", description: "Free session to shortlist programs and countries." },
-  { title: "Apply", description: "Applications and essays reviewed before submission." },
-  { title: "Visa", description: "Documents, financials, and interview coaching." },
-  { title: "Pre-departure", description: "Housing, insurance, and orientation briefing." },
-  { title: "Arrival", description: "Airport pickup coordination and local check-in." },
+  { title: "Personal Assessment", description: "Explore your study goals, country preference, and career path." },
+  { title: "Document & Finance Check", description: "Review academic and financial readiness." },
+  { title: "Admission Process", description: "Apply and secure offers from partner universities." },
+  { title: "Visa & Immigration", description: "Full support for a smooth application process." },
+  { title: "Pre-Departure Prep", description: "Orientation, accommodation, and travel guidance." },
+  { title: "Enrollment Abroad", description: "Begin your study journey with confidence." },
+];
+
+const LANGUAGE_PROGRAMS = [
+  { name: "General English", href: "/language-programs#general-english" },
+  { name: "Conversation Class", href: "/language-programs#conversation-class" },
+  { name: "IELTS", href: "/language-programs#ielts" },
+  { name: "JLPT", href: "/language-programs#jlpt" },
 ];
 
 const DESTINATIONS = [
-  { country: "South Korea", cities: "Seoul · Busan · Daegu", tag: "Open", gradient: "from-[#153A5B] to-[#0A1D30]" },
-  { country: "Australia", cities: "Melbourne · Sydney", tag: "Open", gradient: "from-[#1E78C7] to-[#0C2F4E]" },
-  { country: "Japan", cities: "Osaka · Tokyo", tag: "3 seats", gradient: "from-[#C7297E] to-[#4E0F32]" },
-  { country: "Malaysia", cities: "Kuala Lumpur", tag: "Open", gradient: "from-[#2E9E7A] to-[#0F3D2F]" },
+  { country: "Australia", slug: "australia", cities: "Melbourne · Sydney", tag: "Open", gradient: "from-[#1E78C7] to-[#0C2F4E]" },
+  { country: "Japan", slug: "japan", cities: "Osaka · Tokyo", tag: "3 seats", gradient: "from-[#C7297E] to-[#4E0F32]" },
+  { country: "United Kingdom", slug: "uk", cities: "London · Manchester", tag: "Open", gradient: "from-[#153A5B] to-[#0A1D30]" },
+  { country: "Canada", slug: "canada", cities: "Toronto · Vancouver", tag: "Open", gradient: "from-[#2E9E7A] to-[#0F3D2F]" },
 ];
 
 const TESTIMONIALS = [
@@ -82,7 +91,7 @@ export default function Home() {
                 <a href="/study-abroad" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-transform hover:scale-[1.03]">
                   Find Course
                 </a>
-                <a href={WHATSAPP_URL} className="rounded-full border border-line px-6 py-3 text-sm font-semibold hover:bg-paper-raise">
+                <a href="#consultation" className="rounded-full border border-line px-6 py-3 text-sm font-semibold hover:bg-paper-raise">
                   Book a free session
                 </a>
               </div>
@@ -174,13 +183,14 @@ export default function Home() {
                 The journey
               </div>
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
-                Five stamps in your passport, one process.
+                Your journey to study abroad, simplified in 6 steps.
               </h2>
               <p className="text-[15.5px] leading-relaxed text-muted">
-                The actual sequence every student goes through with their counselor.
+                From your first consultation to landing at your dream university, we guide you
+                every step of the way.
               </p>
             </div>
-            <div className="relative grid gap-7 sm:grid-cols-5 sm:before:absolute sm:before:left-[5%] sm:before:right-[5%] sm:before:top-[11px] sm:before:h-px sm:before:bg-line sm:before:content-['']">
+            <div className="relative grid gap-7 sm:grid-cols-3 lg:grid-cols-6 lg:before:absolute lg:before:left-[5%] lg:before:right-[5%] lg:before:top-[11px] lg:before:h-px lg:before:bg-line lg:before:content-['']">
               {JOURNEY_STEPS.map((step, i) => (
                 <div key={step.title} className="relative px-0 sm:px-3.5">
                   <div
@@ -211,8 +221,9 @@ export default function Home() {
             </div>
             <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-4">
               {DESTINATIONS.map((dest) => (
-                <div
+                <a
                   key={dest.country}
+                  href={`/study-abroad/${dest.slug}`}
                   className={`relative flex aspect-3/4 flex-col justify-end overflow-hidden rounded-2xl bg-gradient-to-b p-4.5 text-white ${dest.gradient}`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/85" />
@@ -221,7 +232,37 @@ export default function Home() {
                   </span>
                   <h4 className="relative text-lg font-bold">{dest.country}</h4>
                   <span className="relative text-xs opacity-85">{dest.cities}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Language programs */}
+        <section className="py-19">
+          <div className="mx-auto max-w-6xl px-7">
+            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
+                  Browse our language program
                 </div>
+                <h2 className="text-3xl font-extrabold tracking-tight">
+                  Get exam-ready or just conversation-ready.
+                </h2>
+              </div>
+              <a href="/language-programs" className="text-sm font-semibold text-accent hover:underline">
+                See all programs →
+              </a>
+            </div>
+            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+              {LANGUAGE_PROGRAMS.map((program) => (
+                <a
+                  key={program.name}
+                  href={program.href}
+                  className="rounded-xl border border-line bg-card px-5 py-4.5 font-bold transition-colors hover:border-accent/40"
+                >
+                  {program.name}
+                </a>
               ))}
             </div>
           </div>
@@ -251,23 +292,22 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-19">
-          <div className="mx-auto max-w-6xl px-7">
-            <div className="flex flex-col items-center gap-4.5 rounded-3xl bg-ink px-8 py-14 text-center text-white">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-white/25 px-2.5 py-1 font-mono text-[11px] text-white/70">
-                ✓ Rebuilt on Next.js — indexed for search &amp; AI answer engines
-              </span>
-              <h2 className="max-w-xs text-3xl font-extrabold sm:max-w-md">
-                Ready to see your name on a departures board?
+        {/* Free consultation form */}
+        <section id="consultation" className="scroll-mt-20 bg-paper-raise py-19">
+          <div className="mx-auto max-w-3xl px-7">
+            <div className="mb-8 text-center">
+              <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
+                Free Consultation
+              </div>
+              <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
+                Tell us your study plans, we&apos;ll do the rest.
               </h2>
-              <p className="max-w-md text-white/70">
-                Book a free 30-minute session. No obligation, no fees to talk.
+              <p className="mx-auto max-w-lg text-[15.5px] leading-relaxed text-muted">
+                No obligation, no fees to talk. A counselor reviews your details and replies with
+                a personalized recommendation.
               </p>
-              <a href={WHATSAPP_URL} className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/30">
-                Book a free session
-              </a>
             </div>
+            <ConsultationForm />
           </div>
         </section>
       </main>

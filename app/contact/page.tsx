@@ -4,15 +4,21 @@ import Footer from "../components/Footer";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Book a free consultation with an iStudentPlus counselor via WhatsApp, or reach our Sydney and Makassar offices.",
+  description: "Book a free consultation with an iStudentPlus counselor via WhatsApp, or reach our Pangkalpinang and Makassar offices.",
 };
 
 const OFFICES = [
-  { city: "Sydney", country: "Australia" },
-  { city: "Makassar", country: "Indonesia" },
+  { city: "Pangkalpinang", country: "Indonesia", status: null },
+  { city: "Makassar", country: "Indonesia", status: null },
+  { city: "Jakarta", country: "Indonesia", status: "Coming Soon" },
 ];
 
 const LANGUAGES = ["Indonesian", "English", "Chinese", "Japanese", "French"];
+
+const SOCIALS = [
+  { label: "Instagram", href: "#" },
+  { label: "Facebook", href: "#" },
+];
 
 export default function ContactPage() {
   return (
@@ -48,9 +54,14 @@ export default function ContactPage() {
                 <span className="text-2xl">→</span>
               </a>
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-3">
                 {OFFICES.map((office) => (
-                  <div key={office.city} className="rounded-2xl border border-line bg-card p-5">
+                  <div key={office.city} className="relative rounded-2xl border border-line bg-card p-5">
+                    {office.status && (
+                      <span className="absolute right-4 top-4 rounded-full bg-sky-ink px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-sky">
+                        {office.status}
+                      </span>
+                    )}
                     <div className="mb-1 text-xs font-bold uppercase tracking-widest text-accent">
                       Office
                     </div>
@@ -70,6 +81,22 @@ export default function ContactPage() {
                       {lang}
                     </span>
                   ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl border border-line bg-card p-5">
+                <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
+                  Social Media
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {SOCIALS.map((s) => (
+                    <a key={s.label} href={s.href} className="rounded-full border border-line px-4 py-1.5 text-[13px] font-semibold hover:bg-paper-raise">
+                      {s.label}
+                    </a>
+                  ))}
+                  <a href={WHATSAPP_URL} className="rounded-full bg-accent px-4 py-1.5 text-[13px] font-semibold text-white">
+                    WhatsApp
+                  </a>
                 </div>
               </div>
             </div>
