@@ -12,9 +12,14 @@ export type Country = {
   tag: string;
   cities: string;
   gradient: string;
+  image?: string;
+  imageLabel?: string;
   whyStudy: string;
   overview: CountryOverview;
   featuredPrograms?: { name: string; description: string; href: string }[];
+  keyFacts?: { label: string; value: string }[];
+  livingCosts?: { expense: string; range: string }[];
+  visaRequirements?: string[];
 };
 
 export const COUNTRIES: Country[] = [
@@ -24,16 +29,44 @@ export const COUNTRIES: Country[] = [
     tag: "Open",
     cities: "Melbourne · Sydney",
     gradient: "from-[#1E78C7] to-[#0C2F4E]",
+    image: "/destinations/australia.jpg",
     whyStudy:
-      "Australia pairs globally ranked universities with a strong vocational (VET) pathway, " +
-      "post-study work rights, and one of the largest international student communities in the world.",
+      "Australia is the fourth most popular destination for international students — offering " +
+      "more than 1,200 schools with over 22,000 courses, high-ranked universities, and the " +
+      "chance to work while you study and after you graduate.",
     overview: {
-      livingCost: "Varies by city — Melbourne and Sydney run higher than regional areas. Ask your counselor for a current cost-of-living breakdown by city.",
-      career: "Clear post-study work visa pathways and strong demand in IT, engineering, health, and hospitality sectors.",
+      livingCost: "Varies by city — Melbourne and Sydney run higher than regional areas. See the monthly cost breakdown below.",
+      career: "International students may work while studying, with clear post-study work visa pathways in IT, engineering, health, and hospitality.",
       admission: "Requirements vary by qualification level (VET, Bachelor, Master) — your counselor matches documents to the right pathway.",
       accommodation: "On-campus dorms, homestays, and shared apartments, arranged before departure.",
       culture: "Multicultural, English-speaking, with a large and active Indonesian student community.",
     },
+    keyFacts: [
+      { label: "Languages spoken", value: "English" },
+      { label: "Cost of study", value: "AUD 20,000 – AUD 45,000 / year" },
+      { label: "Sources of funding", value: "Scholarships, grants, bursaries, work opportunities, and financial aid" },
+      { label: "Exams required", value: "IELTS/TOEFL and GMAT/GRE" },
+      { label: "Degrees", value: "Diploma, Bachelor's, Master's, Doctorate" },
+      { label: "Intakes", value: "February/March and July/August" },
+      { label: "Visa", value: "Subclass 500 visa" },
+    ],
+    livingCosts: [
+      { expense: "Accommodation", range: "AUD 800 – 2,500" },
+      { expense: "Groceries", range: "AUD 300 – 500" },
+      { expense: "Transportation", range: "AUD 100 – 200" },
+      { expense: "Dining out", range: "AUD 300 – 500" },
+      { expense: "Utilities", range: "AUD 150 – 250" },
+      { expense: "Internet & mobile", range: "AUD 50 – 100" },
+      { expense: "Miscellaneous", range: "AUD 200 – 400" },
+    ],
+    visaRequirements: [
+      "Confirmation of Enrollment (CoE) from a recognised Australian educational institution",
+      "Proof of sufficient financial resources to cover tuition, living expenses, and return travel",
+      "English language proficiency test results (e.g., IELTS, TOEFL)",
+      "Overseas Student Health Cover (OSHC) to cover medical expenses",
+      "Genuine Temporary Entrant (GTE) statement",
+      "Meet health and character requirements",
+    ],
     featuredPrograms: [
       {
         name: "VET Courses",
@@ -58,6 +91,7 @@ export const COUNTRIES: Country[] = [
     tag: "Open",
     cities: "London · Manchester",
     gradient: "from-[#153A5B] to-[#0A1D30]",
+    image: "/destinations/uk.jpg",
     whyStudy:
       "The UK offers shorter degree lengths (3-year Bachelor's, 1-year Master's), centuries-old " +
       "institutions, and a Graduate visa route that lets students stay on to work after graduation.",
@@ -75,6 +109,7 @@ export const COUNTRIES: Country[] = [
     tag: "Open",
     cities: "New York · Boston",
     gradient: "from-[#2E9E7A] to-[#0F3D2F]",
+    image: "/destinations/usa.jpg",
     whyStudy:
       "The US has the widest range of institutions and majors, flexible liberal-arts-style " +
       "degrees, and Optional Practical Training (OPT) for hands-on work experience after study.",
@@ -92,6 +127,7 @@ export const COUNTRIES: Country[] = [
     tag: "Open",
     cities: "Toronto · Vancouver",
     gradient: "from-[#C7297E] to-[#4E0F32]",
+    image: "/destinations/canada.jpg",
     whyStudy:
       "Canada is known for accessible tuition relative to the US/UK, a straightforward Post-Graduation " +
       "Work Permit (PGWP), and clear pathways toward permanent residency.",
@@ -109,6 +145,8 @@ export const COUNTRIES: Country[] = [
     tag: "Open",
     cities: "Beijing · Shanghai",
     gradient: "from-[#B85042] to-[#3E1A0C]",
+    image: "/destinations/china.jpg",
+    imageLabel: "Kuliah di Tiongkok",
     whyStudy:
       "China offers a growing number of English-taught programs, government and university " +
       "scholarships, and strong options for students pairing Mandarin study with their degree.",
@@ -126,6 +164,8 @@ export const COUNTRIES: Country[] = [
     tag: "3 seats",
     cities: "Osaka · Tokyo",
     gradient: "from-[#7A5C1E] to-[#2E2007]",
+    image: "/destinations/japan.jpg",
+    imageLabel: "Kuliah di Jepang",
     whyStudy:
       "Japan pairs respected universities and language schools with JLPT-linked pathways, making " +
       "it a strong fit for students combining language study with a degree or career move.",

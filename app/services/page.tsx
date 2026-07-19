@@ -7,7 +7,38 @@ export const metadata: Metadata = {
   description: "Visa & Admission support and Admission Counselling from iStudentPlus education consultants.",
 };
 
-const VISA_TYPES = ["Student visa", "Dependent visa", "Graduate visa"];
+const VISA_SERVICES = [
+  {
+    name: "Student Visa",
+    intro: "Want to study in Australia? We'll help you get the right visa so you can study, work part-time, and enjoy Aussie life.",
+    points: ["Work up to 48 hours per fortnight", "Study at top institutions", "Step-by-step guidance"],
+  },
+  {
+    name: "Student Visa Renewal",
+    intro: "Need to extend your stay? We make it simple.",
+    points: ["No last-minute stress", "Course extension options", "Full application support"],
+  },
+  {
+    name: "Working Holiday Visa",
+    intro: "Work & travel across Australia for up to a year (or more).",
+    points: ["Earn money while exploring", "Study for up to 4 months", "Easy extensions available"],
+  },
+  {
+    name: "Tourist Visa",
+    intro: "Short stay? No worries.",
+    points: ["Explore Australia for up to 3, 6, or 12 months", "Simple application process", "Option to extend (conditions apply)"],
+  },
+  {
+    name: "Visa Advice with IMMagine Immigration",
+    intro: "Not sure which visa is right for you? We've got experts for that.",
+    points: ["PR & skilled migration pathways", "Post-study visa options", "Personalised consultations"],
+  },
+  {
+    name: "Housing with Middow",
+    intro: "Need a place to stay? We've got student-friendly housing sorted.",
+    points: ["Affordable & secure accommodation", "Locations across Australia", "Easy booking process"],
+  },
+];
 
 const PITFALLS = [
   "Incomplete or inconsistent application forms",
@@ -72,25 +103,30 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            <div className="grid gap-4.5 sm:grid-cols-2">
-              <div className="rounded-2xl border border-line bg-card p-6">
-                <h3 className="mb-3 font-bold">We cover</h3>
-                <div className="flex flex-wrap gap-2">
-                  {VISA_TYPES.map((v) => (
-                    <span key={v} className="rounded-full bg-paper-raise px-3 py-1 text-[12.5px] font-medium">
-                      {v}
-                    </span>
-                  ))}
+            <div className="mb-4.5 grid gap-4.5 sm:grid-cols-2 lg:grid-cols-3">
+              {VISA_SERVICES.map((service) => (
+                <div key={service.name} className="rounded-2xl border border-line bg-card p-6">
+                  <h3 className="mb-2 font-bold">{service.name}</h3>
+                  <p className="mb-3 text-[13px] leading-relaxed text-muted">{service.intro}</p>
+                  <ul className="flex flex-col gap-1.5 text-[13px] text-muted">
+                    {service.points.map((p) => (
+                      <li key={p} className="flex gap-2">
+                        <span className="text-emerald-600">✓</span>
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-              <div className="rounded-2xl border border-line bg-card p-6">
-                <h3 className="mb-3 font-bold">Common pitfalls to avoid</h3>
-                <ul className="flex flex-col gap-1.5 text-[13.5px] text-muted">
-                  {PITFALLS.map((p) => (
-                    <li key={p}>• {p}</li>
-                  ))}
-                </ul>
-              </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-line bg-card p-6">
+              <h3 className="mb-3 font-bold">Common pitfalls to avoid</h3>
+              <ul className="flex flex-col gap-1.5 text-[13.5px] text-muted">
+                {PITFALLS.map((p) => (
+                  <li key={p}>• {p}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="mt-4.5 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-line bg-paper-raise p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -137,14 +173,22 @@ export default function ServicesPage() {
               ))}
             </div>
 
-            <div className="mb-8 rounded-2xl border border-line bg-card p-6">
-              <h3 className="mb-4 font-bold">FAQs</h3>
-              <div className="flex flex-col gap-4">
+            <div className="mb-8">
+              <h3 className="mb-4 text-center text-xl font-extrabold">
+                Frequently Asked Questions (FAQ)
+              </h3>
+              <div className="flex flex-col gap-3">
                 {FAQS.map((faq) => (
-                  <div key={faq.q}>
-                    <div className="mb-1 text-[14.5px] font-semibold">{faq.q}</div>
-                    <p className="text-[13.5px] leading-relaxed text-muted">{faq.a}</p>
-                  </div>
+                  <details key={faq.q} className="group rounded-xl border border-line bg-card px-5 py-4">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-[14.5px] font-bold [&::-webkit-details-marker]:hidden">
+                      <span className="flex items-center gap-3">
+                        <span className="text-lg font-bold text-accent group-open:rotate-45 transition-transform">+</span>
+                        {faq.q}
+                      </span>
+                      <span className="text-muted transition-transform group-open:rotate-90">›</span>
+                    </summary>
+                    <p className="mt-3 pl-7 text-[13.5px] leading-relaxed text-muted">{faq.a}</p>
+                  </details>
                 ))}
               </div>
             </div>

@@ -34,14 +34,28 @@ export default function StudyAbroadPage() {
                 <Link
                   key={dest.slug}
                   href={`/study-abroad/${dest.slug}`}
-                  className={`relative flex aspect-4/3 flex-col justify-end overflow-hidden rounded-2xl bg-gradient-to-b p-5 text-white ${dest.gradient}`}
+                  className={`relative flex aspect-2/1 flex-col justify-end overflow-hidden rounded-2xl bg-gradient-to-b p-4 text-white transition-transform hover:scale-[1.02] ${dest.gradient}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/85" />
-                  <span className="absolute left-4 top-4 rounded-full bg-white/20 px-2 py-1 text-[10.5px] font-bold uppercase tracking-wide backdrop-blur-sm">
-                    {dest.tag}
-                  </span>
-                  <h4 className="relative text-xl font-bold">{dest.name}</h4>
-                  <span className="relative text-xs opacity-85">{dest.cities}</span>
+                  {dest.image && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={dest.image}
+                      alt={`Kuliah di ${dest.name}`}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  )}
+                  {dest.imageLabel && (
+                    <span className="relative text-lg font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
+                      {dest.imageLabel}
+                    </span>
+                  )}
+                  {!dest.image && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/85" />
+                      <h4 className="relative text-lg font-bold">{dest.name}</h4>
+                      <span className="relative text-xs opacity-85">{dest.cities}</span>
+                    </>
+                  )}
                 </Link>
               ))}
             </div>

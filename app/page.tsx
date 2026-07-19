@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ConsultationForm from "./components/ConsultationForm";
+import { COUNTRIES } from "./study-abroad/data";
 
 const STATS = [
   { value: "9.3K", label: "Enrolled" },
@@ -19,10 +21,30 @@ const DEPARTURES = [
 const PARTNER_ALUMNI = ["KAIST", "Seoul Nat'l Univ", "U. Toronto", "UCL", "UBC"];
 
 const SERVICES = [
-  { name: "Education Counseling", description: "Program and university matching based on grades, budget, and goals." },
-  { name: "Visa Application", description: "Document prep and mock interviews with former visa officers." },
-  { name: "Student Accommodation", description: "Verified dorms and homestays arranged before you land." },
-  { name: "Pre-Departure", description: "Orientation, insurance, and travel briefing before you fly." },
+  {
+    name: "Education Counseling",
+    description: "Program and university matching based on grades, budget, and goals.",
+    href: "/services#admission-counselling",
+    bg: "bg-[#FDF3C7]",
+  },
+  {
+    name: "Visa Application",
+    description: "Document prep and full support for a smooth application process.",
+    href: "/services#visa-admission",
+    bg: "bg-[#FBDCE5]",
+  },
+  {
+    name: "Student Accommodation",
+    description: "Verified dorms and homestays arranged before you land.",
+    href: "/services#visa-admission",
+    bg: "bg-[#D9F3EC]",
+  },
+  {
+    name: "Pre-Departure",
+    description: "Orientation, insurance, and travel briefing before you fly.",
+    href: "/services",
+    bg: "bg-[#E6E1F7]",
+  },
 ];
 
 const JOURNEY_STEPS = [
@@ -34,6 +56,10 @@ const JOURNEY_STEPS = [
   { title: "Enrollment Abroad", description: "Begin your study journey with confidence." },
 ];
 
+const DESTINATIONS = COUNTRIES.filter((c) =>
+  ["australia", "japan", "uk", "canada"].includes(c.slug)
+);
+
 const LANGUAGE_PROGRAMS = [
   { name: "General English", href: "/language-programs#general-english" },
   { name: "Conversation Class", href: "/language-programs#conversation-class" },
@@ -41,17 +67,34 @@ const LANGUAGE_PROGRAMS = [
   { name: "JLPT", href: "/language-programs#jlpt" },
 ];
 
-const DESTINATIONS = [
-  { country: "Australia", slug: "australia", cities: "Melbourne · Sydney", tag: "Open", gradient: "from-[#1E78C7] to-[#0C2F4E]" },
-  { country: "Japan", slug: "japan", cities: "Osaka · Tokyo", tag: "3 seats", gradient: "from-[#C7297E] to-[#4E0F32]" },
-  { country: "United Kingdom", slug: "uk", cities: "London · Manchester", tag: "Open", gradient: "from-[#153A5B] to-[#0A1D30]" },
-  { country: "Canada", slug: "canada", cities: "Toronto · Vancouver", tag: "Open", gradient: "from-[#2E9E7A] to-[#0F3D2F]" },
-];
-
 const TESTIMONIALS = [
-  { quote: "My counselor caught a missing bank statement two days before my visa interview.", name: "Jennifer", destination: "KAIST & Seoul National University" },
-  { quote: "Accommodation was sorted before I even booked my flight.", name: "Nareswari", destination: "University of Toronto, UBC Okanagan" },
-  { quote: "Four offers, one counselor keeping every deadline straight.", name: "Hafiz", destination: "UBC & Monash University" },
+  {
+    name: "Kak Jennifer",
+    photo: "/testimonials/jennifer.jpg",
+    badge: "Student IELTS & Mentoring",
+    loa: ["KAIST"],
+    more: null,
+    quote:
+      "My mentor kindly helped answer questions when I struggled with the application form — and the IELTS guidance was a huge help.",
+  },
+  {
+    name: "Kak Nareswari",
+    photo: "/testimonials/nareswari.jpg",
+    badge: "Student Mentoring",
+    loa: ["University of Toronto, Mississauga", "University of Toronto, St. George", "UBC Okanagan"],
+    more: "and 9 other campuses",
+    quote:
+      "The mentoring program was effective and exciting at once — experienced mentors whose essay feedback carried real weight.",
+  },
+  {
+    name: "Kak Hafiz",
+    photo: "/testimonials/hafiz.jpg",
+    badge: "Student Mentoring",
+    loa: ["The University of British Columbia", "City University of Hongkong", "University of Western Australia", "Monash University"],
+    more: "and 6 other campuses",
+    quote:
+      "Everything was personalized — flexible sessions, a neatly organized target timeline, and detailed essay proofreading.",
+  },
 ];
 
 function StatusPill({ status }: { status: "Open" | "3 Seats" }) {
@@ -73,13 +116,10 @@ export default function Home() {
       <Header />
 
       <main>
-        {/* Hero */}
-        <section className="pt-16">
-          <div className="mx-auto grid max-w-6xl items-center gap-14 px-7 lg:grid-cols-[1.1fr_0.9fr]">
+        {/* Hero — reference: text left, student photo over organic shapes right */}
+        <section className="pt-14">
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-7 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
-              <div className="mb-4.5 inline-flex items-center gap-2 rounded-full bg-sky-ink px-3 py-1 text-xs font-bold uppercase tracking-widest text-sky">
-                100+ Partner Universities Worldwide
-              </div>
               <h1 className="mb-5.5 text-4xl font-extrabold leading-[1.08] tracking-tight text-balance sm:text-5xl">
                 More Than <span className="text-accent">100+</span> Partner Universities Worldwide
               </h1>
@@ -89,7 +129,7 @@ export default function Home() {
               </p>
               <div className="mb-9 flex items-center gap-3.5">
                 <a href="/study-abroad" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-transform hover:scale-[1.03]">
-                  Find Course
+                  Find Course →
                 </a>
                 <a href="#consultation" className="rounded-full border border-line px-6 py-3 text-sm font-semibold hover:bg-paper-raise">
                   Book a free session
@@ -105,35 +145,19 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Departure board */}
-            <div className="rounded-2xl bg-ink px-5.5 pb-2.5 pt-5.5 font-mono text-white shadow-2xl shadow-ink/20">
-              <div className="mb-1 flex items-baseline justify-between border-b border-white/20 pb-3.5">
-                <h3 className="text-[13px] font-bold uppercase tracking-widest">Departures — Intake 2026</h3>
-                <span className="text-xs opacity-70">SYNCED 07 JUL</span>
-              </div>
-              <div className="grid grid-cols-[1.4fr_1.6fr_0.9fr_0.9fr] gap-2.5 border-b border-white/25 py-2 text-[10.5px] uppercase tracking-wide opacity-55">
-                <span>City</span>
-                <span>Program</span>
-                <span>Intake</span>
-                <span>Status</span>
-              </div>
-              {DEPARTURES.map((row) => (
-                <div
-                  key={row.city}
-                  className="grid grid-cols-[1.4fr_1.6fr_0.9fr_0.9fr] items-center gap-2.5 border-b border-dashed border-white/15 py-3.5 text-[13.5px]"
-                >
-                  <span className="font-bold">{row.city}</span>
-                  <span className="opacity-75">{row.program}</span>
-                  <span>{row.intake}</span>
-                  <StatusPill status={row.status} />
-                </div>
-              ))}
-            </div>
+            <Image
+              src="/hero-student.jpg"
+              alt="Student ready to study abroad"
+              width={988}
+              height={940}
+              priority
+              className="mx-auto w-full max-w-md mix-blend-multiply lg:max-w-lg"
+            />
           </div>
         </section>
 
         {/* Trust strip */}
-        <div className="mt-16 border-y border-line bg-paper-raise py-6.5">
+        <div className="border-y border-line bg-paper-raise py-6.5">
           <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-5 px-7 font-mono text-[13px] text-muted">
             {PARTNER_ALUMNI.map((name) => (
               <div key={name}>
@@ -144,72 +168,102 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Services */}
+        {/* Services — reference: pastel cards carousel */}
         <section className="py-19">
           <div className="mx-auto max-w-6xl px-7">
             <div className="mb-11 max-w-xl">
-              <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
-                What we handle
-              </div>
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
-                Everything between &quot;I want to study abroad&quot; and the arrivals hall.
+                With you at every step of your study abroad journey.
               </h2>
               <p className="text-[15.5px] leading-relaxed text-muted">
-                Four services, one counselor, no dropped handoffs between departments.
+                Get personalised, friendly, honest guidance for free.
               </p>
             </div>
             <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-4">
-              {SERVICES.map((service, i) => (
-                <div key={service.name} className="relative overflow-hidden rounded-xl border border-line bg-card p-6 pt-5.5">
-                  <div className="absolute right-3.5 top-3.5 h-11.5 w-11.5 -rotate-12 rounded-full border-2 border-sky opacity-30" />
-                  <div className="mb-3.5 font-mono text-[13px] text-muted">{String(i + 1).padStart(2, "0")}</div>
-                  <h4 className="mb-2 text-[16.5px] font-bold">{service.name}</h4>
-                  <p className="text-[13.5px] leading-relaxed text-muted">{service.description}</p>
-                </div>
+              {SERVICES.map((service) => (
+                <a
+                  key={service.name}
+                  href={service.href}
+                  className={`flex flex-col justify-between rounded-2xl p-6 text-ink transition-transform hover:scale-[1.02] ${service.bg}`}
+                >
+                  <div>
+                    <h4 className="mb-2 text-[16.5px] font-extrabold">{service.name}</h4>
+                    <p className="mb-6 text-[13.5px] leading-relaxed opacity-70">{service.description}</p>
+                  </div>
+                  <span className="text-[13px] font-bold">Know more &gt;</span>
+                </a>
               ))}
             </div>
           </div>
         </section>
 
-        <div className="mx-auto max-w-6xl px-7">
-          <div className="stub" />
-        </div>
-
-        {/* Journey */}
-        <section className="py-19">
+        {/* Journey — reference: vertical numbered timeline + visual right */}
+        <section className="bg-paper-raise py-19">
           <div className="mx-auto max-w-6xl px-7">
-            <div className="mb-11 max-w-xl">
-              <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
-                The journey
-              </div>
+            <div className="mb-11 text-center">
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
                 Your journey to study abroad, simplified in 6 steps.
               </h2>
-              <p className="text-[15.5px] leading-relaxed text-muted">
+              <p className="mx-auto max-w-lg text-[15.5px] leading-relaxed text-muted">
                 From your first consultation to landing at your dream university, we guide you
                 every step of the way.
               </p>
             </div>
-            <div className="relative grid gap-7 sm:grid-cols-3 lg:grid-cols-6 lg:before:absolute lg:before:left-[5%] lg:before:right-[5%] lg:before:top-[11px] lg:before:h-px lg:before:bg-line lg:before:content-['']">
-              {JOURNEY_STEPS.map((step, i) => (
-                <div key={step.title} className="relative px-0 sm:px-3.5">
+
+            <div className="grid items-center gap-10 lg:grid-cols-[1fr_0.9fr]">
+              <div className="relative flex flex-col gap-2.5 before:absolute before:bottom-6 before:left-[21px] before:top-6 before:w-px before:bg-line before:content-['']">
+                {JOURNEY_STEPS.map((step, i) => (
                   <div
-                    className={`relative z-10 mb-4.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-ink font-mono text-[11px] font-bold ${
-                      i % 2 === 0 ? "bg-ink text-white" : "bg-white text-ink"
+                    key={step.title}
+                    className={`relative flex items-start gap-4 rounded-2xl px-3.5 py-3.5 ${
+                      i === 0 ? "border border-accent/20 bg-accent/5" : ""
                     }`}
                   >
-                    {i + 1}
+                    <div
+                      className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-[13px] font-bold ${
+                        i === 0 ? "bg-accent text-white" : "border border-line bg-card text-muted"
+                      }`}
+                    >
+                      {i + 1}
+                    </div>
+                    <div>
+                      <h4 className="text-[15px] font-extrabold">{step.title}</h4>
+                      <p className="text-[13px] leading-relaxed text-muted">{step.description}</p>
+                    </div>
                   </div>
-                  <h4 className="mb-1.5 text-[15px] font-bold">{step.title}</h4>
-                  <p className="text-[13px] leading-relaxed text-muted">{step.description}</p>
+                ))}
+              </div>
+
+              {/* Departure board */}
+              <div className="rounded-2xl bg-ink px-5.5 pb-2.5 pt-5.5 font-mono text-white shadow-2xl shadow-ink/20">
+                <div className="mb-1 flex items-baseline justify-between border-b border-white/20 pb-3.5">
+                  <h3 className="text-[13px] font-bold uppercase tracking-widest">Departures — Intake 2026</h3>
+                  <span className="text-xs opacity-70">SYNCED 07 JUL</span>
                 </div>
-              ))}
+                <div className="grid grid-cols-[1.4fr_1.6fr_0.9fr_0.9fr] gap-2.5 border-b border-white/25 py-2 text-[10.5px] uppercase tracking-wide opacity-55">
+                  <span>City</span>
+                  <span>Program</span>
+                  <span>Intake</span>
+                  <span>Status</span>
+                </div>
+                {DEPARTURES.map((row) => (
+                  <div
+                    key={row.city}
+                    className="grid grid-cols-[1.4fr_1.6fr_0.9fr_0.9fr] items-center gap-2.5 border-b border-dashed border-white/15 py-3.5 text-[13.5px]"
+                  >
+                    <span className="font-bold">{row.city}</span>
+                    <span className="opacity-75">{row.program}</span>
+                    <span>{row.intake}</span>
+                    <StatusPill status={row.status} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         {/* Destinations */}
-        <section id="destinations" className="bg-paper-raise py-19">
+        <section id="destinations" className="py-19">
           <div className="mx-auto max-w-6xl px-7">
             <div className="mb-11 max-w-xl">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
@@ -219,19 +273,33 @@ export default function Home() {
                 Four countries, most requested this intake.
               </h2>
             </div>
-            <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4.5 sm:grid-cols-2">
               {DESTINATIONS.map((dest) => (
                 <a
-                  key={dest.country}
+                  key={dest.slug}
                   href={`/study-abroad/${dest.slug}`}
-                  className={`relative flex aspect-3/4 flex-col justify-end overflow-hidden rounded-2xl bg-gradient-to-b p-4.5 text-white ${dest.gradient}`}
+                  className={`relative flex aspect-2/1 flex-col justify-end overflow-hidden rounded-2xl bg-gradient-to-b p-4.5 text-white transition-transform hover:scale-[1.02] ${dest.gradient}`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/85" />
-                  <span className="absolute left-3.5 top-3.5 rounded-full bg-white/20 px-2 py-1 text-[10.5px] font-bold uppercase tracking-wide backdrop-blur-sm">
-                    {dest.tag}
-                  </span>
-                  <h4 className="relative text-lg font-bold">{dest.country}</h4>
-                  <span className="relative text-xs opacity-85">{dest.cities}</span>
+                  {dest.image && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={dest.image}
+                      alt={`Kuliah di ${dest.name}`}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  )}
+                  {dest.imageLabel && (
+                    <span className="relative text-xl font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
+                      {dest.imageLabel}
+                    </span>
+                  )}
+                  {!dest.image && (
+                    <>
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/85" />
+                      <h4 className="relative text-lg font-bold">{dest.name}</h4>
+                      <span className="relative text-xs opacity-85">{dest.cities}</span>
+                    </>
+                  )}
                 </a>
               ))}
             </div>
@@ -239,7 +307,7 @@ export default function Home() {
         </section>
 
         {/* Language programs */}
-        <section className="py-19">
+        <section className="py-19 pt-0">
           <div className="mx-auto max-w-6xl px-7">
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
               <div>
@@ -268,24 +336,49 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section className="py-19">
+        {/* Testimonials — reference: avatar + badge + Raih LoA list */}
+        <section className="bg-sky-ink py-19">
           <div className="mx-auto max-w-6xl px-7">
-            <div className="mb-11 max-w-xl">
-              <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
-                Postcards from alumni
-              </div>
-              <h2 className="text-3xl font-extrabold tracking-tight">
-                They wrote back, from campus.
+            <div className="mb-11 text-center">
+              <h2 className="mb-2 text-3xl font-extrabold tracking-tight">
+                Alumni who made it, <span className="text-accent">on record</span>.
               </h2>
+              <p className="text-[15.5px] text-muted">
+                Accepted at 50+ top campuses across 15 different countries.
+              </p>
             </div>
             <div className="grid gap-5 lg:grid-cols-3">
               {TESTIMONIALS.map((t) => (
-                <div key={t.name} className="relative rounded-xl border border-line bg-card p-6.5">
-                  <div className="absolute right-4.5 top-4.5 h-8.5 w-8.5 rounded-full border-2 border-accent opacity-40" />
-                  <q className="mb-4.5 block text-base italic leading-relaxed">{t.quote}</q>
-                  <div className="text-[13px] font-bold">{t.name}</div>
-                  <div className="text-xs text-muted">→ {t.destination}</div>
+                <div key={t.name} className="flex flex-col rounded-3xl bg-card p-6.5 shadow-sm">
+                  <div className="mb-4 flex items-center gap-3.5">
+                    <Image
+                      src={t.photo}
+                      alt={t.name}
+                      width={82}
+                      height={82}
+                      loading="eager"
+                      className="h-12 w-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <div className="text-[15px] font-extrabold">{t.name}</div>
+                      <span className="inline-block rounded-full bg-[#FDF3C7] px-2.5 py-0.5 text-[10.5px] font-bold">
+                        {t.badge}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="mb-1.5 text-[13px] font-extrabold text-accent">Raih LoA:</div>
+                    <ul className="flex flex-col gap-1">
+                      {t.loa.map((uni) => (
+                        <li key={uni} className="flex gap-2 text-[13px] font-semibold">
+                          <span className="text-emerald-600">✓</span>
+                          {uni}
+                        </li>
+                      ))}
+                    </ul>
+                    {t.more && <div className="mt-1 pl-5 text-[12.5px] text-muted">{t.more}</div>}
+                  </div>
+                  <p className="text-[13.5px] leading-relaxed text-muted">{t.quote}</p>
                 </div>
               ))}
             </div>
@@ -293,7 +386,7 @@ export default function Home() {
         </section>
 
         {/* Free consultation form */}
-        <section id="consultation" className="scroll-mt-20 bg-paper-raise py-19">
+        <section id="consultation" className="scroll-mt-20 py-19">
           <div className="mx-auto max-w-3xl px-7">
             <div className="mb-8 text-center">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">

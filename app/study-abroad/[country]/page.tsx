@@ -71,6 +71,27 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
           </section>
         )}
 
+        {country.keyFacts && (
+          <section className="py-14">
+            <div className="mx-auto max-w-4xl px-7">
+              <div className="overflow-hidden rounded-2xl border border-line bg-card">
+                <div className="bg-sky-ink px-6 py-4 text-center text-lg font-extrabold text-ink">
+                  Key Facts to Study in {country.name}
+                </div>
+                {country.keyFacts.map((fact, i) => (
+                  <div
+                    key={fact.label}
+                    className={`grid gap-1 px-6 py-3.5 sm:grid-cols-[200px_1fr] ${i % 2 === 1 ? "bg-paper-raise/60" : ""}`}
+                  >
+                    <div className="text-sm font-bold">{fact.label}</div>
+                    <div className="text-sm text-muted">{fact.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         <section className="bg-paper-raise py-16">
           <div className="mx-auto max-w-5xl px-7">
             <h2 className="mb-6 text-2xl font-extrabold tracking-tight">Overview</h2>
@@ -86,6 +107,55 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
             </div>
           </div>
         </section>
+
+        {(country.livingCosts || country.visaRequirements) && (
+          <section className="py-16">
+            <div className="mx-auto grid max-w-5xl gap-6 px-7 lg:grid-cols-2">
+              {country.livingCosts && (
+                <div className="overflow-hidden rounded-2xl border border-line bg-card">
+                  <div className="px-6 pb-2 pt-5">
+                    <h3 className="text-lg font-extrabold">Cost of Living in {country.name}</h3>
+                    <p className="mt-1 text-[13px] text-muted">Approximate monthly expenses.</p>
+                  </div>
+                  <table className="w-full border-collapse text-sm">
+                    <thead>
+                      <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
+                        <th className="px-6 py-2 font-semibold">Expense</th>
+                        <th className="px-6 py-2 font-semibold">Cost range (monthly)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {country.livingCosts.map((row, i) => (
+                        <tr key={row.expense} className={i % 2 === 1 ? "bg-paper-raise/60" : ""}>
+                          <td className="px-6 py-2.5 font-semibold">{row.expense}</td>
+                          <td className="px-6 py-2.5 font-mono text-muted">{row.range}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {country.visaRequirements && (
+                <div className="rounded-2xl border border-line bg-card p-6">
+                  <h3 className="mb-1 text-lg font-extrabold">
+                    Student Visa Requirements
+                  </h3>
+                  <p className="mb-4 text-[13px] text-muted">
+                    What you need before applying — we help you prepare every item.
+                  </p>
+                  <ul className="flex flex-col gap-2.5">
+                    {country.visaRequirements.map((req) => (
+                      <li key={req} className="flex gap-2.5 text-[13.5px] leading-relaxed text-muted">
+                        <span className="mt-0.5 text-emerald-600">✓</span>
+                        {req}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         <section className="py-16">
           <div className="mx-auto max-w-5xl px-7 text-center">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -18,11 +19,13 @@ const TEAM = [
   {
     name: "Cindy Christella",
     role: "CEO & Education Consultant",
+    photo: null,
     bio: null,
   },
   {
     name: "Nur Fadillah",
     role: "Education Consultant",
+    photo: "/team/nur-fadillah.jpg",
     bio:
       "An Education Consultant with more than two years of experience assisting international " +
       "students in choosing the right study pathways abroad. Provides personalized guidance on " +
@@ -64,10 +67,51 @@ export default function AboutPage() {
             <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
               A global student network and <span className="text-accent">media agency</span>.
             </h1>
-            <p className="mx-auto max-w-xl text-[17px] leading-relaxed text-muted">
-              We promote inclusivity and empower students locally and internationally — helping
-              with educational and migration needs, with a focus on studying in Australia.
+            <p className="mx-auto mb-4 max-w-xl text-[17px] leading-relaxed text-muted">
+              iStudentPlus started in Australia and opened its first branch in Makassar in 2021.
+              Our team of international alumni — from China, the United States, and Australia —
+              brings deep experience in education and immigration.
             </p>
+            <p className="mx-auto max-w-xl text-[17px] leading-relaxed text-muted">
+              We are committed to expanding opportunities for Indonesian students to study
+              abroad, with the hope that every child gets an equal chance.
+            </p>
+          </div>
+        </section>
+
+        {/* Vision & Mission — reference: navy + orange cards */}
+        <section className="py-8">
+          <div className="mx-auto grid max-w-5xl gap-4.5 px-7 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="relative overflow-hidden rounded-3xl bg-ink p-8 text-white">
+              <div className="absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-white/10" />
+              <h2 className="relative mb-4 text-lg font-extrabold uppercase tracking-wide">Our Vision</h2>
+              <p className="relative mb-1 text-[15px]">Becoming</p>
+              <p className="relative mb-3">
+                <span className="mr-2 text-5xl font-extrabold">#1</span>
+                <span className="text-xl font-bold">Support System</span>
+              </p>
+              <p className="relative text-[15px] leading-relaxed">
+                for students to <b>study overseas</b> and <b>make a big impact</b>.
+              </p>
+            </div>
+            <div className="rounded-3xl bg-[#E8722C] p-8 text-white">
+              <h2 className="mb-5 text-lg font-extrabold uppercase tracking-wide">Our Mission</h2>
+              <ul className="flex flex-col gap-3.5">
+                <li className="flex gap-3 text-[15px] leading-relaxed">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FDF3C7] text-xs text-[#B8860B]">✓</span>
+                  <span>
+                    <b>Fully supporting the ambition</b> of students to reach their{" "}
+                    <b>dream of studying abroad</b>.
+                  </span>
+                </li>
+                <li className="flex gap-3 text-[15px] leading-relaxed">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FDF3C7] text-xs text-[#B8860B]">✓</span>
+                  <span>
+                    Creating a <b>comfortable, fun,</b> and <b>meaningful learning atmosphere</b>.
+                  </span>
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -78,7 +122,7 @@ export default function AboutPage() {
                 <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
                   Office
                 </div>
-                <h3 className="text-2xl font-extrabold">{office.city}</h3>
+                <h3 className="break-words text-2xl font-extrabold leading-tight">{office.city}</h3>
                 <div className="flex flex-wrap items-center justify-between gap-1.5">
                   <p className="text-muted">{office.country}</p>
                   {office.status && (
@@ -92,6 +136,25 @@ export default function AboutPage() {
           </div>
         </section>
 
+        <section className="border-y border-line bg-card py-12">
+          <div className="mx-auto max-w-5xl px-7">
+            <h2 className="mb-2 text-center text-2xl font-extrabold tracking-tight">
+              Our Certifications
+            </h2>
+            <p className="mx-auto mb-7 max-w-lg text-center text-[14px] leading-relaxed text-muted">
+              Member of The Law Society of NSW · QEAC #12929 (Cindy Christella, Qualified
+              Education Agent Counsellor) · ISEAA · Australia FutureUnlimited
+            </p>
+            <Image
+              src="/certifications.png"
+              alt="Certifications: Member of The Law Society of NSW, QEAC #12929, ISEAA, Australia FutureUnlimited"
+              width={2048}
+              height={459}
+              className="mx-auto w-full max-w-3xl"
+            />
+          </div>
+        </section>
+
         <section className="py-16">
           <div className="mx-auto max-w-5xl px-7">
             <h2 className="mb-3 text-3xl font-extrabold tracking-tight">Our Team</h2>
@@ -102,9 +165,19 @@ export default function AboutPage() {
               {TEAM.map((member) => (
                 <div key={member.name} className="rounded-2xl border border-line bg-card p-7">
                   <div className="mb-4 flex items-center gap-4">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-paper-raise text-lg font-extrabold text-muted">
-                      {member.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
-                    </div>
+                    {member.photo ? (
+                      <Image
+                        src={member.photo}
+                        alt={member.name}
+                        width={64}
+                        height={64}
+                        className="h-16 w-16 shrink-0 rounded-full object-cover object-[50%_55%]"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-paper-raise text-lg font-extrabold text-muted">
+                        {member.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                      </div>
+                    )}
                     <div>
                       <h3 className="text-lg font-extrabold">{member.name}</h3>
                       <p className="text-sm text-accent">{member.role}</p>

@@ -60,7 +60,7 @@ export default function ContactPage() {
                     <div className="mb-1 text-xs font-bold uppercase tracking-widest text-accent">
                       Office
                     </div>
-                    <div className="text-lg font-extrabold">{office.city}</div>
+                    <div className="break-words text-lg font-extrabold leading-tight">{office.city}</div>
                     <div className="flex flex-wrap items-center justify-between gap-1.5">
                       <div className="text-sm text-muted">{office.country}</div>
                       {office.status && (
