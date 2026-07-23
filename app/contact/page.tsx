@@ -1,26 +1,24 @@
 import type { Metadata } from "next";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import ContactForm from "../components/ContactForm";
+import { readContent } from "../../lib/content";
 
 export const metadata: Metadata = {
   title: "Contact",
   description: "Book a free consultation with an iStudentPlus counselor via WhatsApp, or reach our Pangkalpinang and Makassar offices.",
 };
 
-const OFFICES = [
-  { city: "Pangkalpinang", country: "Indonesia", status: null },
-  { city: "Makassar", country: "Indonesia", status: null },
-  { city: "Jakarta", country: "Indonesia", status: "Coming Soon" },
-];
+type Office = { city: string; country: string; status: string | null };
+type Social = { label: string; href: string };
+type Settings = { offices: Office[]; languages: string[]; socials: Social[] };
 
-const LANGUAGES = ["Indonesian", "English", "Chinese", "Japanese", "French"];
+export default async function ContactPage() {
+  const SETTINGS = await readContent<Settings>("settings");
+  const OFFICES = SETTINGS.offices;
+  const LANGUAGES = SETTINGS.languages;
+  const SOCIALS = SETTINGS.socials;
 
-const SOCIALS = [
-  { label: "Instagram", href: "#" },
-  { label: "Facebook", href: "#" },
-];
-
-export default function ContactPage() {
   return (
     <>
       <Header />
@@ -103,58 +101,7 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <form className="flex flex-col gap-4 rounded-2xl border border-line bg-card p-7">
-              <div>
-                <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
-                  Full name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  placeholder="Your name"
-                  className="w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent"
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  className="w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent"
-                />
-              </div>
-              <div>
-                <label htmlFor="destination" className="mb-1.5 block text-sm font-semibold">
-                  Interested destination
-                </label>
-                <input
-                  id="destination"
-                  type="text"
-                  placeholder="e.g. Australia, Korea, Japan"
-                  className="w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent"
-                />
-              </div>
-              <div>
-                <label htmlFor="message" className="mb-1.5 block text-sm font-semibold">
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  rows={4}
-                  placeholder="Tell us about your study plans"
-                  className="w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent"
-                />
-              </div>
-              <button
-                type="submit"
-                className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.02]"
-              >
-                Send message
-              </button>
-            </form>
+            <ContactForm />
           </div>
         </section>
       </main>

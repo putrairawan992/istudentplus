@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Education Counseling",
+    "description": "Program and university matching based on grades, budget, and goals.",
+    "href": "/services#admission-counselling",
+    "bg": "bg-[#FDF3C7]"
+  },
+  {
+    "name": "Visa Application",
+    "description": "Document prep and full support for a smooth application process.",
+    "href": "/services#visa-admission",
+    "bg": "bg-[#FBDCE5]"
+  },
+  {
+    "name": "Student Accommodation",
+    "description": "Verified dorms and homestays arranged before you land.",
+    "href": "/services#visa-admission",
+    "bg": "bg-[#D9F3EC]"
+  },
+  {
+    "name": "Pre-Departure",
+    "description": "Orientation, insurance, and travel briefing before you fly.",
+    "href": "/services",
+    "bg": "bg-[#E6E1F7]"
+  }
+]

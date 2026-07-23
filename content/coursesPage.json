@@ -1,0 +1,30 @@
+{
+  "qualifications": [
+    { "name": "VET / Diploma", "length": "6 months – 2 years", "benefit": "Hands-on learning, fast entry to the workforce." },
+    { "name": "Bachelor Degree", "length": "3–4 years", "benefit": "Broad academic foundation and global recognition." },
+    { "name": "Master Degree", "length": "1–2 years", "benefit": "Career advancement and specialization." },
+    { "name": "PhD", "length": "3+ years", "benefit": "Research depth and academic/migration pathways." },
+    { "name": "Language Study", "length": "Weeks – months", "benefit": "Builds proficiency ahead of a degree or work move." },
+    { "name": "Student Exchange", "length": "1 semester – 1 year", "benefit": "Global experience without leaving your home degree." }
+  ],
+  "popularFields": [
+    { "level": "Bachelor Degree", "fields": ["Business", "Engineering", "IT", "Health"] },
+    { "level": "VET / Diploma", "fields": ["Hospitality", "IT", "Business", "Design"] }
+  ],
+  "vetLevels": [
+    { "level": "Certificate I", "duration": "4–6 months", "outcome": "Competent operator" },
+    { "level": "Certificate II", "duration": "~1 year", "outcome": "Advanced operator" },
+    { "level": "Certificate III", "duration": "~1 year", "outcome": "Qualified tradesperson" },
+    { "level": "Certificate IV", "duration": "12–18 months", "outcome": "Supervisor" },
+    { "level": "Diploma", "duration": "18–24 months", "outcome": "Paraprofessional" },
+    { "level": "Advanced Diploma", "duration": "24–36 months", "outcome": "Junior manager" }
+  ],
+  "vetFields": [
+    "IT & Cybersecurity", "Tourism & Hospitality", "Business", "Engineering", "Construction",
+    "Agriculture", "Legal Studies", "Automotive", "Health Sciences", "Creative Industries"
+  ],
+  "highSchool": [
+    { "years": "Years 7–10 (Junior)", "description": "Core subjects — English, Mathematics, Science, History, Geography, Health/PE, the Arts — plus electives. Assessed via assignments, tests, and participation." },
+    { "years": "Years 11–12 (Senior)", "description": "State qualifications like HSC (NSW) or VCE (Victoria); academic or vocational subjects, leading to an ATAR for university entrance." }
+  ]
+}

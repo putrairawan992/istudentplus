@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Student Visa",
+    "intro": "Want to study in Australia? We'll help you get the right visa so you can study, work part-time, and enjoy Aussie life.",
+    "points": ["Work up to 48 hours per fortnight", "Study at top institutions", "Step-by-step guidance"]
+  },
+  {
+    "name": "Student Visa Renewal",
+    "intro": "Need to extend your stay? We make it simple.",
+    "points": ["No last-minute stress", "Course extension options", "Full application support"]
+  },
+  {
+    "name": "Working Holiday Visa",
+    "intro": "Work & travel across Australia for up to a year (or more).",
+    "points": ["Earn money while exploring", "Study for up to 4 months", "Easy extensions available"]
+  },
+  {
+    "name": "Tourist Visa",
+    "intro": "Short stay? No worries.",
+    "points": ["Explore Australia for up to 3, 6, or 12 months", "Simple application process", "Option to extend (conditions apply)"]
+  },
+  {
+    "name": "Visa Advice with IMMagine Immigration",
+    "intro": "Not sure which visa is right for you? We've got experts for that.",
+    "points": ["PR & skilled migration pathways", "Post-study visa options", "Personalised consultations"]
+  },
+  {
+    "name": "Housing with Middow",
+    "intro": "Need a place to stay? We've got student-friendly housing sorted.",
+    "points": ["Affordable & secure accommodation", "Locations across Australia", "Easy booking process"]
+  }
+]

@@ -1,14 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { WHATSAPP_URL } from "./Header";
+import { readContent } from "../../lib/content";
 
-const SOCIALS = [
-  { label: "Instagram", href: "#" },
-  { label: "Facebook", href: "#" },
-  { label: "WhatsApp", href: WHATSAPP_URL },
-];
+type Social = { label: string; href: string };
 
-export default function Footer() {
+export default async function Footer() {
+  const SETTINGS = await readContent<{ socials: Social[] }>("settings");
+  const SOCIALS = [...SETTINGS.socials, { label: "WhatsApp", href: WHATSAPP_URL }];
+
   return (
     <footer className="mt-5 border-t border-line py-14">
       <div className="mx-auto max-w-6xl px-7">

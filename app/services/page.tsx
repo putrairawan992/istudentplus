@@ -1,74 +1,33 @@
 import type { Metadata } from "next";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import { readContent } from "../../lib/content";
 
 export const metadata: Metadata = {
   title: "Services",
   description: "Visa & Admission support and Admission Counselling from iStudentPlus education consultants.",
 };
 
-const VISA_SERVICES = [
-  {
-    name: "Student Visa",
-    intro: "Want to study in Australia? We'll help you get the right visa so you can study, work part-time, and enjoy Aussie life.",
-    points: ["Work up to 48 hours per fortnight", "Study at top institutions", "Step-by-step guidance"],
-  },
-  {
-    name: "Student Visa Renewal",
-    intro: "Need to extend your stay? We make it simple.",
-    points: ["No last-minute stress", "Course extension options", "Full application support"],
-  },
-  {
-    name: "Working Holiday Visa",
-    intro: "Work & travel across Australia for up to a year (or more).",
-    points: ["Earn money while exploring", "Study for up to 4 months", "Easy extensions available"],
-  },
-  {
-    name: "Tourist Visa",
-    intro: "Short stay? No worries.",
-    points: ["Explore Australia for up to 3, 6, or 12 months", "Simple application process", "Option to extend (conditions apply)"],
-  },
-  {
-    name: "Visa Advice with IMMagine Immigration",
-    intro: "Not sure which visa is right for you? We've got experts for that.",
-    points: ["PR & skilled migration pathways", "Post-study visa options", "Personalised consultations"],
-  },
-  {
-    name: "Housing with Middow",
-    intro: "Need a place to stay? We've got student-friendly housing sorted.",
-    points: ["Affordable & secure accommodation", "Locations across Australia", "Easy booking process"],
-  },
-];
+type VisaService = { name: string; intro: string; points: string[] };
+type AdmissionStep = { title: string; description: string };
+type Faq = { q: string; a: string };
+type ServicesPageContent = { pitfalls: string[]; admissionSteps: AdmissionStep[]; faqs: Faq[] };
 
-const PITFALLS = [
-  "Incomplete or inconsistent application forms",
-  "Insufficient proof of funds",
-  "Missing or expired supporting documents",
-  "Weak or generic statement of purpose",
-];
+export default async function ServicesPage() {
+  const VISA_SERVICES = await readContent<VisaService[]>("visaServices");
+  const { pitfalls: PITFALLS, admissionSteps: ADMISSION_STEPS, faqs: FAQS } =
+    await readContent<ServicesPageContent>("servicesPage");
 
-const ADMISSION_STEPS = [
-  { title: "Course Matching", description: "We match your goals, budget, and academic background to the right program." },
-  { title: "Application", description: "We prepare and review every document before it's submitted." },
-  { title: "Offer Letter", description: "You receive and accept your offer, with our team explaining every condition." },
-];
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
+  };
 
-const FAQS = [
-  { q: "What documents are required?", a: "Typically academic transcripts, passport, proof of funds, and a statement of purpose — your counselor gives you the exact list for your destination." },
-  { q: "When should I start applying?", a: "Most students start 6–12 months before their intended intake, especially for visa processing time." },
-];
-
-const faqJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: FAQS.map((faq) => ({
-    "@type": "Question",
-    name: faq.q,
-    acceptedAnswer: { "@type": "Answer", text: faq.a },
-  })),
-};
-
-export default function ServicesPage() {
   return (
     <>
       <script

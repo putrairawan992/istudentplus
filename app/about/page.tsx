@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import { readContent } from "../../lib/content";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -9,52 +10,25 @@ export const metadata: Metadata = {
     "iStudentPlus is a global student network and media agency with offices in Pangkalpinang and Makassar, Indonesia — promoting inclusivity and empowering students worldwide.",
 };
 
-const OFFICES = [
-  { city: "Pangkalpinang", country: "Indonesia", status: null },
-  { city: "Makassar", country: "Indonesia", status: null },
-  { city: "Jakarta", country: "Indonesia", status: "Coming Soon" },
-];
-
-const TEAM = [
-  {
-    name: "Cindy Christella",
-    role: "CEO & Education Consultant",
-    photo: null,
-    bio: null,
-  },
-  {
-    name: "Nur Fadillah",
-    role: "Education Consultant",
-    photo: "/team/nur-fadillah.jpg",
-    bio:
-      "An Education Consultant with more than two years of experience assisting international " +
-      "students in choosing the right study pathways abroad. Provides personalized guidance on " +
-      "course selection, visa processes, and applications to educational institutions, with a " +
-      "strong understanding of international education systems and student visa regulations. " +
-      "Has supported students from diverse backgrounds while maintaining effective communication " +
-      "with partner institutions and ensuring smooth application processes.",
-  },
-];
-
-const CLIENT_COUNTRIES = [
-  "Indonesia", "Malaysia", "Vietnam", "Thailand", "China", "Japan", "Korea",
-  "Jordan", "Germany", "UK", "Estonia", "Colombia", "Chile", "Argentina", "Brazil",
-];
+type Office = { city: string; country: string; status: string | null };
+type TeamMember = { name: string; role: string; photo: string | null; bio: string | null };
+type Settings = {
+  offices: Office[];
+  languages: string[];
+  clientCountries: string[];
+  aboutStory: string[];
+  whatWeDo: string[];
+};
 
 const LANGUAGES = ["English", "Bahasa Indonesia", "Chinese", "Spanish"];
 
-const SERVICES = [
-  "Expert visa guidance",
-  "English language courses",
-  "Short-term study programs",
-  "Partnerships with educational institutions",
-  "Resource hub — scholarships & visa info",
-  "Accommodation assistance",
-  "Mental health support",
-  "Academic guidance",
-];
+export default async function AboutPage() {
+  const SETTINGS = await readContent<Settings>("settings");
+  const OFFICES = SETTINGS.offices;
+  const TEAM = await readContent<TeamMember[]>("team");
+  const CLIENT_COUNTRIES = SETTINGS.clientCountries;
+  const SERVICES = SETTINGS.whatWeDo;
 
-export default function AboutPage() {
   return (
     <>
       <Header />
@@ -67,15 +41,14 @@ export default function AboutPage() {
             <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
               A global student network and <span className="text-accent">media agency</span>.
             </h1>
-            <p className="mx-auto mb-4 max-w-xl text-[17px] leading-relaxed text-muted">
-              iStudentPlus started in Australia and opened its first branch in Makassar in 2021.
-              Our team of international alumni — from China, the United States, and Australia —
-              brings deep experience in education and immigration.
-            </p>
-            <p className="mx-auto max-w-xl text-[17px] leading-relaxed text-muted">
-              We are committed to expanding opportunities for Indonesian students to study
-              abroad, with the hope that every child gets an equal chance.
-            </p>
+            {SETTINGS.aboutStory.map((paragraph, i) => (
+              <p
+                key={i}
+                className={`mx-auto max-w-xl text-[17px] leading-relaxed text-muted ${i === 0 ? "mb-4" : ""}`}
+              >
+                {paragraph}
+              </p>
+            ))}
           </div>
         </section>
 

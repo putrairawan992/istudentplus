@@ -2,41 +2,29 @@ import type { Metadata } from "next";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
 import CourseFilter from "../components/CourseFilter";
+import { readContent } from "../../lib/content";
 
 export const metadata: Metadata = {
   title: "Courses & Universities",
   description: "Compare VET/Diploma, Bachelor, Master, PhD, Language Study, and Exchange qualification pathways.",
 };
 
-const QUALIFICATIONS = [
-  { name: "VET / Diploma", length: "6 months – 2 years", benefit: "Hands-on learning, fast entry to the workforce." },
-  { name: "Bachelor Degree", length: "3–4 years", benefit: "Broad academic foundation and global recognition." },
-  { name: "Master Degree", length: "1–2 years", benefit: "Career advancement and specialization." },
-  { name: "PhD", length: "3+ years", benefit: "Research depth and academic/migration pathways." },
-  { name: "Language Study", length: "Weeks – months", benefit: "Builds proficiency ahead of a degree or work move." },
-  { name: "Student Exchange", length: "1 semester – 1 year", benefit: "Global experience without leaving your home degree." },
-];
+type CoursesPage = {
+  qualifications: { name: string; length: string; benefit: string }[];
+  popularFields: { level: string; fields: string[] }[];
+  vetLevels: { level: string; duration: string; outcome: string }[];
+  vetFields: string[];
+  highSchool: { years: string; description: string }[];
+};
 
-const POPULAR_FIELDS = [
-  { level: "Bachelor Degree", fields: ["Business", "Engineering", "IT", "Health"] },
-  { level: "VET / Diploma", fields: ["Hospitality", "IT", "Business", "Design"] },
-];
-
-const VET_LEVELS = [
-  { level: "Certificate I", duration: "4–6 months", outcome: "Competent operator" },
-  { level: "Certificate II", duration: "~1 year", outcome: "Advanced operator" },
-  { level: "Certificate III", duration: "~1 year", outcome: "Qualified tradesperson" },
-  { level: "Certificate IV", duration: "12–18 months", outcome: "Supervisor" },
-  { level: "Diploma", duration: "18–24 months", outcome: "Paraprofessional" },
-  { level: "Advanced Diploma", duration: "24–36 months", outcome: "Junior manager" },
-];
-
-const VET_FIELDS = [
-  "IT & Cybersecurity", "Tourism & Hospitality", "Business", "Engineering", "Construction",
-  "Agriculture", "Legal Studies", "Automotive", "Health Sciences", "Creative Industries",
-];
-
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  const {
+    qualifications: QUALIFICATIONS,
+    popularFields: POPULAR_FIELDS,
+    vetLevels: VET_LEVELS,
+    vetFields: VET_FIELDS,
+    highSchool: HIGH_SCHOOL,
+  } = await readContent<CoursesPage>("coursesPage");
   return (
     <>
       <Header />
@@ -139,20 +127,12 @@ export default function CoursesPage() {
                 goals, location, and budget.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-xl bg-paper-raise p-5">
-                  <h4 className="mb-1.5 font-bold">Years 7–10 (Junior)</h4>
-                  <p className="text-[13.5px] leading-relaxed text-muted">
-                    Core subjects — English, Mathematics, Science, History, Geography, Health/PE,
-                    the Arts — plus electives. Assessed via assignments, tests, and participation.
-                  </p>
-                </div>
-                <div className="rounded-xl bg-paper-raise p-5">
-                  <h4 className="mb-1.5 font-bold">Years 11–12 (Senior)</h4>
-                  <p className="text-[13.5px] leading-relaxed text-muted">
-                    State qualifications like HSC (NSW) or VCE (Victoria); academic or vocational
-                    subjects, leading to an ATAR for university entrance.
-                  </p>
-                </div>
+                {HIGH_SCHOOL.map((tier) => (
+                  <div key={tier.years} className="rounded-xl bg-paper-raise p-5">
+                    <h4 className="mb-1.5 font-bold">{tier.years}</h4>
+                    <p className="text-[13.5px] leading-relaxed text-muted">{tier.description}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

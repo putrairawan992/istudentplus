@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Kak Jennifer",
+    "photo": "/testimonials/jennifer.jpg",
+    "badge": "Student IELTS & Mentoring",
+    "loa": [
+      "KAIST"
+    ],
+    "more": null,
+    "quote": "My mentor kindly helped answer questions when I struggled with the application form — and the IELTS guidance was a huge help."
+  },
+  {
+    "name": "Kak Nareswari",
+    "photo": "/testimonials/nareswari.jpg",
+    "badge": "Student Mentoring",
+    "loa": [
+      "University of Toronto, Mississauga",
+      "University of Toronto, St. George",
+      "UBC Okanagan"
+    ],
+    "more": "and 9 other campuses",
+    "quote": "The mentoring program was effective and exciting at once — experienced mentors whose essay feedback carried real weight."
+  },
+  {
+    "name": "Kak Hafiz",
+    "photo": "/testimonials/hafiz.jpg",
+    "badge": "Student Mentoring",
+    "loa": [
+      "The University of British Columbia",
+      "City University of Hongkong",
+      "University of Western Australia",
+      "Monash University"
+    ],
+    "more": "and 6 other campuses",
+    "quote": "Everything was personalized — flexible sessions, a neatly organized target timeline, and detailed essay proofreading."
+  }
+]

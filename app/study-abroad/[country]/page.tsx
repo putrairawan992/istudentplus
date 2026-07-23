@@ -2,15 +2,15 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Header, { WHATSAPP_URL } from "../../components/Header";
 import Footer from "../../components/Footer";
-import { COUNTRIES, getCountry } from "../data";
+import { getCountries, getCountry } from "../data";
 
-export function generateStaticParams() {
-  return COUNTRIES.map((c) => ({ country: c.slug }));
+export async function generateStaticParams() {
+  return (await getCountries()).map((c) => ({ country: c.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ country: string }> }): Promise<Metadata> {
   const { country: slug } = await params;
-  const country = getCountry(slug);
+  const country = await getCountry(slug);
   if (!country) return {};
   return {
     title: `Study in ${country.name}`,
@@ -28,7 +28,7 @@ const OVERVIEW_LABELS: { key: keyof import("../data").CountryOverview; label: st
 
 export default async function CountryPage({ params }: { params: Promise<{ country: string }> }) {
   const { country: slug } = await params;
-  const country = getCountry(slug);
+  const country = await getCountry(slug);
   if (!country) notFound();
 
   return (

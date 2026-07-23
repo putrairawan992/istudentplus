@@ -2,13 +2,20 @@ import Image from "next/image";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ConsultationForm from "./components/ConsultationForm";
-import { COUNTRIES } from "./study-abroad/data";
+import { getCountries } from "./study-abroad/data";
+import { readContent } from "../lib/content";
 
-const STATS = [
-  { value: "9.3K", label: "Enrolled" },
-  { value: "20+", label: "Languages" },
-  { value: "100+", label: "Partner Universities" },
-];
+type Stat = { value: string; label: string };
+type HomeService = { name: string; description: string; href: string; bg: string };
+type Testimonial = {
+  name: string;
+  photo: string;
+  badge: string;
+  loa: string[];
+  more: string | null;
+  quote: string;
+};
+type LanguageProgram = { id: string; name: string };
 
 const DEPARTURES = [
   { city: "Melbourne", program: "VET + Bachelor", intake: "Feb", status: "Open" as const },
@@ -18,35 +25,6 @@ const DEPARTURES = [
   { city: "Beijing", program: "Language + University", intake: "Mar", status: "Open" as const },
 ];
 
-const PARTNER_ALUMNI = ["KAIST", "Seoul Nat'l Univ", "U. Toronto", "UCL", "UBC"];
-
-const SERVICES = [
-  {
-    name: "Education Counseling",
-    description: "Program and university matching based on grades, budget, and goals.",
-    href: "/services#admission-counselling",
-    bg: "bg-[#FDF3C7]",
-  },
-  {
-    name: "Visa Application",
-    description: "Document prep and full support for a smooth application process.",
-    href: "/services#visa-admission",
-    bg: "bg-[#FBDCE5]",
-  },
-  {
-    name: "Student Accommodation",
-    description: "Verified dorms and homestays arranged before you land.",
-    href: "/services#visa-admission",
-    bg: "bg-[#D9F3EC]",
-  },
-  {
-    name: "Pre-Departure",
-    description: "Orientation, insurance, and travel briefing before you fly.",
-    href: "/services",
-    bg: "bg-[#E6E1F7]",
-  },
-];
-
 const JOURNEY_STEPS = [
   { title: "Personal Assessment", description: "Explore your study goals, country preference, and career path." },
   { title: "Document & Finance Check", description: "Review academic and financial readiness." },
@@ -54,47 +32,6 @@ const JOURNEY_STEPS = [
   { title: "Visa & Immigration", description: "Full support for a smooth application process." },
   { title: "Pre-Departure Prep", description: "Orientation, accommodation, and travel guidance." },
   { title: "Enrollment Abroad", description: "Begin your study journey with confidence." },
-];
-
-const DESTINATIONS = COUNTRIES.filter((c) =>
-  ["australia", "japan", "uk", "canada"].includes(c.slug)
-);
-
-const LANGUAGE_PROGRAMS = [
-  { name: "General English", href: "/language-programs#general-english" },
-  { name: "Conversation Class", href: "/language-programs#conversation-class" },
-  { name: "IELTS", href: "/language-programs#ielts" },
-  { name: "JLPT", href: "/language-programs#jlpt" },
-];
-
-const TESTIMONIALS = [
-  {
-    name: "Kak Jennifer",
-    photo: "/testimonials/jennifer.jpg",
-    badge: "Student IELTS & Mentoring",
-    loa: ["KAIST"],
-    more: null,
-    quote:
-      "My mentor kindly helped answer questions when I struggled with the application form — and the IELTS guidance was a huge help.",
-  },
-  {
-    name: "Kak Nareswari",
-    photo: "/testimonials/nareswari.jpg",
-    badge: "Student Mentoring",
-    loa: ["University of Toronto, Mississauga", "University of Toronto, St. George", "UBC Okanagan"],
-    more: "and 9 other campuses",
-    quote:
-      "The mentoring program was effective and exciting at once — experienced mentors whose essay feedback carried real weight.",
-  },
-  {
-    name: "Kak Hafiz",
-    photo: "/testimonials/hafiz.jpg",
-    badge: "Student Mentoring",
-    loa: ["The University of British Columbia", "City University of Hongkong", "University of Western Australia", "Monash University"],
-    more: "and 6 other campuses",
-    quote:
-      "Everything was personalized — flexible sessions, a neatly organized target timeline, and detailed essay proofreading.",
-  },
 ];
 
 function StatusPill({ status }: { status: "Open" | "3 Seats" }) {
@@ -110,7 +47,19 @@ function StatusPill({ status }: { status: "Open" | "3 Seats" }) {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const SETTINGS = await readContent<{ stats: Stat[]; partnerAlumni: string[] }>("settings");
+  const HOME_SERVICES = await readContent<HomeService[]>("homeServices");
+  const TESTIMONIALS = await readContent<Testimonial[]>("testimonials");
+  const LANGUAGE_PROGRAM_ITEMS = await readContent<LanguageProgram[]>("languagePrograms");
+  const DESTINATIONS = (await getCountries()).filter((c) =>
+    ["australia", "japan", "uk", "canada"].includes(c.slug)
+  );
+  const LANGUAGE_PROGRAMS = LANGUAGE_PROGRAM_ITEMS.map((p) => ({
+    name: p.name,
+    href: `/language-programs#${p.id}`,
+  }));
+
   return (
     <>
       <Header />
@@ -136,7 +85,7 @@ export default function Home() {
                 </a>
               </div>
               <div className="flex gap-9 font-mono tabular-nums">
-                {STATS.map((stat) => (
+                {SETTINGS.stats.map((stat) => (
                   <div key={stat.label}>
                     <b className="block text-2xl font-extrabold text-ink">{stat.value}</b>
                     <span className="text-[12.5px] uppercase tracking-wide text-muted">{stat.label}</span>
@@ -159,7 +108,7 @@ export default function Home() {
         {/* Trust strip */}
         <div className="border-y border-line bg-paper-raise py-6.5">
           <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-5 px-7 font-mono text-[13px] text-muted">
-            {PARTNER_ALUMNI.map((name) => (
+            {SETTINGS.partnerAlumni.map((name) => (
               <div key={name}>
                 <b className="mr-1.5 font-sans text-[15px] font-bold text-ink">{name}</b>
                 Alumni placed
@@ -180,7 +129,7 @@ export default function Home() {
               </p>
             </div>
             <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-4">
-              {SERVICES.map((service) => (
+              {HOME_SERVICES.map((service) => (
                 <a
                   key={service.name}
                   href={service.href}

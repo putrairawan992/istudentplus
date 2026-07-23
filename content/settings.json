@@ -1,0 +1,89 @@
+{
+  "stats": [
+    {
+      "value": "9.3K",
+      "label": "Enrolled"
+    },
+    {
+      "value": "20+",
+      "label": "Languages"
+    },
+    {
+      "value": "100+",
+      "label": "Partner Universities"
+    }
+  ],
+  "whatsapp": "https://wa.me/6281234567890",
+  "offices": [
+    {
+      "city": "Pangkalpinang",
+      "country": "Indonesia",
+      "status": null
+    },
+    {
+      "city": "Makassar",
+      "country": "Indonesia",
+      "status": null
+    },
+    {
+      "city": "Jakarta",
+      "country": "Indonesia",
+      "status": "Coming Soon"
+    }
+  ],
+  "languages": [
+    "Indonesian",
+    "English",
+    "Chinese",
+    "Japanese",
+    "French"
+  ],
+  "socials": [
+    {
+      "label": "Instagram",
+      "href": "#"
+    },
+    {
+      "label": "Facebook",
+      "href": "#"
+    }
+  ],
+  "clientCountries": [
+    "Indonesia",
+    "Malaysia",
+    "Vietnam",
+    "Thailand",
+    "China",
+    "Japan",
+    "Korea",
+    "Jordan",
+    "Germany",
+    "UK",
+    "Estonia",
+    "Colombia",
+    "Chile",
+    "Argentina",
+    "Brazil"
+  ],
+  "partnerAlumni": [
+    "KAIST",
+    "Seoul Nat'l Univ",
+    "U. Toronto",
+    "UCL",
+    "UBC"
+  ],
+  "aboutStory": [
+    "iStudentPlus started in Australia and opened its first branch in Makassar in 2021. Our team of international alumni — from China, the United States, and Australia — brings deep experience in education and immigration.",
+    "We are committed to expanding opportunities for Indonesian students to study abroad, with the hope that every child gets an equal chance."
+  ],
+  "whatWeDo": [
+    "Expert visa guidance",
+    "English language courses",
+    "Short-term study programs",
+    "Partnerships with educational institutions",
+    "Resource hub — scholarships & visa info",
+    "Accommodation assistance",
+    "Mental health support",
+    "Academic guidance"
+  ]
+}

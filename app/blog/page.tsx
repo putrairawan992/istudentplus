@@ -2,11 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import { readContent } from "../../lib/content";
 
 export const metadata: Metadata = {
   title: "Blog",
   description: "Visa updates, study tips, and student stories from the iStudentPlus team.",
 };
+
+type Article = { title: string; excerpt: string; category: string };
+type Video = { series: string; title: string; duration: string };
 
 const CATEGORIES = [
   { slug: "recent-news", label: "Recent News" },
@@ -15,36 +19,14 @@ const CATEGORIES = [
   { slug: "study-tips", label: "Study Tips" },
 ];
 
-const ARTICLES = [
-  {
-    title: "2024 AU Education Evolves: 2024 Visa Updates Explained",
-    excerpt: "What changed in Australia's student visa policy and what it means for your application.",
-    category: "immigration",
-  },
-  {
-    title: "Understanding the Genuine Student Requirement (GSR)",
-    excerpt: "The Genuine Student Requirement (GSR) is a key part of every Australian visa assessment.",
-    category: "immigration",
-  },
-  {
-    title: "Australian Visa Medical Check-Up Locations in Indonesia",
-    excerpt: "If you're an Indonesian student planning to study in Australia, here's where to complete your medical exam.",
-    category: "immigration",
-  },
-];
-
-const VIDEO_SERIES = [
-  { series: "Abroad Stories", title: "Introduction", duration: "0:16" },
-  { series: "Abroad Stories", title: "My Study Abroad Journey", duration: "0:16" },
-  { series: "Scholarships", title: "Beasiswa Tiongkok 2025", duration: "—" },
-];
-
 export default async function BlogPage({
   searchParams,
 }: {
   searchParams: Promise<{ category?: string }>;
 }) {
   const { category } = await searchParams;
+  const ARTICLES = await readContent<Article[]>("blog");
+  const VIDEO_SERIES = await readContent<Video[]>("videoSeries");
   const filtered = category ? ARTICLES.filter((a) => a.category === category) : ARTICLES;
 
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import { readContent } from "../../lib/content";
 
 export const metadata: Metadata = {
   title: "Language Programs",
@@ -9,69 +10,14 @@ export const metadata: Metadata = {
     "General English, Conversation Class, IELTS, and JLPT preparation with iStudentPlus — placement evaluation, international certification from Australia, and native-speaker instructors.",
 };
 
-const ENGLISH_SKILLS = [
-  { name: "Reading", description: "Vocabulary building and comprehension." },
-  { name: "Writing", description: "Clear, concise written communication." },
-  { name: "Speaking", description: "Interactive, conversational exercises." },
-  { name: "Listening", description: "Comprehension across authentic materials and accents." },
-];
+type LanguageProgram = { id: string; name: string; overview: string; features: string[]; duration: string };
+type Instructor = { name: string; photo: string };
+type EnglishSkill = { name: string; description: string };
 
-const PROGRAMS = [
-  {
-    id: "general-english",
-    name: "General English",
-    overview:
-      "A comprehensive foundation across all four language skills, for everyday communication, " +
-      "travel, work, or further study — with personalized teacher feedback throughout.",
-    features: ["Placement evaluation", "International certification from Australia"],
-    duration: "1 month · 20 sessions · 90 minutes each · 5 days per week",
-  },
-  {
-    id: "ielts",
-    name: "IELTS Preparation",
-    overview:
-      "Exam-focused preparation for the International English Language Testing System, used for " +
-      "university admission and visa applications across most English-speaking destinations.",
-    features: [
-      "Placement evaluation",
-      "Comprehensive handbook",
-      "Complimentary weekly counseling",
-      "Pre-test and post-test evaluations",
-    ],
-    duration: "6 weeks · 30 sessions · 90 minutes each · 5 times a week",
-  },
-  {
-    id: "conversation-class",
-    name: "Conversation Class",
-    overview:
-      "Focused on speaking confidence and fluency — smaller, discussion-driven sessions rather " +
-      "than grammar drills.",
-    features: [
-      "Instructor who is a native speaker",
-      "Comprehensive handbook",
-      "Progress assessments",
-    ],
-    duration: "3 months · 26 sessions · 90 minutes per session · 3 times a week",
-  },
-  {
-    id: "jlpt",
-    name: "JLPT Preparation",
-    overview:
-      "Preparation for the Japanese Language Proficiency Test (N5–N1), the standard benchmark for " +
-      "language schools and employers in Japan.",
-    features: ["Level-based classes covering vocabulary, grammar, reading, and listening"],
-    duration: "Ask a counselor which level and intake matches your current Japanese ability",
-  },
-];
-
-const INSTRUCTORS = [
-  { name: "Danny Dermawansyah", photo: "/instructors/danny-dermawansyah.jpg" },
-  { name: "Shah Reza Pahlevi", photo: "/instructors/shah-reza-pahlevi.jpg" },
-  { name: "Anastasia Naomi", photo: "/instructors/anastasia-naomi.jpg" },
-  { name: "Firsty Viriani", photo: "/instructors/firsty-viriani.jpg" },
-];
-
-export default function LanguageProgramsPage() {
+export default async function LanguageProgramsPage() {
+  const PROGRAMS = await readContent<LanguageProgram[]>("languagePrograms");
+  const INSTRUCTORS = await readContent<Instructor[]>("instructors");
+  const ENGLISH_SKILLS = await readContent<EnglishSkill[]>("englishSkills");
   return (
     <>
       <Header />

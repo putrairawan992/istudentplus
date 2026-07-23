@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
-import { COUNTRIES } from "./data";
+import { getCountries } from "./data";
 
 export const metadata: Metadata = {
   title: "Study Abroad",
@@ -10,7 +10,8 @@ export const metadata: Metadata = {
     "Explore study destinations — Australia, UK, USA, Canada, China, and Japan — with guidance from iStudentPlus counselors.",
 };
 
-export default function StudyAbroadPage() {
+export default async function StudyAbroadPage() {
+  const COUNTRIES = await getCountries();
   return (
     <>
       <Header />
