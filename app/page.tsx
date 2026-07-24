@@ -2,8 +2,10 @@ import Image from "next/image";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ConsultationForm from "./components/ConsultationForm";
+import YouTubeEmbed from "./components/YouTubeEmbed";
 import { getCountries } from "./study-abroad/data";
 import { readContent } from "../lib/content";
+import { getVideo } from "../lib/videos";
 
 type Stat = { value: string; label: string };
 type HomeService = { name: string; description: string; href: string; bg: string };
@@ -55,6 +57,7 @@ export default async function Home() {
   const DESTINATIONS = (await getCountries()).filter((c) =>
     ["australia", "japan", "uk", "canada"].includes(c.slug)
   );
+  const STEPS_VIDEO = await getVideo("Step by Step");
   const LANGUAGE_PROGRAMS = LANGUAGE_PROGRAM_ITEMS.map((p) => ({
     name: p.name,
     href: `/language-programs#${p.id}`,
@@ -213,6 +216,16 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        {STEPS_VIDEO && (
+          <section className="py-19 pt-0">
+            <div className="mx-auto max-w-3xl px-7">
+              <div className="reveal overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+                <YouTubeEmbed id={STEPS_VIDEO.youtubeId} title={STEPS_VIDEO.title} />
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Destinations */}
         <section id="destinations" className="py-19">

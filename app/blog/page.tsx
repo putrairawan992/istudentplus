@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 type Article = { title: string; excerpt: string; category: string };
-type Video = { series: string; title: string; duration: string };
+type Video = { series: string; title: string; youtubeId: string };
 
 const CATEGORIES = [
   { slug: "recent-news", label: "Recent News" },
@@ -97,18 +98,15 @@ export default async function BlogPage({
               </div>
               <h2 className="text-3xl font-extrabold tracking-tight">Abroad Stories &amp; Scholarships</h2>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {VIDEO_SERIES.map((video) => (
-                <div key={video.title} className="overflow-hidden rounded-xl border border-line bg-card">
-                  <div className="flex aspect-video items-center justify-center bg-ink text-white">
-                    <span className="text-3xl">▶</span>
-                  </div>
+                <div key={video.youtubeId} className="overflow-hidden rounded-xl border border-line bg-card">
+                  <YouTubeEmbed id={video.youtubeId} title={video.title} />
                   <div className="p-4">
                     <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-accent">
                       {video.series}
                     </div>
                     <div className="text-sm font-semibold">{video.title}</div>
-                    <div className="font-mono text-xs text-muted">{video.duration}</div>
                   </div>
                 </div>
               ))}

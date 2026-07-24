@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import YouTubeEmbed from "../components/YouTubeEmbed";
 import { getCountries } from "./data";
+import { getVideo } from "../../lib/videos";
 
 export const metadata: Metadata = {
   title: "Study Abroad",
@@ -12,6 +14,7 @@ export const metadata: Metadata = {
 
 export default async function StudyAbroadPage() {
   const COUNTRIES = await getCountries();
+  const VIDEO = await getVideo("Study Info");
   return (
     <>
       <Header />
@@ -27,6 +30,16 @@ export default async function StudyAbroadPage() {
             </h1>
           </div>
         </section>
+
+        {VIDEO && (
+          <section className="pb-8">
+            <div className="mx-auto max-w-3xl px-7">
+              <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+                <YouTubeEmbed id={VIDEO.youtubeId} title={VIDEO.title} />
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="pb-16">
           <div className="mx-auto max-w-6xl px-7">

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
+import { getVideo } from "../../lib/videos";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -17,6 +19,7 @@ export default async function ServicesPage() {
   const VISA_SERVICES = await readContent<VisaService[]>("visaServices");
   const { pitfalls: PITFALLS, admissionSteps: ADMISSION_STEPS, faqs: FAQS } =
     await readContent<ServicesPageContent>("servicesPage");
+  const VIDEO = await getVideo("Layanan");
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -47,6 +50,16 @@ export default async function ServicesPage() {
             </h1>
           </div>
         </section>
+
+        {VIDEO && (
+          <section className="pb-8">
+            <div className="mx-auto max-w-3xl px-7">
+              <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+                <YouTubeEmbed id={VIDEO.youtubeId} title={VIDEO.title} />
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Visa & Admission */}
         <section id="visa-admission" className="scroll-mt-20 py-16">

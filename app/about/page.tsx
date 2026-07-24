@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Header, { WHATSAPP_URL } from "../components/Header";
 import Footer from "../components/Footer";
+import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
+import { getVideo } from "../../lib/videos";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -28,6 +30,7 @@ export default async function AboutPage() {
   const TEAM = await readContent<TeamMember[]>("team");
   const CLIENT_COUNTRIES = SETTINGS.clientCountries;
   const SERVICES = SETTINGS.whatWeDo;
+  const VIDEO = await getVideo("About Us");
 
   return (
     <>
@@ -51,6 +54,16 @@ export default async function AboutPage() {
             ))}
           </div>
         </section>
+
+        {VIDEO && (
+          <section className="pb-8">
+            <div className="mx-auto max-w-3xl px-7">
+              <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+                <YouTubeEmbed id={VIDEO.youtubeId} title={VIDEO.title} />
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Vision & Mission — reference: navy + orange cards */}
         <section className="py-8">
