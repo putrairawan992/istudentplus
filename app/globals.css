@@ -33,6 +33,30 @@ body {
   color: var(--ink);
 }
 
+/* Scroll-reveal: native scroll-driven animation. No JS, no deps.
+   Unsupported browsers simply skip the animation and show content as-is. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      /* Complete while the element enters — so anchor jumps (#consultation) never
+         land on a still-faded section. */
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 .stub {
   position: relative;
   height: 1px;

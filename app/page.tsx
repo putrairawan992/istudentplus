@@ -59,6 +59,9 @@ export default async function Home() {
     name: p.name,
     href: `/language-programs#${p.id}`,
   }));
+  const synced = new Date()
+    .toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
+    .toUpperCase();
 
   return (
     <>
@@ -70,11 +73,11 @@ export default async function Home() {
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-7 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               <h1 className="mb-5.5 text-4xl font-extrabold leading-[1.08] tracking-tight text-balance sm:text-5xl">
-                More Than <span className="text-accent">100+</span> Partner Universities Worldwide
+                Get into your <span className="text-accent">dream university</span> abroad — guided every step.
               </h1>
               <p className="mb-8 max-w-md text-[17px] leading-relaxed text-muted">
-                Your journey to studying abroad starts here. Access detailed information,
-                personalized recommendations, and expert guidance from our education counselors.
+                Free counseling from application to arrival, backed by 100+ partner universities.
+                Personalized recommendations and expert guidance, at no cost to talk.
               </p>
               <div className="mb-9 flex items-center gap-3.5">
                 <a href="/study-abroad" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-transform hover:scale-[1.03]">
@@ -120,7 +123,7 @@ export default async function Home() {
         {/* Services — reference: pastel cards carousel */}
         <section className="py-19">
           <div className="mx-auto max-w-6xl px-7">
-            <div className="mb-11 max-w-xl">
+            <div className="reveal mb-11 max-w-xl">
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
                 With you at every step of your study abroad journey.
               </h2>
@@ -128,7 +131,7 @@ export default async function Home() {
                 Get personalised, friendly, honest guidance for free.
               </p>
             </div>
-            <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="reveal grid gap-4.5 sm:grid-cols-2 lg:grid-cols-4">
               {HOME_SERVICES.map((service) => (
                 <a
                   key={service.name}
@@ -149,7 +152,7 @@ export default async function Home() {
         {/* Journey — reference: vertical numbered timeline + visual right */}
         <section className="bg-paper-raise py-19">
           <div className="mx-auto max-w-6xl px-7">
-            <div className="mb-11 text-center">
+            <div className="reveal mb-11 text-center">
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
                 Your journey to study abroad, simplified in 6 steps.
               </h2>
@@ -159,7 +162,7 @@ export default async function Home() {
               </p>
             </div>
 
-            <div className="grid items-center gap-10 lg:grid-cols-[1fr_0.9fr]">
+            <div className="reveal grid items-center gap-10 lg:grid-cols-[1fr_0.9fr]">
               <div className="relative flex flex-col gap-2.5 before:absolute before:bottom-6 before:left-[21px] before:top-6 before:w-px before:bg-line before:content-['']">
                 {JOURNEY_STEPS.map((step, i) => (
                   <div
@@ -187,7 +190,7 @@ export default async function Home() {
               <div className="rounded-2xl bg-ink px-5.5 pb-2.5 pt-5.5 font-mono text-white shadow-2xl shadow-ink/20">
                 <div className="mb-1 flex items-baseline justify-between border-b border-white/20 pb-3.5">
                   <h3 className="text-[13px] font-bold uppercase tracking-widest">Departures — Intake 2026</h3>
-                  <span className="text-xs opacity-70">SYNCED 07 JUL</span>
+                  <span className="text-xs opacity-70">SYNCED {synced}</span>
                 </div>
                 <div className="grid grid-cols-[1.4fr_1.6fr_0.9fr_0.9fr] gap-2.5 border-b border-white/25 py-2 text-[10.5px] uppercase tracking-wide opacity-55">
                   <span>City</span>
@@ -214,7 +217,7 @@ export default async function Home() {
         {/* Destinations */}
         <section id="destinations" className="py-19">
           <div className="mx-auto max-w-6xl px-7">
-            <div className="mb-11 max-w-xl">
+            <div className="reveal mb-11 max-w-xl">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Where students go
               </div>
@@ -222,7 +225,7 @@ export default async function Home() {
                 Four countries, most requested this intake.
               </h2>
             </div>
-            <div className="grid gap-4.5 sm:grid-cols-2">
+            <div className="reveal grid gap-4.5 sm:grid-cols-2">
               {DESTINATIONS.map((dest) => (
                 <a
                   key={dest.slug}
@@ -233,7 +236,7 @@ export default async function Home() {
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={dest.image}
-                      alt={`Kuliah di ${dest.name}`}
+                      alt={`Study in ${dest.name}`}
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                   )}
@@ -258,7 +261,7 @@ export default async function Home() {
         {/* Language programs */}
         <section className="py-19 pt-0">
           <div className="mx-auto max-w-6xl px-7">
-            <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                   Browse our language program
@@ -271,7 +274,7 @@ export default async function Home() {
                 See all programs →
               </a>
             </div>
-            <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="reveal grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
               {LANGUAGE_PROGRAMS.map((program) => (
                 <a
                   key={program.name}
@@ -288,7 +291,7 @@ export default async function Home() {
         {/* Testimonials — reference: avatar + badge + Raih LoA list */}
         <section className="bg-sky-ink py-19">
           <div className="mx-auto max-w-6xl px-7">
-            <div className="mb-11 text-center">
+            <div className="reveal mb-11 text-center">
               <h2 className="mb-2 text-3xl font-extrabold tracking-tight">
                 Alumni who made it, <span className="text-accent">on record</span>.
               </h2>
@@ -296,7 +299,7 @@ export default async function Home() {
                 Accepted at 50+ top campuses across 15 different countries.
               </p>
             </div>
-            <div className="grid gap-5 lg:grid-cols-3">
+            <div className="reveal grid gap-5 lg:grid-cols-3">
               {TESTIMONIALS.map((t) => (
                 <div key={t.name} className="flex flex-col rounded-3xl bg-card p-6.5 shadow-sm">
                   <div className="mb-4 flex items-center gap-3.5">
@@ -316,7 +319,7 @@ export default async function Home() {
                     </div>
                   </div>
                   <div className="mb-4">
-                    <div className="mb-1.5 text-[13px] font-extrabold text-accent">Raih LoA:</div>
+                    <div className="mb-1.5 text-[13px] font-extrabold text-accent">Letters of Acceptance:</div>
                     <ul className="flex flex-col gap-1">
                       {t.loa.map((uni) => (
                         <li key={uni} className="flex gap-2 text-[13px] font-semibold">
@@ -336,7 +339,7 @@ export default async function Home() {
 
         {/* Free consultation form */}
         <section id="consultation" className="scroll-mt-20 py-19">
-          <div className="mx-auto max-w-3xl px-7">
+          <div className="reveal mx-auto max-w-3xl px-7">
             <div className="mb-8 text-center">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Free Consultation

@@ -72,43 +72,52 @@ export default function ConsultationForm() {
           ))}
         </select>
       </Field>
-      <Field label="Preferred Field of Study">
-        <select name="fieldOfStudy" className={inputClass} defaultValue="">
-          <option value="" disabled>Select a field</option>
-          {FIELDS_OF_STUDY.map((f) => (
-            <option key={f} value={f}>{f}</option>
-          ))}
-        </select>
-      </Field>
-      <Field label="Preferred Level of Qualification">
-        <select name="qualificationLevel" className={inputClass} defaultValue="">
-          <option value="" disabled>Select a level</option>
-          {QUALIFICATION_LEVELS.map((q) => (
-            <option key={q} value={q}>{q}</option>
-          ))}
-        </select>
-      </Field>
-      <div className="sm:col-span-2">
-        <Field label="Latest Qualification">
-          <select name="latestQualification" className={inputClass} defaultValue="">
-            <option value="" disabled>Select your latest qualification</option>
-            {LATEST_QUALIFICATIONS.map((q) => (
-              <option key={q} value={q}>{q}</option>
-            ))}
-          </select>
-        </Field>
-      </div>
-      <div className="sm:col-span-2">
-        <Field label="Attach Your Most Updated CV">
-          <input
-            name="cv"
-            type="file"
-            accept=".pdf,.doc,.docx"
-            className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-ink file:px-3.5 file:py-1.5 file:text-xs file:font-semibold file:text-white`}
-          />
-          <p className="mt-1.5 text-xs text-muted">For assessment purposes prior to your consultation.</p>
-        </Field>
-      </div>
+      {/* Optional details tucked behind a native disclosure — lowers friction to a 4-field ask. */}
+      <details className="group sm:col-span-2">
+        <summary className="cursor-pointer list-none text-sm font-semibold text-accent hover:underline">
+          <span className="group-open:hidden">+ Add study details &amp; CV (optional)</span>
+          <span className="hidden group-open:inline">− Hide optional details</span>
+        </summary>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <Field label="Preferred Field of Study">
+            <select name="fieldOfStudy" className={inputClass} defaultValue="">
+              <option value="" disabled>Select a field</option>
+              {FIELDS_OF_STUDY.map((f) => (
+                <option key={f} value={f}>{f}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Preferred Level of Qualification">
+            <select name="qualificationLevel" className={inputClass} defaultValue="">
+              <option value="" disabled>Select a level</option>
+              {QUALIFICATION_LEVELS.map((q) => (
+                <option key={q} value={q}>{q}</option>
+              ))}
+            </select>
+          </Field>
+          <div className="sm:col-span-2">
+            <Field label="Latest Qualification">
+              <select name="latestQualification" className={inputClass} defaultValue="">
+                <option value="" disabled>Select your latest qualification</option>
+                {LATEST_QUALIFICATIONS.map((q) => (
+                  <option key={q} value={q}>{q}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+          <div className="sm:col-span-2">
+            <Field label="Attach Your Most Updated CV">
+              <input
+                name="cv"
+                type="file"
+                accept=".pdf,.doc,.docx"
+                className={`${inputClass} file:mr-3 file:rounded-full file:border-0 file:bg-ink file:px-3.5 file:py-1.5 file:text-xs file:font-semibold file:text-white`}
+              />
+              <p className="mt-1.5 text-xs text-muted">For assessment purposes prior to your consultation.</p>
+            </Field>
+          </div>
+        </div>
+      </details>
       {status === "error" && (
         <p className="sm:col-span-2 rounded-lg bg-red-50 px-3 py-2 text-[13px] text-red-700">{error}</p>
       )}

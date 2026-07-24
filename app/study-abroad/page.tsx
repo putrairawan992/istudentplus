@@ -41,7 +41,7 @@ export default async function StudyAbroadPage() {
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={dest.image}
-                      alt={`Kuliah di ${dest.name}`}
+                      alt={`Study in ${dest.name}`}
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                   )}

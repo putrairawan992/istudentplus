@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import FloatWhatsApp from "./components/FloatWhatsApp";
 
 const siteUrl = "https://www.istudentplus.com";
 
@@ -52,7 +53,33 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+              var EXT_ATTRS = ['fdprocessedid'];
+              function strip(el) {
+                if (el.nodeType !== 1) return;
+                EXT_ATTRS.forEach(function(a) { el.removeAttribute(a); });
+                if (!el.querySelectorAll) return;
+                EXT_ATTRS.forEach(function(a) {
+                  el.querySelectorAll('[' + a + ']').forEach(function(c) { c.removeAttribute(a); });
+                });
+              }
+              // strip already-parsed elements
+              EXT_ATTRS.forEach(function(a) {
+                document.querySelectorAll('[' + a + ']').forEach(function(c) { c.removeAttribute(a); });
+              });
+              // strip future elements (React portals, dynamically inserted nodes)
+              new MutationObserver(function(ms) {
+                ms.forEach(function(m) { m.addedNodes.forEach(strip); });
+              }).observe(document.documentElement, { childList: true, subtree: true });
+            })();`,
+          }}
+        />
+        {children}
+        <FloatWhatsApp />
+      </body>
     </html>
   );
 }
