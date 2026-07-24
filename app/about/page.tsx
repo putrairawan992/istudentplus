@@ -56,8 +56,17 @@ export default async function AboutPage() {
         </section>
 
         {VIDEO && (
-          <section className="pb-8">
+          <section className="py-8">
             <div className="mx-auto max-w-3xl px-7">
+              <div className="mb-8 text-center">
+                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">Watch</div>
+                <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
+                  Get to know <span className="text-accent">iStudentPlus</span>.
+                </h2>
+                <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
+                  A quick introduction to who we are and how we support students.
+                </p>
+              </div>
               <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
                 <YouTubeEmbed id={VIDEO.youtubeId} title={VIDEO.title} />
               </div>
