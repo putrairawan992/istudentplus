@@ -220,6 +220,17 @@ export default async function Home() {
         {STEPS_VIDEO && (
           <section className="py-19 pt-0">
             <div className="mx-auto max-w-3xl px-7">
+              <div className="reveal mb-8 text-center">
+                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
+                  Watch
+                </div>
+                <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
+                  See how iStudentPlus helps you, <span className="text-accent">step by step</span>.
+                </h2>
+                <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
+                  A quick look at how we guide you from first consultation to enrollment abroad.
+                </p>
+              </div>
               <div className="reveal overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
                 <YouTubeEmbed id={STEPS_VIDEO.youtubeId} title={STEPS_VIDEO.title} />
               </div>
