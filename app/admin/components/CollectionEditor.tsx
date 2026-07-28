@@ -3,6 +3,8 @@
 import { useRef, useState, useTransition } from "react";
 import type { JsonValue, JsonObject } from "../../../lib/json-tree";
 import { setAtPath, removeAtIndex, insertAtEnd, blankShapeOf } from "../../../lib/json-tree";
+import ConfirmModal from "./ConfirmModal";
+import { useToast } from "./Toast";
 
 function humanize(key: string) {
   const withSpaces = key.replace(/([A-Z])/g, " $1");
@@ -383,6 +385,12 @@ export default function CollectionEditor({
   const [dirty, setDirty] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [draft, setDraft] = useState<JsonValue>({});
+  const [confirmRemove, setConfirmRemove] = useState<{
+    index: number;
+    title: string;
+  } | null>(null);
+  const [removeBusy, setRemoveBusy] = useState(false);
+  const { toast } = useToast();
   // Collapse list entries by default when there are more than a few, so the page stays scannable.
   const [openIdx, setOpenIdx] = useState<Set<number>>(() => {
     if (!Array.isArray(initialData) || initialData.length > 3) return new Set();
@@ -405,11 +413,43 @@ export default function CollectionEditor({
     });
   }
 
+  function handleRemove(index: number, entryLabel: string) {
+    setConfirmRemove({ index, title: entryLabel });
+  }
+
+  async function confirmRemoveEntry() {
+    if (confirmRemove === null || !Array.isArray(data)) return;
+    const { index } = confirmRemove;
+    const newData = removeAtIndex(data, [], index);
+    setRemoveBusy(true);
+    try {
+      const res = await saveAction(collection, JSON.stringify(newData));
+      if (res.ok) {
+        setData(newData);
+        setDirty(false);
+        setStatus("saved");
+        toast("success", `"${confirmRemove.title}" has been deleted.`);
+      } else {
+        toast("error", res.error || "Failed to delete.");
+      }
+    } catch {
+      toast("error", "Failed to delete.");
+    } finally {
+      setRemoveBusy(false);
+      setConfirmRemove(null);
+    }
+  }
+
   function handleSave() {
     startTransition(async () => {
       const res = await saveAction(collection, JSON.stringify(data));
       setStatus(res.ok ? "saved" : "error");
-      if (res.ok) setDirty(false);
+      if (res.ok) {
+        setDirty(false);
+        toast("success", "Changes saved successfully.");
+      } else {
+        toast("error", res.error || "Failed to save.");
+      }
     });
   }
 
@@ -459,6 +499,22 @@ export default function CollectionEditor({
           </button>
         </div>
       )}
+
+      {/* Confirm delete modal */}
+      <ConfirmModal
+        open={confirmRemove !== null}
+        title="Delete entry"
+        message={
+          confirmRemove
+            ? `Are you sure you want to delete "${confirmRemove.title}"? This action cannot be undone.`
+            : ""
+        }
+        confirmLabel="Delete"
+        variant="danger"
+        busy={removeBusy}
+        onConfirm={confirmRemoveEntry}
+        onCancel={() => setConfirmRemove(null)}
+      />
 
       {isList && showAddModal && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-5" onClick={cancelAddEntry}>
@@ -531,7 +587,7 @@ export default function CollectionEditor({
                   </button>
                   <button
                     type="button"
-                    onClick={() => edit(removeAtIndex(data, [], i))}
+                    onClick={() => handleRemove(i, entryTitle(item, `Entry #${i + 1}`))}
                     className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-[12px] text-red-600 transition-colors hover:bg-red-50"
                   >
                     Remove
