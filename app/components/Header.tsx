@@ -4,8 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const WHATSAPP_URL = "https://wa.me/6281234567890";
-
 type NavItem = {
   label: string;
   href: string;
@@ -193,4 +191,4 @@ export default function Header() {
   );
 }
 
-export { WHATSAPP_URL, COUNTRIES };
+export { COUNTRIES };

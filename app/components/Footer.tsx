@@ -1,17 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
-import { WHATSAPP_URL } from "./Header";
 import { readContent } from "../../lib/content";
 
 type Social = { label: string; href: string };
 
 export default async function Footer() {
-  const SETTINGS = await readContent<{ socials: Social[] }>("settings");
-  const SOCIALS = [...SETTINGS.socials, { label: "WhatsApp", href: WHATSAPP_URL }];
+  const SETTINGS = await readContent<{ socials: Social[]; whatsapp: string }>("settings");
+  const SOCIALS = [...SETTINGS.socials, { label: "WhatsApp", href: SETTINGS.whatsapp }];
 
   return (
     <footer className="mt-5 border-t border-line py-14">
-      <div className="mx-auto max-w-6xl px-7">
+      <div className="mx-auto max-w-[1400px] px-7">
         <div className="mb-10 grid gap-9 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1fr]">
           <div>
             <Image

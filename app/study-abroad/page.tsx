@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Header, { WHATSAPP_URL } from "../components/Header";
+import Header from "../components/Header";
 import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import { getCountries } from "./data";
 import { getVideo } from "../../lib/videos";
+import { getWhatsAppUrl } from "../../lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Study Abroad",
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export default async function StudyAbroadPage() {
   const COUNTRIES = await getCountries();
   const VIDEO = await getVideo("Study Info");
+  const WHATSAPP_URL = await getWhatsAppUrl();
   return (
     <>
       <Header />
@@ -44,14 +46,14 @@ export default async function StudyAbroadPage() {
                 </p>
               </div>
               <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
-                <YouTubeEmbed id={VIDEO.youtubeId} title={VIDEO.title} />
+                <YouTubeEmbed id={VIDEO.youtubeId} videoFile={VIDEO.videoFile} title={VIDEO.title} />
               </div>
             </div>
           </section>
         )}
 
         <section className="pb-16">
-          <div className="mx-auto max-w-6xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-3">
               {COUNTRIES.map((dest) => (
                 <Link
@@ -86,7 +88,7 @@ export default async function StudyAbroadPage() {
         </section>
 
         <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-5xl px-7 text-center">
+          <div className="mx-auto max-w-[1400px] px-7 text-center">
             <h2 className="mb-3 text-2xl font-extrabold tracking-tight">
               Not sure which qualification fits your goal?
             </h2>
@@ -101,7 +103,7 @@ export default async function StudyAbroadPage() {
         </section>
 
         <section className="py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="flex flex-col items-center gap-4.5 rounded-3xl bg-ink px-8 py-14 text-center text-white">
               <h2 className="max-w-md text-3xl font-extrabold">
                 Not sure which country fits? Ask a counselor.

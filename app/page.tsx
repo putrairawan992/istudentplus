@@ -73,7 +73,7 @@ export default async function Home() {
       <main>
         {/* Hero — reference: text left, student photo over organic shapes right */}
         <section className="pt-14">
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-7 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-7 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               <h1 className="mb-5.5 text-4xl font-extrabold leading-[1.08] tracking-tight text-balance sm:text-5xl">
                 Get into your <span className="text-accent">dream university</span> abroad — guided every step.
@@ -113,7 +113,7 @@ export default async function Home() {
 
         {/* Trust strip */}
         <div className="border-y border-line bg-paper-raise py-6.5">
-          <div className="mx-auto flex max-w-6xl flex-wrap justify-between gap-5 px-7 font-mono text-[13px] text-muted">
+          <div className="mx-auto flex max-w-[1400px] flex-wrap justify-between gap-5 px-7 font-mono text-[13px] text-muted">
             {SETTINGS.partnerAlumni.map((name) => (
               <div key={name}>
                 <b className="mr-1.5 font-sans text-[15px] font-bold text-ink">{name}</b>
@@ -125,7 +125,7 @@ export default async function Home() {
 
         {/* Services — reference: pastel cards carousel */}
         <section className="py-19">
-          <div className="mx-auto max-w-6xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="reveal mb-11 max-w-xl">
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
                 With you at every step of your study abroad journey.
@@ -154,7 +154,7 @@ export default async function Home() {
 
         {/* Journey — reference: vertical numbered timeline + visual right */}
         <section className="bg-paper-raise py-19">
-          <div className="mx-auto max-w-6xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="reveal mb-11 text-center">
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
                 Your journey to study abroad, simplified in 6 steps.
@@ -232,7 +232,7 @@ export default async function Home() {
                 </p>
               </div>
               <div className="reveal overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
-                <YouTubeEmbed id={STEPS_VIDEO.youtubeId} title={STEPS_VIDEO.title} />
+                <YouTubeEmbed id={STEPS_VIDEO.youtubeId} videoFile={STEPS_VIDEO.videoFile} title={STEPS_VIDEO.title} />
               </div>
             </div>
           </section>
@@ -240,7 +240,7 @@ export default async function Home() {
 
         {/* Destinations */}
         <section id="destinations" className="py-19">
-          <div className="mx-auto max-w-6xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="reveal mb-11 max-w-xl">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Where students go
@@ -284,7 +284,7 @@ export default async function Home() {
 
         {/* Language programs */}
         <section className="py-19 pt-0">
-          <div className="mx-auto max-w-6xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="reveal mb-8 flex flex-wrap items-end justify-between gap-4">
               <div>
                 <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
@@ -314,7 +314,7 @@ export default async function Home() {
 
         {/* Testimonials — reference: avatar + badge + Raih LoA list */}
         <section className="bg-sky-ink py-19">
-          <div className="mx-auto max-w-6xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="reveal mb-11 text-center">
               <h2 className="mb-2 text-3xl font-extrabold tracking-tight">
                 Alumni who made it, <span className="text-accent">on record</span>.

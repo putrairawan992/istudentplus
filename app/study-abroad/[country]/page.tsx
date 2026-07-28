@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Header, { WHATSAPP_URL } from "../../components/Header";
+import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import { getCountries, getCountry } from "../data";
+import { getWhatsAppUrl } from "../../../lib/whatsapp";
 
 export async function generateStaticParams() {
   return (await getCountries()).map((c) => ({ country: c.slug }));
@@ -30,6 +31,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
   const { country: slug } = await params;
   const country = await getCountry(slug);
   if (!country) notFound();
+  const WHATSAPP_URL = await getWhatsAppUrl();
 
   return (
     <>
@@ -51,7 +53,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
 
         {country.featuredPrograms && (
           <section className="py-14">
-            <div className="mx-auto max-w-5xl px-7">
+            <div className="mx-auto max-w-[1400px] px-7">
               <h2 className="mb-6 text-2xl font-extrabold tracking-tight">
                 Popular programs in {country.name}
               </h2>
@@ -93,7 +95,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
         )}
 
         <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-6 text-2xl font-extrabold tracking-tight">Overview</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               {OVERVIEW_LABELS.map(({ key, label }) => (
@@ -110,7 +112,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
 
         {(country.livingCosts || country.visaRequirements) && (
           <section className="py-16">
-            <div className="mx-auto grid max-w-5xl gap-6 px-7 lg:grid-cols-2">
+            <div className="mx-auto grid max-w-[1400px] gap-6 px-7 lg:grid-cols-2">
               {country.livingCosts && (
                 <div className="overflow-hidden rounded-2xl border border-line bg-card">
                   <div className="px-6 pb-2 pt-5">
@@ -158,7 +160,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
         )}
 
         <section className="py-16">
-          <div className="mx-auto max-w-5xl px-7 text-center">
+          <div className="mx-auto max-w-[1400px] px-7 text-center">
             <h2 className="mb-3 text-2xl font-extrabold tracking-tight">
               See qualification types available in {country.name}
             </h2>
@@ -169,7 +171,7 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
         </section>
 
         <section className="pb-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="flex flex-col items-center gap-4.5 rounded-3xl bg-ink px-8 py-14 text-center text-white">
               <h2 className="max-w-md text-3xl font-extrabold">
                 Ready to talk about studying in {country.name}?

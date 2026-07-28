@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Header, { WHATSAPP_URL } from "../components/Header";
+import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { readContent } from "../../lib/content";
+import { getWhatsAppUrl } from "../../lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Language Programs",
@@ -18,6 +19,7 @@ export default async function LanguageProgramsPage() {
   const PROGRAMS = await readContent<LanguageProgram[]>("languagePrograms");
   const INSTRUCTORS = await readContent<Instructor[]>("instructors");
   const ENGLISH_SKILLS = await readContent<EnglishSkill[]>("englishSkills");
+  const WHATSAPP_URL = await getWhatsAppUrl();
   return (
     <>
       <Header />
@@ -37,7 +39,7 @@ export default async function LanguageProgramsPage() {
         </section>
 
         <section className="pb-16">
-          <div className="mx-auto flex max-w-5xl flex-col gap-6 px-7">
+          <div className="mx-auto flex max-w-[1400px] flex-col gap-6 px-7">
             {PROGRAMS.map((program) => (
               <div key={program.id} id={program.id} className="scroll-mt-20 rounded-2xl border border-line bg-card p-7">
                 <h2 className="mb-2 text-xl font-extrabold">{program.name}</h2>
@@ -69,7 +71,7 @@ export default async function LanguageProgramsPage() {
         </section>
 
         <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="mb-9 text-center">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Teacher Profiles
@@ -95,7 +97,7 @@ export default async function LanguageProgramsPage() {
         </section>
 
         <section className="py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="flex flex-col items-center gap-4.5 rounded-3xl bg-ink px-8 py-14 text-center text-white">
               <h2 className="max-w-md text-3xl font-extrabold">
                 Not sure which language program fits?

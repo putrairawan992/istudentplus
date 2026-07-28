@@ -1,6 +1,26 @@
 [
-  { "series": "About Us", "title": "Tentang iStudentPlus", "youtubeId": "dLYatad-L_8" },
-  { "series": "Layanan", "title": "Service iStudentPlus", "youtubeId": "Qq0JJayuaS4" },
-  { "series": "Step by Step", "title": "Gimana ISP Bantu Kamu Kuliah di Luar Negeri", "youtubeId": "DFGp7NxfMVE" },
-  { "series": "Study Info", "title": "Study in Australia, China, & Jepang", "youtubeId": "rZIBwUy7Wk0" }
+  {
+    "title": "About iStudentPlus",
+    "series": "About Us",
+    "videoFile": null,
+    "youtubeId": "dLYatad-L_8"
+  },
+  {
+    "title": "iStudentPlus Services",
+    "series": "Services",
+    "videoFile": null,
+    "youtubeId": "Qq0JJayuaS4"
+  },
+  {
+    "title": "How iStudentPlus Helps You Study Abroad",
+    "series": "Step by Step",
+    "videoFile": null,
+    "youtubeId": "DFGp7NxfMVE"
+  },
+  {
+    "title": "Study in Australia, China & Japan",
+    "series": "Study Info",
+    "videoFile": null,
+    "youtubeId": "rZIBwUy7Wk0"
+  }
 ]

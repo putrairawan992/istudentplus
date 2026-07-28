@@ -2,10 +2,24 @@
 
 import { useState } from "react";
 
+type Props = { id?: string | null; videoFile?: string | null; title: string };
+
 // Thumbnail facade: shows the YouTube poster and only loads the (heavy) iframe player on click.
-// Keeps the Blog page light while still playing inline.
-export default function YouTubeEmbed({ id, title }: { id: string; title: string }) {
+// Keeps the Blog page light while still playing inline. A self-hosted `videoFile` (uploaded
+// through the CMS instead of referencing YouTube) skips the facade — native <video> is light
+// enough on its own — and takes priority when both are set.
+export default function YouTubeEmbed({ id, videoFile, title }: Props) {
   const [play, setPlay] = useState(false);
+
+  if (videoFile) {
+    return (
+      <video src={videoFile} controls preload="metadata" className="aspect-video w-full bg-ink">
+        Your browser does not support video playback.
+      </video>
+    );
+  }
+
+  if (!id) return null;
 
   if (play) {
     return (

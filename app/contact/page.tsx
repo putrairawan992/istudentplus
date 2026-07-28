@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Header, { WHATSAPP_URL } from "../components/Header";
+import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ContactForm from "../components/ContactForm";
 import { readContent } from "../../lib/content";
@@ -11,13 +11,14 @@ export const metadata: Metadata = {
 
 type Office = { city: string; country: string; status: string | null };
 type Social = { label: string; href: string };
-type Settings = { offices: Office[]; languages: string[]; socials: Social[] };
+type Settings = { offices: Office[]; languages: string[]; socials: Social[]; whatsapp: string };
 
 export default async function ContactPage() {
   const SETTINGS = await readContent<Settings>("settings");
   const OFFICES = SETTINGS.offices;
   const LANGUAGES = SETTINGS.languages;
   const SOCIALS = SETTINGS.socials;
+  const WHATSAPP_URL = SETTINGS.whatsapp;
 
   return (
     <>
@@ -39,7 +40,7 @@ export default async function ContactPage() {
         </section>
 
         <section className="pb-16">
-          <div className="mx-auto grid max-w-5xl gap-8 px-7 lg:grid-cols-[1fr_1.1fr]">
+          <div className="mx-auto grid max-w-[1400px] gap-8 px-7 lg:grid-cols-[1fr_1.1fr]">
             <div className="flex flex-col gap-4.5">
               <a
                 href={WHATSAPP_URL}

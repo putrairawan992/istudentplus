@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Header, { WHATSAPP_URL } from "../components/Header";
+import Header from "../components/Header";
 import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
@@ -20,6 +20,7 @@ type Settings = {
   clientCountries: string[];
   aboutStory: string[];
   whatWeDo: string[];
+  whatsapp: string;
 };
 
 const LANGUAGES = ["English", "Bahasa Indonesia", "Chinese", "Spanish"];
@@ -30,6 +31,7 @@ export default async function AboutPage() {
   const TEAM = await readContent<TeamMember[]>("team");
   const CLIENT_COUNTRIES = SETTINGS.clientCountries;
   const SERVICES = SETTINGS.whatWeDo;
+  const WHATSAPP_URL = SETTINGS.whatsapp;
   const VIDEO = await getVideo("About Us");
 
   return (
@@ -68,7 +70,7 @@ export default async function AboutPage() {
                 </p>
               </div>
               <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
-                <YouTubeEmbed id={VIDEO.youtubeId} title={VIDEO.title} />
+                <YouTubeEmbed id={VIDEO.youtubeId} videoFile={VIDEO.videoFile} title={VIDEO.title} />
               </div>
             </div>
           </section>
@@ -76,7 +78,7 @@ export default async function AboutPage() {
 
         {/* Vision & Mission — reference: navy + orange cards */}
         <section className="py-8">
-          <div className="mx-auto grid max-w-5xl gap-4.5 px-7 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="mx-auto grid max-w-[1400px] gap-4.5 px-7 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="relative overflow-hidden rounded-3xl bg-ink p-8 text-white">
               <div className="absolute -bottom-16 -left-10 h-56 w-56 rounded-full bg-white/10" />
               <h2 className="relative mb-4 text-lg font-extrabold uppercase tracking-wide">Our Vision</h2>
@@ -111,7 +113,7 @@ export default async function AboutPage() {
         </section>
 
         <section className="py-14">
-          <div className="mx-auto grid max-w-5xl gap-4.5 px-7 sm:grid-cols-3">
+          <div className="mx-auto grid max-w-[1400px] gap-4.5 px-7 sm:grid-cols-3">
             {OFFICES.map((office) => (
               <div key={office.city} className="rounded-2xl border border-line bg-card p-7">
                 <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
@@ -132,7 +134,7 @@ export default async function AboutPage() {
         </section>
 
         <section className="border-y border-line bg-card py-12">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-2 text-center text-2xl font-extrabold tracking-tight">
               Our Certifications
             </h2>
@@ -151,7 +153,7 @@ export default async function AboutPage() {
         </section>
 
         <section className="py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-3 text-3xl font-extrabold tracking-tight">Our Team</h2>
             <p className="mb-8 max-w-xl text-[15.5px] leading-relaxed text-muted">
               The counselors behind your application.
@@ -192,7 +194,7 @@ export default async function AboutPage() {
         </section>
 
         <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-3 text-3xl font-extrabold tracking-tight">What we do</h2>
             <p className="mb-8 max-w-xl text-[15.5px] leading-relaxed text-muted">
               From the first consultation to settling in on campus, our team covers every part of
@@ -209,7 +211,7 @@ export default async function AboutPage() {
         </section>
 
         <section className="py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
               Students we&apos;ve worked with, by country
             </h2>
@@ -227,7 +229,7 @@ export default async function AboutPage() {
         </section>
 
         <section className="py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="flex flex-col items-center gap-4.5 rounded-3xl bg-ink px-8 py-14 text-center text-white">
               <h2 className="max-w-md text-3xl font-extrabold">
                 Talk to a counselor who&apos;s helped students like you.

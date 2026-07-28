@@ -43,3 +43,6 @@ next-env.d.ts
 
 # user-submitted files (CVs from consultation form) — contains PII, never commit
 /uploads/
+
+# local-dev media uploads (when no backend is configured) — real media lives on the Go backend
+/public/uploads/

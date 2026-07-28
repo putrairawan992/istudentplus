@@ -1,10 +1,11 @@
-import { WHATSAPP_URL } from "./Header";
+import { getWhatsAppUrl } from "../../lib/whatsapp";
 
 // Persistent chat CTA on every page — the fastest path to a lead, always in reach.
-export default function FloatWhatsApp() {
+export default async function FloatWhatsApp() {
+  const whatsappUrl = await getWhatsAppUrl();
   return (
     <a
-      href={WHATSAPP_URL}
+      href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Chat with a counselor on WhatsApp"

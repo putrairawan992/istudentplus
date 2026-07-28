@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import Header, { WHATSAPP_URL } from "../components/Header";
+import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CourseFilter from "../components/CourseFilter";
 import { readContent } from "../../lib/content";
+import { getWhatsAppUrl } from "../../lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Courses & Universities",
@@ -25,6 +26,7 @@ export default async function CoursesPage() {
     vetFields: VET_FIELDS,
     highSchool: HIGH_SCHOOL,
   } = await readContent<CoursesPage>("coursesPage");
+  const WHATSAPP_URL = await getWhatsAppUrl();
   return (
     <>
       <Header />
@@ -41,7 +43,7 @@ export default async function CoursesPage() {
         </section>
 
         <section className="pb-16">
-          <div className="mx-auto max-w-6xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {QUALIFICATIONS.map((q) => (
                 <div key={q.name} className="rounded-2xl border border-line bg-card p-6">
@@ -55,7 +57,7 @@ export default async function CoursesPage() {
         </section>
 
         <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-6 text-2xl font-extrabold tracking-tight">
               Popular fields among Indonesian students
             </h2>
@@ -78,7 +80,7 @@ export default async function CoursesPage() {
 
         {/* VET detail (Australia) */}
         <section id="vet" className="scroll-mt-20 py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="rounded-2xl border border-line bg-card p-7">
               <h2 className="mb-2 text-xl font-extrabold">VET Courses (Australia)</h2>
               <p className="mb-6 max-w-2xl text-[15px] leading-relaxed text-muted">
@@ -119,7 +121,7 @@ export default async function CoursesPage() {
 
         {/* High School detail (Australia) */}
         <section id="high-school" className="scroll-mt-20 bg-paper-raise py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="rounded-2xl border border-line bg-card p-7">
               <h2 className="mb-2 text-xl font-extrabold">High School (Australia)</h2>
               <p className="mb-6 max-w-2xl text-[15px] leading-relaxed text-muted">
@@ -145,7 +147,7 @@ export default async function CoursesPage() {
         </section>
 
         <section className="pb-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="flex flex-col items-center gap-4.5 rounded-3xl bg-ink px-8 py-14 text-center text-white">
               <h2 className="max-w-md text-3xl font-extrabold">
                 Still deciding between qualifications?

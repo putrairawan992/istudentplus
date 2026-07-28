@@ -1,6 +1,6 @@
 import { readContent } from "./content";
 
-export type Video = { series: string; title: string; youtubeId: string };
+export type Video = { series: string; title: string; youtubeId?: string | null; videoFile?: string | null };
 
 // Videos live in the `videoSeries` CMS collection; pages pick the one they want by `series`.
 // (Keep the series strings in sync with content/videoSeries.json.)

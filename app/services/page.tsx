@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import Header, { WHATSAPP_URL } from "../components/Header";
+import Header from "../components/Header";
 import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
 import { getVideo } from "../../lib/videos";
+import { getWhatsAppUrl } from "../../lib/whatsapp";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -19,7 +20,8 @@ export default async function ServicesPage() {
   const VISA_SERVICES = await readContent<VisaService[]>("visaServices");
   const { pitfalls: PITFALLS, admissionSteps: ADMISSION_STEPS, faqs: FAQS } =
     await readContent<ServicesPageContent>("servicesPage");
-  const VIDEO = await getVideo("Layanan");
+  const VIDEO = await getVideo("Services");
+  const WHATSAPP_URL = await getWhatsAppUrl();
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -64,7 +66,7 @@ export default async function ServicesPage() {
                 </p>
               </div>
               <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
-                <YouTubeEmbed id={VIDEO.youtubeId} title={VIDEO.title} />
+                <YouTubeEmbed id={VIDEO.youtubeId} videoFile={VIDEO.videoFile} title={VIDEO.title} />
               </div>
             </div>
           </section>
@@ -72,7 +74,7 @@ export default async function ServicesPage() {
 
         {/* Visa & Admission */}
         <section id="visa-admission" className="scroll-mt-20 py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="mb-8 max-w-xl">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Visa &amp; Admission
@@ -130,7 +132,7 @@ export default async function ServicesPage() {
 
         {/* Admission Counselling */}
         <section id="admission-counselling" className="scroll-mt-20 bg-paper-raise py-16">
-          <div className="mx-auto max-w-5xl px-7">
+          <div className="mx-auto max-w-[1400px] px-7">
             <div className="mb-8 max-w-xl">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Admission Counselling
