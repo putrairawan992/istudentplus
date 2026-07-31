@@ -8,11 +8,21 @@ export type Webinar = {
   platform?: string;
   description?: string;
   image?: string;
+  // A YouTube Live stream is an ordinary video ID, so the same widget covers it. Once the
+  // stream ends that ID becomes the replay, which is why it falls back to being the recording.
+  liveYoutubeId?: string | null;
   // Recording keys follow the blog's convention so the CMS gives the same widgets and
   // <YouTubeEmbed> handles both cases: a YouTube link, or a video uploaded through the CMS.
   recordingYoutubeId?: string | null;
   recordingVideoFile?: string | null;
 };
+
+export type WebinarStatus = "upcoming" | "live" | "past";
+export type WebinarWithStatus = Webinar & { status: WebinarStatus };
+
+// Assumed length for an entry with no duration filled in, so a live session doesn't get
+// filed as "past" the minute it starts.
+const DEFAULT_MINUTES = 90;
 
 const dateFmt = new Intl.DateTimeFormat("id-ID", {
   weekday: "long",
@@ -32,18 +42,34 @@ export function schedule(w: Webinar) {
   return `${dateFmt.format(d)} WIB${duration}`;
 }
 
-// Upcoming vs past comes from the date itself, so nobody has to remember to flip a flag in the
-// CMS after an event. Undated entries count as upcoming. connection() keeps this out of the
+// The replay: an explicit recording if one was uploaded, otherwise the live stream's own ID.
+export function replayOf(w: Webinar) {
+  return {
+    youtubeId: w.recordingYoutubeId || w.liveYoutubeId || null,
+    videoFile: w.recordingVideoFile || null,
+  };
+}
+
+// Status comes from the date itself, so nobody has to remember to flip a flag in the CMS
+// after an event. Undated entries count as upcoming. connection() keeps this out of the
 // prerender — the answer depends on when the page is requested, not when it was built.
 export async function splitByDate(webinars: Webinar[]) {
   await connection();
   const now = Date.now();
-  const isPast = (w: Webinar) => {
-    const t = w.date ? new Date(w.date).getTime() : NaN;
-    return !Number.isNaN(t) && t < now;
-  };
+
+  const withStatus: WebinarWithStatus[] = webinars.map((w) => {
+    const start = w.date ? new Date(w.date).getTime() : NaN;
+    if (Number.isNaN(start)) return { ...w, status: "upcoming" };
+    const end = start + (w.durationMinutes ?? DEFAULT_MINUTES) * 60_000;
+    return { ...w, status: now < start ? "upcoming" : now <= end ? "live" : "past" };
+  });
+
+  const byDate = (a: Webinar, b: Webinar) => (a.date ?? "").localeCompare(b.date ?? "");
   return {
-    upcoming: webinars.filter((w) => !isPast(w)).sort((a, b) => (a.date ?? "").localeCompare(b.date ?? "")),
-    past: webinars.filter(isPast).sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "")),
+    // A session in progress belongs at the top, not buried under future dates.
+    upcoming: withStatus
+      .filter((w) => w.status !== "past")
+      .sort((a, b) => (a.status === b.status ? byDate(a, b) : a.status === "live" ? -1 : 1)),
+    past: withStatus.filter((w) => w.status === "past").sort((a, b) => byDate(b, a)),
   };
 }

@@ -12,18 +12,29 @@ export const metadata: Metadata = {
   description: "Webinar gratis seputar kuliah di luar negeri, beasiswa, dan persiapan bahasa.",
 };
 
-function WebinarCard({ webinar, past }: { webinar: Webinar; past: boolean }) {
+const BADGE: Record<WebinarStatus, { label: string; className: string }> = {
+  upcoming: { label: "Akan datang", className: "bg-accent/10 text-accent-ink" },
+  live: { label: "● Sedang berlangsung", className: "bg-red-600 text-white" },
+  past: { label: "Sudah lewat", className: "bg-paper-raise text-muted" },
+};
+
+function WebinarCard({ webinar }: { webinar: WebinarWithStatus }) {
   const when = schedule(webinar);
-  const recording = webinar.recordingYoutubeId || webinar.recordingVideoFile;
+  const status = webinar.status;
+  const replay = replayOf(webinar);
+  // While the stream is on, the player is the point of the page. Afterwards the replay takes
+  // that spot — that's what people come back for. Otherwise, the poster.
+  const player =
+    status === "live" && webinar.liveYoutubeId
+      ? { id: webinar.liveYoutubeId, videoFile: null }
+      : status === "past" && (replay.youtubeId || replay.videoFile)
+        ? { id: replay.youtubeId, videoFile: replay.videoFile }
+        : null;
+
   return (
     <article className="overflow-hidden rounded-2xl border border-line bg-card">
-      {/* Once there's a recording it replaces the poster — that's what people come back for. */}
-      {past && recording ? (
-        <YouTubeEmbed
-          id={webinar.recordingYoutubeId}
-          videoFile={webinar.recordingVideoFile}
-          title={webinar.title}
-        />
+      {player ? (
+        <YouTubeEmbed id={player.id} videoFile={player.videoFile} title={webinar.title} />
       ) : (
         webinar.image && (
           <div className="relative aspect-[16/7]">
@@ -33,9 +44,7 @@ function WebinarCard({ webinar, past }: { webinar: Webinar; past: boolean }) {
       )}
       <div className="p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wide">
-          <span className={`rounded-full px-2.5 py-1 ${past ? "bg-paper-raise text-muted" : "bg-accent/10 text-accent-ink"}`}>
-            {past ? "Sudah lewat" : "Akan datang"}
-          </span>
+          <span className={`rounded-full px-2.5 py-1 ${BADGE[status].className}`}>{BADGE[status].label}</span>
           {webinar.platform && <span className="text-muted">{webinar.platform}</span>}
         </div>
         <h3 className="mt-2.5 text-lg font-extrabold leading-snug">{webinar.title}</h3>
