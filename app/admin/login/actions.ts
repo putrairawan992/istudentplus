@@ -13,5 +13,9 @@ export async function loginAction(_prevState: { error: string } | null, formData
   }
 
   await createSession();
-  redirect("/admin");
+
+  // Callers can ask to land back where they started (the forum logs in inline). Only same-site
+  // paths — "//evil.com" is a valid URL to a browser, so a leading "/" alone isn't enough.
+  const to = String(formData.get("redirectTo") || "/admin");
+  redirect(to.startsWith("/") && !to.startsWith("//") ? to : "/admin");
 }

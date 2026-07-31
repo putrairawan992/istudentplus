@@ -1,0 +1,101 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import YouTubeEmbed from "../components/YouTubeEmbed";
+import { readContent } from "../../lib/content";
+import RegisterForm from "./RegisterForm";
+import { schedule, splitByDate, type Webinar } from "./shared";
+
+export const metadata: Metadata = {
+  title: "Webinar",
+  description: "Webinar gratis seputar kuliah di luar negeri, beasiswa, dan persiapan bahasa.",
+};
+
+function WebinarCard({ webinar, past }: { webinar: Webinar; past: boolean }) {
+  const when = schedule(webinar);
+  const recording = webinar.recordingYoutubeId || webinar.recordingVideoFile;
+  return (
+    <article className="overflow-hidden rounded-2xl border border-line bg-card">
+      {/* Once there's a recording it replaces the poster — that's what people come back for. */}
+      {past && recording ? (
+        <YouTubeEmbed
+          id={webinar.recordingYoutubeId}
+          videoFile={webinar.recordingVideoFile}
+          title={webinar.title}
+        />
+      ) : (
+        webinar.image && (
+          <div className="relative aspect-[16/7]">
+            <Image src={webinar.image} alt={webinar.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 700px" />
+          </div>
+        )
+      )}
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wide">
+          <span className={`rounded-full px-2.5 py-1 ${past ? "bg-paper-raise text-muted" : "bg-accent/10 text-accent-ink"}`}>
+            {past ? "Sudah lewat" : "Akan datang"}
+          </span>
+          {webinar.platform && <span className="text-muted">{webinar.platform}</span>}
+        </div>
+        <h3 className="mt-2.5 text-lg font-extrabold leading-snug">{webinar.title}</h3>
+        {when && <p className="mt-1 text-[13px] font-semibold text-muted">{when}</p>}
+        {webinar.speaker && <p className="mt-0.5 text-[13px] text-muted">Pembicara: {webinar.speaker}</p>}
+        {webinar.description && (
+          <p className="mt-3 text-[14.5px] leading-relaxed text-muted">{webinar.description}</p>
+        )}
+
+        {past ? (
+          !recording && <p className="mt-4 text-[13px] text-muted">Rekaman belum tersedia.</p>
+        ) : (
+          <RegisterForm webinar={webinar.title} />
+        )}
+      </div>
+    </article>
+  );
+}
+
+export default async function WebinarsPage() {
+  const webinars = await readContent<Webinar[]>("webinars");
+  const { upcoming, past } = await splitByDate(webinars);
+
+  return (
+    <>
+      <Header />
+      <main className="mx-auto max-w-3xl px-5 py-10 sm:px-7 sm:py-14">
+        <h1 className="text-3xl font-extrabold sm:text-4xl">Webinar</h1>
+        <p className="mt-2 text-[15px] leading-relaxed text-muted">
+          Sesi online gratis seputar kuliah di luar negeri, beasiswa, dan persiapan bahasa. Daftar
+          dengan email — link acaranya kami kirim sebelum hari-H.
+        </p>
+
+        <section className="mt-8">
+          <h2 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted">Akan datang</h2>
+          {upcoming.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-line px-5 py-10 text-center text-sm text-muted">
+              Belum ada jadwal baru. Cek lagi nanti, atau lihat rekaman di bawah.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-5">
+              {upcoming.map((w) => (
+                <WebinarCard key={w.title} webinar={w} past={false} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {past.length > 0 && (
+          <section className="mt-10">
+            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted">Sudah lewat</h2>
+            <div className="flex flex-col gap-5">
+              {past.map((w) => (
+                <WebinarCard key={w.title} webinar={w} past />
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
+      <Footer />
+    </>
+  );
+}

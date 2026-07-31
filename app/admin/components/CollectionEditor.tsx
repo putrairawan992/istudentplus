@@ -207,17 +207,23 @@ function entryTitle(item: JsonValue, fallback: string): string {
   return typeof firstStr === "string" ? (firstStr.length > 60 ? firstStr.slice(0, 60) + "…" : firstStr) : fallback;
 }
 
+// Free-text fields get a textarea no matter how short today's value happens to be — a
+// one-line input crops them ("AUD 20,000 – AUD 45,000 / yea…") and you can't see what you edit.
+const MULTILINE_KEY = /^(value|desc|description)$/i;
+
 function StringField({
   value,
   onChange,
   placeholder,
+  label,
 }: {
   value: string | null;
   onChange: (v: string | null) => void;
   placeholder?: string;
+  label?: string;
 }) {
   const str = value ?? "";
-  const long = str.length > 50 || str.includes("\n");
+  const long = str.length > 50 || str.includes("\n") || (!!label && MULTILINE_KEY.test(label));
   if (long) {
     return (
       <textarea
@@ -260,7 +266,7 @@ function FieldEditor({
     if (isMediaKey(label)) return <ImageField value={value} onChange={update} />;
     if (label && YOUTUBE_KEY.test(label)) return <VideoField value={value} onChange={update} />;
     if (isBgColorField(label, value)) return <BgColorField value={value ?? ""} onChange={update} />;
-    return <StringField value={value} onChange={update} placeholder={placeholder} />;
+    return <StringField value={value} onChange={update} placeholder={placeholder} label={label} />;
   }
 
   if (typeof value === "number") {

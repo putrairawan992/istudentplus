@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ConsultationForm from "./components/ConsultationForm";
@@ -6,6 +7,7 @@ import YouTubeEmbed from "./components/YouTubeEmbed";
 import { getCountries } from "./study-abroad/data";
 import { readContent } from "../lib/content";
 import { getVideo } from "../lib/videos";
+import { schedule, splitByDate, type Webinar } from "./webinars/shared";
 
 type Stat = { value: string; label: string };
 type HomeService = { name: string; description: string; href: string; bg: string };
@@ -54,6 +56,8 @@ export default async function Home() {
   const HOME_SERVICES = await readContent<HomeService[]>("homeServices");
   const TESTIMONIALS = await readContent<Testimonial[]>("testimonials");
   const LANGUAGE_PROGRAM_ITEMS = await readContent<LanguageProgram[]>("languagePrograms");
+  const { upcoming } = await splitByDate(await readContent<Webinar[]>("webinars"));
+  const nextWebinar = upcoming[0];
   const DESTINATIONS = (await getCountries()).filter((c) =>
     ["australia", "japan", "uk", "canada"].includes(c.slug)
   );
@@ -122,6 +126,37 @@ export default async function Home() {
             ))}
           </div>
         </div>
+
+        {/* Next webinar — only the nearest one, and nothing at all when there isn't one.
+            An empty "no upcoming events" box on the home page reads worse than no box. */}
+        {nextWebinar && (
+          <section className="py-19 pb-0">
+            <div className="mx-auto max-w-[1400px] px-7">
+              <Link
+                href="/webinars"
+                className="group flex flex-col gap-4 rounded-3xl border border-line bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-7 sm:p-7"
+              >
+                <div className="flex-1">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-accent">
+                    Webinar berikutnya
+                  </p>
+                  <h3 className="mt-1.5 text-xl font-extrabold leading-snug">{nextWebinar.title}</h3>
+                  {schedule(nextWebinar) && (
+                    <p className="mt-1 text-[13.5px] font-semibold text-muted">{schedule(nextWebinar)}</p>
+                  )}
+                  {nextWebinar.description && (
+                    <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-muted">
+                      {nextWebinar.description}
+                    </p>
+                  )}
+                </div>
+                <span className="shrink-0 rounded-full bg-accent px-5 py-2.5 text-center text-[13.5px] font-semibold text-white shadow-sm shadow-accent/30 transition-transform group-hover:scale-[1.03]">
+                  Lihat detail & daftar
+                </span>
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* Services — reference: pastel cards carousel */}
         <section className="py-19">

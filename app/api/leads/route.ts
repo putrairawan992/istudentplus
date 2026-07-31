@@ -5,9 +5,11 @@ import { readContent, writeContent } from "../../../lib/content";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
+const SOURCES = ["consultation", "contact", "webinar"] as const;
+
 type Lead = {
   id: string;
-  source: "consultation" | "contact";
+  source: (typeof SOURCES)[number];
   submittedAt: string;
   name: string;
   email: string;
@@ -27,7 +29,8 @@ async function saveCv(file: File): Promise<string> {
 export async function POST(request: Request) {
   const form = await request.formData();
 
-  const source = form.get("source") === "contact" ? "contact" : "consultation";
+  const raw = String(form.get("source") || "");
+  const source = (SOURCES as readonly string[]).includes(raw) ? (raw as Lead["source"]) : "consultation";
   const name = String(form.get("name") || "").trim();
   const email = String(form.get("email") || "").trim();
 

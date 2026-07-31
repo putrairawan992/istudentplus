@@ -26,7 +26,8 @@ export const COLLECTIONS: CollectionMeta[] = [
   { key: "videoSeries", label: "Blog Videos", description: "Abroad Stories & Scholarships video cards", kind: "list", usedOn: "Blog", icon: "▶️", group: "Content" },
   { key: "coursesPage", label: "Courses & Universities", description: "Qualification types, popular fields, VET levels/fields, high school", kind: "single", usedOn: "Courses", icon: "🎯", group: "Content" },
   { key: "englishSkills", label: "English Skills", description: "The 4 General English skill cards (Reading, Writing, Speaking, Listening)", kind: "list", usedOn: "Language Programs", icon: "📚", group: "Content" },
-  { key: "leads", label: "Consultation & Contact Leads", description: "Submissions from the Free Consultation and Contact forms", kind: "list", usedOn: "Home, Contact", icon: "📥", group: "Inbox" },
+  { key: "webinars", label: "Webinars", description: "Upcoming and past webinars — upcoming/past is decided by the date, no flag to flip", kind: "list", usedOn: "Webinars", icon: "🎥", group: "Content" },
+  { key: "leads", label: "Consultation & Contact Leads", description: "Submissions from the Free Consultation, Contact, and webinar registration forms", kind: "list", usedOn: "Collected from Home, Contact, Webinars", icon: "📥", group: "Inbox" },
 ];
 
 export const COLLECTION_GROUPS: CollectionGroup[] = ["General", "Content", "Inbox"];

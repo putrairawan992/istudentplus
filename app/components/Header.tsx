@@ -55,6 +55,8 @@ const NAV_ITEMS: NavItem[] = [
       { label: "Study Tips", href: "/blog?category=study-tips" },
     ],
   },
+  { label: "Webinar", href: "/webinars" },
+  { label: "Forum", href: "/threads" },
   { label: "Contact Us", href: "/contact" },
 ];
 
