@@ -137,8 +137,12 @@ export default async function Home() {
                 className="group flex flex-col gap-4 rounded-3xl border border-line bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-7 sm:p-7"
               >
                 <div className="flex-1">
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-accent">
-                    Webinar berikutnya
+                  <p
+                    className={`text-[11px] font-bold uppercase tracking-widest ${
+                      nextWebinar.status === "live" ? "text-red-600" : "text-accent"
+                    }`}
+                  >
+                    {nextWebinar.status === "live" ? "● Sedang berlangsung" : "Webinar berikutnya"}
                   </p>
                   <h3 className="mt-1.5 text-xl font-extrabold leading-snug">{nextWebinar.title}</h3>
                   {schedule(nextWebinar) && (
@@ -151,7 +155,7 @@ export default async function Home() {
                   )}
                 </div>
                 <span className="shrink-0 rounded-full bg-accent px-5 py-2.5 text-center text-[13.5px] font-semibold text-white shadow-sm shadow-accent/30 transition-transform group-hover:scale-[1.03]">
-                  Lihat detail & daftar
+                  {nextWebinar.status === "live" ? "Tonton sekarang" : "Lihat detail & daftar"}
                 </span>
               </Link>
             </div>

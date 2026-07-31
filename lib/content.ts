@@ -31,7 +31,12 @@ function filePath(key: CollectionKey) {
 
 export async function readContent<T>(key: CollectionKey): Promise<T> {
   if (API_URL) {
-    const res = await fetch(`${API_URL}/content/${key}`, { cache: "no-store" });
+    // Always send the token: most collections are public, but "leads" holds visitor PII and
+    // the API now requires auth to read it. This only ever runs server-side.
+    const res = await fetch(`${API_URL}/content/${key}`, {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${API_TOKEN}` },
+    });
     if (!res.ok) throw new Error(`readContent ${key}: ${res.status}`);
     return (await res.json()) as T;
   }

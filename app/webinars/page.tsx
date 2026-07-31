@@ -5,7 +5,14 @@ import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
 import RegisterForm from "./RegisterForm";
-import { schedule, splitByDate, type Webinar } from "./shared";
+import {
+  replayOf,
+  schedule,
+  splitByDate,
+  type Webinar,
+  type WebinarStatus,
+  type WebinarWithStatus,
+} from "./shared";
 
 export const metadata: Metadata = {
   title: "Webinar",
@@ -54,8 +61,11 @@ function WebinarCard({ webinar }: { webinar: WebinarWithStatus }) {
           <p className="mt-3 text-[14.5px] leading-relaxed text-muted">{webinar.description}</p>
         )}
 
-        {past ? (
-          !recording && <p className="mt-4 text-[13px] text-muted">Rekaman belum tersedia.</p>
+        {status === "past" ? (
+          !player && <p className="mt-4 text-[13px] text-muted">Rekaman belum tersedia.</p>
+        ) : player ? (
+          // The stream is already playing above; asking them to register now helps nobody.
+          <p className="mt-4 text-[13px] font-semibold text-muted">Sesi sedang berlangsung — tonton di atas.</p>
         ) : (
           <RegisterForm webinar={webinar.title} />
         )}
@@ -87,7 +97,7 @@ export default async function WebinarsPage() {
           ) : (
             <div className="flex flex-col gap-5">
               {upcoming.map((w) => (
-                <WebinarCard key={w.title} webinar={w} past={false} />
+                <WebinarCard key={w.title} webinar={w} />
               ))}
             </div>
           )}
@@ -98,7 +108,7 @@ export default async function WebinarsPage() {
             <h2 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted">Sudah lewat</h2>
             <div className="flex flex-col gap-5">
               {past.map((w) => (
-                <WebinarCard key={w.title} webinar={w} past />
+                <WebinarCard key={w.title} webinar={w} />
               ))}
             </div>
           </section>
