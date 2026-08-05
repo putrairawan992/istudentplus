@@ -396,6 +396,7 @@ export default function CollectionEditor({
     title: string;
   } | null>(null);
   const [removeBusy, setRemoveBusy] = useState(false);
+  const [reorderBusy, setReorderBusy] = useState(false);
   const { toast } = useToast();
   // Collapse list entries by default when there are more than a few, so the page stays scannable.
   const [openIdx, setOpenIdx] = useState<Set<number>>(() => {
@@ -443,6 +444,42 @@ export default function CollectionEditor({
     } finally {
       setRemoveBusy(false);
       setConfirmRemove(null);
+    }
+  }
+
+  // Display order on every public page is just array order (confirmed: no seed data has a
+  // separate "order" field, pages render collections via plain .map()) — so reordering here
+  // is reordering the array, saved the same way Remove already does: immediately, not gated
+  // behind each entry's own "Save changes" button, since this acts on the list itself rather
+  // than one entry's fields.
+  async function moveEntry(index: number, direction: -1 | 1) {
+    if (!Array.isArray(data) || reorderBusy) return;
+    const target = index + direction;
+    if (target < 0 || target >= data.length) return;
+
+    const next = [...data];
+    [next[index], next[target]] = [next[target], next[index]];
+
+    setReorderBusy(true);
+    try {
+      const res = await saveAction(collection, JSON.stringify(next));
+      if (res.ok) {
+        setData(next);
+        setDirty(false);
+        setStatus("saved");
+        // The open/closed entries follow their content, not their old position.
+        setOpenIdx((prev) => {
+          const out = new Set<number>();
+          prev.forEach((i) => out.add(i === index ? target : i === target ? index : i));
+          return out;
+        });
+      } else {
+        toast("error", res.error || "Failed to reorder.");
+      }
+    } catch {
+      toast("error", "Failed to reorder.");
+    } finally {
+      setReorderBusy(false);
     }
   }
 
@@ -591,6 +628,30 @@ export default function CollectionEditor({
                     </span>
                     <span className="truncate text-sm font-bold">{entryTitle(item, `Entry #${i + 1}`)}</span>
                   </button>
+                  {(data as JsonValue[]).length > 1 && (
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => moveEntry(i, -1)}
+                        disabled={i === 0 || reorderBusy}
+                        title="Move up"
+                        aria-label="Move up"
+                        className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ▲
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => moveEntry(i, 1)}
+                        disabled={i === (data as JsonValue[]).length - 1 || reorderBusy}
+                        title="Move down"
+                        aria-label="Move down"
+                        className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => handleRemove(i, entryTitle(item, `Entry #${i + 1}`))}
