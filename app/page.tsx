@@ -10,6 +10,7 @@ import { getVideo } from "../lib/videos";
 import { schedule, splitByDate, type Webinar } from "./webinars/shared";
 
 type Stat = { value: string; label: string };
+type Settings = { stats: Stat[]; partnerAlumni: string[]; heroTitle: string; heroSubtitle: string };
 type HomeService = { name: string; description: string; href: string; bg: string };
 type Testimonial = {
   name: string;
@@ -38,6 +39,24 @@ const JOURNEY_STEPS = [
   { title: "Enrollment Abroad", description: "Begin your study journey with confidence." },
 ];
 
+// The hero title is CMS-editable text with one `**...**` span rendered in the accent color
+// (e.g. "Get into your **dream university** abroad."), so non-technical editors can change the
+// wording without touching code while keeping the highlighted phrase.
+function HeroTitle({ text }: { text: string }) {
+  const parts = text.split("**");
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <span key={i} className="text-accent">{part}</span>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
 function StatusPill({ status }: { status: "Open" | "3 Seats" }) {
   const isOpen = status === "Open";
   return (
@@ -52,7 +71,7 @@ function StatusPill({ status }: { status: "Open" | "3 Seats" }) {
 }
 
 export default async function Home() {
-  const SETTINGS = await readContent<{ stats: Stat[]; partnerAlumni: string[] }>("settings");
+  const SETTINGS = await readContent<Settings>("settings");
   const HOME_SERVICES = await readContent<HomeService[]>("homeServices");
   const TESTIMONIALS = await readContent<Testimonial[]>("testimonials");
   const LANGUAGE_PROGRAM_ITEMS = await readContent<LanguageProgram[]>("languagePrograms");
@@ -80,11 +99,10 @@ export default async function Home() {
           <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-7 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               <h1 className="mb-5.5 text-4xl font-extrabold leading-[1.08] tracking-tight text-balance sm:text-5xl">
-                Get into your <span className="text-accent">dream university</span> abroad — guided every step.
+                <HeroTitle text={SETTINGS.heroTitle} />
               </h1>
               <p className="mb-8 max-w-md text-[17px] leading-relaxed text-muted">
-                Free counseling from application to arrival, backed by 100+ partner universities.
-                Personalized recommendations and expert guidance, at no cost to talk.
+                {SETTINGS.heroSubtitle}
               </p>
               <div className="mb-9 flex items-center gap-3.5">
                 <a href="/study-abroad" className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-transform hover:scale-[1.03]">
