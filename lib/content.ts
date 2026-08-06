@@ -44,6 +44,26 @@ export async function readContent<T>(key: CollectionKey): Promise<T> {
   return JSON.parse(raw) as T;
 }
 
+// Atomically prepends one item to an array collection. Prefer this over readContent +
+// writeContent for anything visitors can submit concurrently (e.g. leads) — a separate
+// read-modify-write round trip loses data when two submissions land at the same time. The
+// local-file fallback still read-modify-writes since a single dev process has nothing to
+// race against.
+export async function appendContent<T>(key: CollectionKey, item: T): Promise<void> {
+  if (API_URL) {
+    const res = await fetch(`${API_URL}/content/${key}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${API_TOKEN}` },
+      body: JSON.stringify(item),
+    });
+    if (!res.ok) throw new Error(`appendContent ${key}: ${res.status}`);
+    return;
+  }
+  const list = await readContent<T[]>(key);
+  list.unshift(item);
+  await writeContent(key, list);
+}
+
 export async function writeContent<T>(key: CollectionKey, data: T): Promise<void> {
   if (API_URL) {
     const res = await fetch(`${API_URL}/content/${key}`, {

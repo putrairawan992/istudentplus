@@ -74,12 +74,40 @@ function WebinarCard({ webinar }: { webinar: WebinarWithStatus }) {
   );
 }
 
+const siteUrl = "https://www.istudentplus.com";
+
+// GEO/SEO: one schema.org Event per dated webinar, so search/AI engines can surface it
+// directly (date, format, organizer) instead of only the page's plain text.
+function eventJsonLd(w: WebinarWithStatus) {
+  if (!w.date) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: w.title,
+    description: w.description,
+    startDate: w.date,
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+    location: { "@type": "VirtualLocation", url: `${siteUrl}/webinars` },
+    image: w.image ? [w.image] : undefined,
+    performer: w.speaker ? { "@type": "Person", name: w.speaker } : undefined,
+    organizer: { "@type": "Organization", name: "iStudentPlus", url: siteUrl },
+  };
+}
+
 export default async function WebinarsPage() {
   const webinars = await readContent<Webinar[]>("webinars");
   const { upcoming, past } = await splitByDate(webinars);
+  const events = [...upcoming, ...past].map(eventJsonLd).filter(Boolean);
 
   return (
     <>
+      {events.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(events) }}
+        />
+      )}
       <Header />
       <main className="mx-auto max-w-3xl px-5 py-10 sm:px-7 sm:py-14">
         <h1 className="text-3xl font-extrabold sm:text-4xl">Webinar</h1>

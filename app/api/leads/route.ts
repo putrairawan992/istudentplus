@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { readContent, writeContent } from "../../../lib/content";
+import { appendContent } from "../../../lib/content";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
+
+// Same backend the admin's image uploads go through (app/api/upload/route.ts) — the browser
+// never sees the token, this route forwards it server-side. Without this, CVs were written to
+// the Next.js server's local disk, which doesn't persist on a fresh container/serverless host.
+const API_URL = process.env.CONTENT_API_URL;
+const API_TOKEN = process.env.CONTENT_API_TOKEN;
 
 const SOURCES = ["consultation", "contact", "webinar"] as const;
 
@@ -18,6 +24,20 @@ type Lead = {
 };
 
 async function saveCv(file: File): Promise<string> {
+  if (API_URL) {
+    const upstream = new FormData();
+    upstream.set("file", file, file.name);
+    const res = await fetch(`${API_URL}/media`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${API_TOKEN}` },
+      body: upstream,
+    });
+    if (!res.ok) throw new Error(`cv upload: ${res.status}`);
+    const data = (await res.json()) as { url: string };
+    return `${API_URL}${data.url}`;
+  }
+
+  // Local-dev fallback: no backend running, write to local disk.
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
   const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
   const filename = `${Date.now()}-${safeName}`;
@@ -62,9 +82,7 @@ export async function POST(request: Request) {
     cvFilename,
   };
 
-  const leads = await readContent<Lead[]>("leads");
-  leads.unshift(lead);
-  await writeContent("leads", leads);
+  await appendContent("leads", lead);
 
   return NextResponse.json({ ok: true });
 }
