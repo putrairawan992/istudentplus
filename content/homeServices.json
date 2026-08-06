@@ -1,26 +1,26 @@
 [
   {
-    "name": "Education Counseling",
-    "description": "Program and university matching based on grades, budget, and goals.",
-    "href": "/services#admission-counselling",
-    "bg": "bg-[#FDF3C7]"
-  },
-  {
-    "name": "Visa Application",
-    "description": "Document prep and full support for a smooth application process.",
-    "href": "/services#visa-admission",
+    "name": "Visa Admission Support",
+    "description": "Prepare your Student visa application with support from our registered migration agent.",
+    "href": "/services",
     "bg": "bg-[#FBDCE5]"
   },
   {
-    "name": "Student Accommodation",
-    "description": "Verified dorms and homestays arranged before you land.",
-    "href": "/services#visa-admission",
+    "name": "Choosing the best education partner",
+    "description": "Find the right course and education provider based on your goals, budget and academic background.",
+    "href": "/courses",
+    "bg": "bg-[#FDF3C7]"
+  },
+  {
+    "name": "Preparing your language skills",
+    "description": "Prepare for IELTS and PTE with practical lessons, study resources and personalised support.",
+    "href": "/language-programs",
     "bg": "bg-[#D9F3EC]"
   },
   {
-    "name": "Pre-Departure",
-    "description": "Orientation, insurance, and travel briefing before you fly.",
-    "href": "/services",
+    "name": "Personalised support",
+    "description": "One-to-one counseling from your first consultation through to enrolment abroad.",
+    "href": "/services#admission-counselling",
     "bg": "bg-[#E6E1F7]"
   }
 ]

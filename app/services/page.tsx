@@ -137,14 +137,14 @@ export default async function ServicesPage() {
           <div className="mx-auto max-w-[1400px] px-7">
             <div className="mb-8 max-w-xl">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
-                Admission Counselling
+                Student Visa Admission Counselling
               </div>
               <h2 className="text-3xl font-extrabold tracking-tight">
-                Student Visa Admission Counselling
+                Get to know your counseling process, step by step.
               </h2>
               <p className="mt-3 text-[15px] leading-relaxed text-muted">
-                Get to know your step-by-step counseling process. We help you choose the right
-                country, program, and university aligned with your career and long-term goals.
+                We help you choose the right country, program, and university aligned with your
+                career and long-term goals.
               </p>
             </div>
 
