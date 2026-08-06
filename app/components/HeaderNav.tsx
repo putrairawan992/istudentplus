@@ -21,19 +21,19 @@ const COUNTRIES = [
 ];
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "About Us", href: "/about" },
+  {
+    label: "About Us",
+    href: "/about",
+    children: [
+      { label: "About Us", href: "/about" },
+      { label: "Our Services", href: "/services" },
+      { label: "Contact Us", href: "/contact" },
+    ],
+  },
   {
     label: "Study Abroad",
     href: "/study-abroad",
     children: COUNTRIES.map((c) => ({ label: c.label, href: `/study-abroad/${c.slug}` })),
-  },
-  {
-    label: "Services",
-    href: "/services",
-    children: [
-      { label: "Visa & Admission", href: "/services#visa-admission" },
-      { label: "Admission Counselling", href: "/services#admission-counselling" },
-    ],
   },
   { label: "Courses & Universities", href: "/courses" },
   {
@@ -58,7 +58,6 @@ const NAV_ITEMS: NavItem[] = [
   },
   { label: "Webinar", href: "/webinars" },
   { label: "Forum", href: "/threads" },
-  { label: "Contact Us", href: "/contact" },
 ];
 
 function NavLink({ item }: { item: NavItem }) {

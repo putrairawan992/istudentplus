@@ -9,13 +9,11 @@ export const metadata: Metadata = {
   description: "Book a free consultation with an iStudentPlus counselor via WhatsApp, or reach our Pangkalpinang and Makassar offices.",
 };
 
-type Office = { city: string; country: string; status: string | null };
 type Social = { label: string; href: string };
-type Settings = { offices: Office[]; languages: string[]; socials: Social[]; whatsapp: string };
+type Settings = { languages: string[]; socials: Social[]; whatsapp: string };
 
 export default async function ContactPage() {
   const SETTINGS = await readContent<Settings>("settings");
-  const OFFICES = SETTINGS.offices;
   const LANGUAGES = SETTINGS.languages;
   const SOCIALS = SETTINGS.socials;
   const WHATSAPP_URL = SETTINGS.whatsapp;
@@ -52,25 +50,6 @@ export default async function ContactPage() {
                 </div>
                 <span className="text-2xl">→</span>
               </a>
-
-              <div className="grid gap-3 sm:grid-cols-3">
-                {OFFICES.map((office) => (
-                  <div key={office.city} className="rounded-2xl border border-line bg-card p-5">
-                    <div className="mb-1 text-xs font-bold uppercase tracking-widest text-accent">
-                      Office
-                    </div>
-                    <div className="break-words text-lg font-extrabold leading-tight">{office.city}</div>
-                    <div className="flex flex-wrap items-center justify-between gap-1.5">
-                      <div className="text-sm text-muted">{office.country}</div>
-                      {office.status && (
-                        <span className="rounded-full bg-sky-ink px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-sky">
-                          {office.status}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
 
               <div className="rounded-2xl border border-line bg-card p-5">
                 <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">

@@ -12,25 +12,28 @@ export const metadata: Metadata = {
     "iStudentPlus is a global student network and media agency with offices in Pangkalpinang and Makassar, Indonesia — promoting inclusivity and empowering students worldwide.",
 };
 
-type Office = { city: string; country: string; status: string | null };
 type TeamMember = { name: string; role: string; photo: string | null; bio: string | null };
 type Settings = {
-  offices: Office[];
   languages: string[];
   clientCountries: string[];
   aboutStory: string[];
-  whatWeDo: string[];
   whatsapp: string;
 };
 
 const LANGUAGES = ["English", "Bahasa Indonesia", "Chinese", "Spanish"];
 
+// Presentable flags for the "students we've worked with" pill list (feedback: countries
+// should read as flags, not just text). Falls back to the plain name if a country isn't mapped.
+const COUNTRY_FLAGS: Record<string, string> = {
+  Indonesia: "🇮🇩", Malaysia: "🇲🇾", Vietnam: "🇻🇳", Thailand: "🇹🇭", China: "🇨🇳", Japan: "🇯🇵",
+  Korea: "🇰🇷", Jordan: "🇯🇴", Germany: "🇩🇪", UK: "🇬🇧", Estonia: "🇪🇪", Colombia: "🇨🇴",
+  Chile: "🇨🇱", Argentina: "🇦🇷", Brazil: "🇧🇷", USA: "🇺🇸", Canada: "🇨🇦", Australia: "🇦🇺",
+};
+
 export default async function AboutPage() {
   const SETTINGS = await readContent<Settings>("settings");
-  const OFFICES = SETTINGS.offices;
   const TEAM = await readContent<TeamMember[]>("team");
   const CLIENT_COUNTRIES = SETTINGS.clientCountries;
-  const SERVICES = SETTINGS.whatWeDo;
   const WHATSAPP_URL = SETTINGS.whatsapp;
   const VIDEO = await getVideo("About Us");
 
@@ -112,27 +115,6 @@ export default async function AboutPage() {
           </div>
         </section>
 
-        <section className="py-14">
-          <div className="mx-auto grid max-w-[1400px] gap-4.5 px-7 sm:grid-cols-3">
-            {OFFICES.map((office) => (
-              <div key={office.city} className="rounded-2xl border border-line bg-card p-7">
-                <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
-                  Office
-                </div>
-                <h3 className="break-words text-2xl font-extrabold leading-tight">{office.city}</h3>
-                <div className="flex flex-wrap items-center justify-between gap-1.5">
-                  <p className="text-muted">{office.country}</p>
-                  {office.status && (
-                    <span className="rounded-full bg-sky-ink px-2.5 py-1 text-[10.5px] font-bold uppercase tracking-wide text-sky">
-                      {office.status}
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
         <section className="border-y border-line bg-card py-12">
           <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-2 text-center text-2xl font-extrabold tracking-tight">
@@ -193,23 +175,6 @@ export default async function AboutPage() {
           </div>
         </section>
 
-        <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-[1400px] px-7">
-            <h2 className="mb-3 text-3xl font-extrabold tracking-tight">What we do</h2>
-            <p className="mb-8 max-w-xl text-[15.5px] leading-relaxed text-muted">
-              From the first consultation to settling in on campus, our team covers every part of
-              the journey.
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {SERVICES.map((service) => (
-                <div key={service} className="rounded-xl border border-line bg-card px-5 py-4 text-sm font-medium">
-                  {service}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section className="py-16">
           <div className="mx-auto max-w-[1400px] px-7">
             <h2 className="mb-3 text-3xl font-extrabold tracking-tight">
@@ -221,6 +186,7 @@ export default async function AboutPage() {
             <div className="flex flex-wrap gap-2.5">
               {CLIENT_COUNTRIES.map((country) => (
                 <span key={country} className="rounded-full border border-line bg-card px-4 py-1.5 text-sm font-medium">
+                  {COUNTRY_FLAGS[country] ? `${COUNTRY_FLAGS[country]} ` : ""}
                   {country}
                 </span>
               ))}

@@ -1,32 +1,68 @@
 [
   {
     "name": "Student Visa",
-    "intro": "Want to study in Australia? We'll help you get the right visa so you can study, work part-time, and enjoy Aussie life.",
-    "points": ["Work up to 48 hours per fortnight", "Study at top institutions", "Step-by-step guidance"]
+    "intro": "We provide course guidance, education provider application support, and information on student visas. ",
+    "points": [
+      "Course and education provider guidance",
+      "Student document checklist",
+      "Enrolment and Confirmation of Enrolment support",
+      "Support before and after enrolment"
+    ],
+    "icon": "🎓"
   },
   {
     "name": "Student Visa Renewal",
-    "intro": "Need to extend your stay? We make it simple.",
-    "points": ["No last-minute stress", "Course extension options", "Full application support"]
+    "intro": "Need more time to complete your studies or planning your next course? ",
+    "points": [
+      "Further-study and course options",
+      "Enrolment document assistance",
+      "Confirmation of Enrolment support",
+      "Referral to our registered migration partner"
+    ],
+    "icon": "🔄"
   },
   {
     "name": "Working Holiday Visa",
-    "intro": "Work & travel across Australia for up to a year (or more).",
-    "points": ["Earn money while exploring", "Study for up to 4 months", "Easy extensions available"]
+    "intro": "Working Holiday Makers allow eligible young adults to spend 12 months in Australia while doing short-term work and studying. ",
+    "points": [
+      "Work while travelling around Australia",
+      "First, second and third-year visa information",
+      "Study or train for up to four months",
+      "Registered migration advice available"
+    ],
+    "icon": "🧳"
   },
   {
-    "name": "Tourist Visa",
-    "intro": "Short stay? No worries.",
-    "points": ["Explore Australia for up to 3, 6, or 12 months", "Simple application process", "Option to extend (conditions apply)"]
+    "name": "Visitor Visa",
+    "intro": "Visitor visas let you stay in Australia for up to three months, depending on your situation and your stream.",
+    "points": [
+      "Supporting-document guidance",
+      "Personalised migration consultation",
+      "Tourism and family-visit options",
+      "Option to extend (conditions apply)"
+    ],
+    "icon": "✈️"
   },
   {
-    "name": "Visa Advice with IMMagine Immigration",
-    "intro": "Not sure which visa is right for you? We've got experts for that.",
-    "points": ["PR & skilled migration pathways", "Post-study visa options", "Personalised consultations"]
+    "name": "Registered Migration Advice ",
+    "intro": "Speak with our in-house registered migration agent to explore the Australian visa pathway best suited to your circumstances.",
+    "points": [
+      "Student and graduate visa options",
+      "Working Holiday and Visitor visa advice",
+      "Skilled migration and permanent residency pathways",
+      "Personalised migration consultations"
+    ],
+    "icon": "🧭"
   },
   {
-    "name": "Housing with Middow",
-    "intro": "Need a place to stay? We've got student-friendly housing sorted.",
-    "points": ["Affordable & secure accommodation", "Locations across Australia", "Easy booking process"]
+    "name": "Student Accommodation",
+    "intro": "Explore student-friendly accommodation options.",
+    "points": [
+      "Accommodation options for students",
+      "Secure enquiry and booking process",
+      "Locations near transport and education providers",
+      "Support before your arrival"
+    ],
+    "icon": "🏠"
   }
 ]

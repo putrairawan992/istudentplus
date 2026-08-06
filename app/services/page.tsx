@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
+import ChecklistForm from "../components/ChecklistForm";
 import { readContent } from "../../lib/content";
 import { getVideo } from "../../lib/videos";
 import { getWhatsAppUrl } from "../../lib/whatsapp";
@@ -11,9 +12,9 @@ export const metadata: Metadata = {
   description: "Visa & Admission support and Admission Counselling from iStudentPlus education consultants.",
 };
 
-type VisaService = { name: string; intro: string; points: string[] };
+type VisaService = { name: string; intro: string; points: string[]; icon?: string };
 type AdmissionStep = { title: string; description: string };
-type Faq = { q: string; a: string };
+type Faq = { q: string; a: string; link?: { text: string; href: string } };
 type ServicesPageContent = { pitfalls: string[]; admissionSteps: AdmissionStep[]; faqs: Faq[] };
 
 export default async function ServicesPage() {
@@ -79,16 +80,21 @@ export default async function ServicesPage() {
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Visa &amp; Admission
               </div>
-              <h2 className="text-3xl font-extrabold tracking-tight">Visa process made easy.</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight">
+                Multiple visa pathways, one end-to-end guide.
+              </h2>
               <p className="mt-3 text-[15px] leading-relaxed text-muted">
-                A simple, guided application flow for Australia, Japan, and every destination we
-                support — so nothing gets missed.
+                From student visas to short and long-stay options across Australia and Japan, we
+                walk with you through every step of settling into a new country.
               </p>
             </div>
 
             <div className="mb-4.5 grid gap-4.5 sm:grid-cols-2 lg:grid-cols-3">
               {VISA_SERVICES.map((service) => (
                 <div key={service.name} className="rounded-2xl border border-line bg-card p-6">
+                  <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-xl">
+                    {service.icon || "📄"}
+                  </div>
                   <h3 className="mb-2 font-bold">{service.name}</h3>
                   <p className="mb-3 text-[13px] leading-relaxed text-muted">{service.intro}</p>
                   <ul className="flex flex-col gap-1.5 text-[13px] text-muted">
@@ -104,22 +110,18 @@ export default async function ServicesPage() {
             </div>
 
             <div className="rounded-2xl border border-line bg-card p-6">
-              <h3 className="mb-3 font-bold">Common pitfalls to avoid</h3>
-              <ul className="flex flex-col gap-1.5 text-[13.5px] text-muted">
+              <h3 className="mb-3 font-bold">Avoid the most common visa rejection reasons</h3>
+              <ul className="mb-5 flex flex-col gap-1.5 text-[13.5px] text-muted">
                 {PITFALLS.map((p) => (
                   <li key={p}>• {p}</li>
                 ))}
               </ul>
-            </div>
-
-            <div className="mt-4.5 flex flex-col items-start gap-3 rounded-2xl border border-dashed border-line bg-paper-raise p-6 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="mb-1 font-bold">Document checklist</h3>
-                <p className="text-[13.5px] text-muted">A ready-to-use PDF checklist for your visa type.</p>
+              <div className="flex flex-col gap-3 rounded-xl border border-dashed border-line bg-paper-raise p-5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-[13.5px] font-semibold">
+                  Inquire this document checklist as your visa guidance.
+                </p>
+                <ChecklistForm />
               </div>
-              <a href={WHATSAPP_URL} className="shrink-0 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white">
-                Get the checklist
-              </a>
             </div>
 
             <div className="mt-6">
@@ -138,20 +140,33 @@ export default async function ServicesPage() {
                 Admission Counselling
               </div>
               <h2 className="text-3xl font-extrabold tracking-tight">
-                Personalized 1:1 counseling, not a generic agency script.
+                Student Visa Admission Counselling
               </h2>
               <p className="mt-3 text-[15px] leading-relaxed text-muted">
-                We help you choose the right country, program, and university aligned with your
-                career goals — then walk the admission process with you end to end.
+                Get to know your step-by-step counseling process. We help you choose the right
+                country, program, and university aligned with your career and long-term goals.
               </p>
             </div>
 
-            <div className="mb-8 grid gap-4 sm:grid-cols-3">
+            <div className="relative mb-8 flex flex-col gap-2.5 before:absolute before:bottom-6 before:left-[21px] before:top-6 before:w-px before:bg-line before:content-['']">
               {ADMISSION_STEPS.map((step, i) => (
-                <div key={step.title} className="rounded-2xl border border-line bg-card p-5">
-                  <div className="mb-2 font-mono text-xs text-muted">{String(i + 1).padStart(2, "0")}</div>
-                  <h3 className="mb-1.5 font-bold">{step.title}</h3>
-                  <p className="text-[13px] leading-relaxed text-muted">{step.description}</p>
+                <div
+                  key={step.title}
+                  className={`relative flex items-start gap-4 rounded-2xl px-3.5 py-3.5 ${
+                    i === 0 ? "border border-accent/20 bg-accent/5" : ""
+                  }`}
+                >
+                  <div
+                    className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-[13px] font-bold ${
+                      i === 0 ? "bg-accent text-white" : "border border-line bg-card text-muted"
+                    }`}
+                  >
+                    {i + 1}
+                  </div>
+                  <div>
+                    <h4 className="text-[15px] font-extrabold">{step.title}</h4>
+                    <p className="text-[13px] leading-relaxed text-muted">{step.description}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -170,7 +185,17 @@ export default async function ServicesPage() {
                       </span>
                       <span className="text-muted transition-transform group-open:rotate-90">›</span>
                     </summary>
-                    <p className="mt-3 pl-7 text-[13.5px] leading-relaxed text-muted">{faq.a}</p>
+                    <p className="mt-3 pl-7 text-[13.5px] leading-relaxed text-muted">
+                      {faq.a}
+                      {faq.link && (
+                        <>
+                          {" "}
+                          <a href={faq.link.href} className="font-semibold text-accent hover:underline">
+                            {faq.link.text} →
+                          </a>
+                        </>
+                      )}
+                    </p>
                   </details>
                 ))}
               </div>

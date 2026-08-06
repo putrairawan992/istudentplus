@@ -1,17 +1,84 @@
 {
+  "faqs": [
+    {
+      "a": "International students are obliged to have Overseas Student Health Cover, also known as OSHC. We can help you with the process and arrange a suitable OSHC policy. There are only five government-approved providers of Overseas Student Health Cover (OSHC) in Australia: AHMI, Nib, Bupa, Medibank, and Allianz Care.",
+      "q": "Do I need Overseas Student Health Cover?"
+    },
+    {
+      "a": "Students with student visas can often work while studying, but always be sure to check your current work rights before beginning employment.",
+      "q": "Can I work while studying in Australia?"
+    },
+    {
+      "a": "It depends on the course and provider, but international students might qualify for scholarships.",
+      "q": "Are scholarships available in Australia?"
+    },
+    {
+      "a": "Some Student visa applicants may need a health examination. We can guide you through the booking process when required.",
+      "q": "Do I need a visa medical examination?"
+    },
+    {
+      "a": "Study counselling and application support are free because we get a commission from our partners. We're transparent about that. You'll know about all costs before you go, but you may have to pay for future migration services like Graduate visas, employer-sponsored visas, and other visa applications.",
+      "q": "Are your services free?"
+    },
+    {
+      "q": "How much financial readiness should I prepare?",
+      "a": "Requirements vary by visa type and destination, but as a general guide you should be able to show enough funds to cover tuition plus at least a year of living costs. Your counselor will confirm the exact figure for your specific visa and destination."
+    },
+    {
+      "q": "What English test is eligible in the Australian education system?",
+      "a": "Australian institutions generally accept IELTS, PTE Academic, TOEFL iBT, and Cambridge English (C1 Advanced). Accepted tests and minimum scores vary by university and course, so check with your counselor for your specific program."
+    },
+    {
+      "q": "How do I prepare for my English test?",
+      "a": "We offer English test preparation support to help you reach the score your program requires.",
+      "link": {
+        "text": "See our Language Programs",
+        "href": "/language-programs"
+      }
+    }
+  ],
   "pitfalls": [
-    "Incomplete or inconsistent application forms",
-    "Insufficient proof of funds",
-    "Missing or expired supporting documents",
-    "Weak or generic statement of purpose"
+    "Incomplete or inconsistent information",
+    "Insufficient financial evidence",
+    "Missing or expired documents",
+    "Weak Genuine Student responses"
   ],
   "admissionSteps": [
-    { "title": "Course Matching", "description": "We match your goals, budget, and academic background to the right program." },
-    { "title": "Application", "description": "We prepare and review every document before it's submitted." },
-    { "title": "Offer Letter", "description": "You receive and accept your offer, with our team explaining every condition." }
-  ],
-  "faqs": [
-    { "q": "What documents are required?", "a": "Typically academic transcripts, passport, proof of funds, and a statement of purpose — your counselor gives you the exact list for your destination." },
-    { "q": "When should I start applying?", "a": "Most students start 6–12 months before their intended intake, especially for visa processing time." }
+    {
+      "title": "Find the Right Course",
+      "description": "Compare suitable courses and education providers across Australia."
+    },
+    {
+      "title": "Apply with Confidence",
+      "description": "Get support preparing and reviewing your enrolment application."
+    },
+    {
+      "title": "Accept Your Offer Letter",
+      "description": "Understand your offer and complete your enrolment with step-by-step guidance."
+    },
+    {
+      "title": "Receive Your CoE",
+      "description": "Complete enrolment and receive your Confirmation of Enrolment."
+    },
+    {
+      "title": "Prepare Your Student Visa and Overseas Student Health Cover (OSHC)",
+      "description": "Get support with your Australian Student visa application."
+    },
+    {
+      "title": "Complete Your Medical Check",
+      "description": "Book and complete your required visa health examination."
+    },
+    {
+      "title": "Track Your Visa Application",
+      "description": "Respond to any additional document requests."
+    },
+    {
+      "title": "Prepare for Australia",
+      "description": "Arrange accommodation, flights and pre-departure support."
+    },
+    {
+      "title": "Arrive and Settle In",
+      "description": "Get help starting your study journey in Australia."
+    }
   ]
 }

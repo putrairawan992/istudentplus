@@ -10,7 +10,7 @@ import { getVideo } from "../lib/videos";
 import { schedule, splitByDate, type Webinar } from "./webinars/shared";
 
 type Stat = { value: string; label: string };
-type Settings = { stats: Stat[]; partnerAlumni: string[]; heroTitle: string; heroSubtitle: string };
+type Settings = { stats: Stat[]; heroTitle: string; heroSubtitle: string };
 type HomeService = { name: string; description: string; href: string; bg: string };
 type Testimonial = {
   name: string;
@@ -122,28 +122,29 @@ export default async function Home() {
               </div>
             </div>
 
-            <Image
-              src="/hero-student.jpg"
-              alt="Student ready to study abroad"
-              width={988}
-              height={940}
-              priority
-              className="mx-auto w-full max-w-md mix-blend-multiply lg:max-w-lg"
-            />
+            <div className="relative mx-auto w-full max-w-md lg:max-w-lg">
+              <div className="absolute -right-5 -top-6 h-36 w-36 rounded-full bg-accent/15" />
+              <div className="absolute -bottom-8 -left-6 h-44 w-44 rounded-full bg-[#E8722C]/15" />
+              <div className="relative flex items-end gap-3.5 sm:gap-4.5">
+                <Image
+                  src="/hero-male.jpg"
+                  alt="Student preparing to study abroad"
+                  width={700}
+                  height={900}
+                  className="w-1/2 rounded-3xl object-cover shadow-xl shadow-ink/10"
+                />
+                <Image
+                  src="/hero-female.jpg"
+                  alt="Student preparing to study abroad"
+                  width={700}
+                  height={900}
+                  priority
+                  className="w-1/2 translate-y-5 rounded-3xl object-cover shadow-xl shadow-ink/10"
+                />
+              </div>
+            </div>
           </div>
         </section>
-
-        {/* Trust strip */}
-        <div className="border-y border-line bg-paper-raise py-6.5">
-          <div className="mx-auto flex max-w-[1400px] flex-wrap justify-between gap-5 px-7 font-mono text-[13px] text-muted">
-            {SETTINGS.partnerAlumni.map((name) => (
-              <div key={name}>
-                <b className="mr-1.5 font-sans text-[15px] font-bold text-ink">{name}</b>
-                Alumni placed
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Next webinar — only the nearest one, and nothing at all when there isn't one.
             An empty "no upcoming events" box on the home page reads worse than no box. */}
@@ -176,6 +177,27 @@ export default async function Home() {
                   {nextWebinar.status === "live" ? "Tonton sekarang" : "Lihat detail & daftar"}
                 </span>
               </Link>
+            </div>
+          </section>
+        )}
+
+        {STEPS_VIDEO && (
+          <section className="py-19">
+            <div className="mx-auto max-w-3xl px-7">
+              <div className="reveal mb-8 text-center">
+                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
+                  Watch
+                </div>
+                <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
+                  See how iStudentPlus helps you, <span className="text-accent">step by step</span>.
+                </h2>
+                <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
+                  A quick look at how we guide you from first consultation to enrollment abroad.
+                </p>
+              </div>
+              <div className="reveal overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+                <YouTubeEmbed id={STEPS_VIDEO.youtubeId} videoFile={STEPS_VIDEO.videoFile} title={STEPS_VIDEO.title} />
+              </div>
             </div>
           </section>
         )}
@@ -273,27 +295,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
-        {STEPS_VIDEO && (
-          <section className="py-19 pt-0">
-            <div className="mx-auto max-w-3xl px-7">
-              <div className="reveal mb-8 text-center">
-                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
-                  Watch
-                </div>
-                <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
-                  See how iStudentPlus helps you, <span className="text-accent">step by step</span>.
-                </h2>
-                <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
-                  A quick look at how we guide you from first consultation to enrollment abroad.
-                </p>
-              </div>
-              <div className="reveal overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
-                <YouTubeEmbed id={STEPS_VIDEO.youtubeId} videoFile={STEPS_VIDEO.videoFile} title={STEPS_VIDEO.title} />
-              </div>
-            </div>
-          </section>
-        )}
 
         {/* Destinations */}
         <section id="destinations" className="py-19">
