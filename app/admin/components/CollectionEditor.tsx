@@ -23,6 +23,23 @@ function isVideoPath(v: string) {
   return /\.(mp4|webm)(\?|#|$)/i.test(v);
 }
 
+// Matches app/api/upload/route.ts: Vercel hard-rejects request bodies over ~4.3 MB before our
+// code runs, returning a plain-text "Request Entity Too Large" page rather than JSON — which is
+// what used to make a too-big file crash here with a garbled "Unexpected token 'R'..." error
+// instead of a real message. Checking client-side skips the round trip and that failure mode.
+const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
+
+// Reads an upload response as JSON, but degrades to the response's status/text instead of
+// throwing a raw parse error when the body isn't JSON (a platform-level 413, a gateway 502, …).
+async function readUploadResponse(res: Response): Promise<{ ok: boolean; error?: string; url?: string }> {
+  try {
+    return await res.json();
+  } catch {
+    const text = (await res.text().catch(() => "")).trim();
+    return { ok: false, error: text ? `Upload failed (${res.status}): ${text}` : `Upload failed (${res.status}).` };
+  }
+}
+
 // A media string field: live preview + upload (click or drag-drop) + editable path/URL.
 function ImageField({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
   const str = value ?? "";
@@ -35,12 +52,17 @@ function ImageField({ value, onChange }: { value: string | null; onChange: (v: s
     setBusy(true);
     setErr("");
     try {
+      if (file.size > MAX_UPLOAD_BYTES) {
+        throw new Error(
+          `File too large (${(file.size / (1024 * 1024)).toFixed(1)} MB) — max 4 MB. Compress the image or trim the video first.`
+        );
+      }
       const fd = new FormData();
       fd.set("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const data = await res.json();
+      const data = await readUploadResponse(res);
       if (!res.ok || !data.ok) throw new Error(data.error || "Upload failed.");
-      onChange(data.url);
+      onChange(data.url as string);
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Upload failed.");
     } finally {
@@ -79,7 +101,7 @@ function ImageField({ value, onChange }: { value: string | null; onChange: (v: s
           onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
           className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
         />
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
