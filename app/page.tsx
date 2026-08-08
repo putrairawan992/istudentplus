@@ -7,7 +7,7 @@ import YouTubeEmbed from "./components/YouTubeEmbed";
 import { getCountries } from "./study-abroad/data";
 import { readContent } from "../lib/content";
 import { getVideo } from "../lib/videos";
-import { schedule, splitByDate, type Webinar } from "./webinars/shared";
+import { schedule, splitByDate, webinarThumbnail, type Webinar } from "./webinars/shared";
 
 type Stat = { value: string; label: string };
 type Settings = { stats: Stat[]; heroTitle: string; heroSubtitle: string };
@@ -77,6 +77,7 @@ export default async function Home() {
   const LANGUAGE_PROGRAM_ITEMS = await readContent<LanguageProgram[]>("languagePrograms");
   const { upcoming } = await splitByDate(await readContent<Webinar[]>("webinars"));
   const nextWebinar = upcoming[0];
+  const nextWebinarThumb = nextWebinar ? webinarThumbnail(nextWebinar) : null;
   const DESTINATIONS = (await getCountries()).filter((c) =>
     ["australia", "japan", "uk", "canada"].includes(c.slug)
   );
@@ -153,8 +154,26 @@ export default async function Home() {
             <div className="mx-auto max-w-[1400px] px-7">
               <Link
                 href="/webinars"
-                className="group flex flex-col gap-4 rounded-3xl border border-line bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-7 sm:p-7"
+                className="group flex flex-col gap-5 overflow-hidden rounded-3xl border border-line bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-7 sm:p-7"
               >
+                {/* Poster if one was uploaded, else the attached video's YouTube frame. A 16:9
+                    box either way, so the row keeps its shape whichever one it gets. */}
+                {nextWebinarThumb && (
+                  <div className="relative aspect-video w-full shrink-0 overflow-hidden rounded-2xl bg-paper-raise sm:w-64 lg:w-80">
+                    <Image
+                      src={nextWebinarThumb}
+                      alt={nextWebinar.title}
+                      fill
+                      className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      sizes="(max-width: 640px) 100vw, 320px"
+                    />
+                    {nextWebinar.status === "live" && (
+                      <span className="absolute left-3 top-3 rounded-full bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+                        ● Live
+                      </span>
+                    )}
+                  </div>
+                )}
                 <div className="flex-1">
                   <p
                     className={`text-[11px] font-bold uppercase tracking-widest ${

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { hasValidSession } from "../../../lib/auth";
+import { ALLOWED_UPLOAD_EXT, MAX_UPLOAD_BYTES } from "../../../lib/image-specs";
 
 // Media uploads go through the Go backend when configured, so files live with the rest of the
 // CMS data (and persist on a real host). The browser never sees the API token: it posts here,
@@ -10,14 +11,16 @@ import { hasValidSession } from "../../../lib/auth";
 const API_URL = process.env.CONTENT_API_URL;
 const API_TOKEN = process.env.CONTENT_API_TOKEN;
 
-const ALLOWED = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg", ".mp4", ".webm", ".pdf"]);
+// Shared with the admin so the formats shown on screen are exactly the ones enforced here.
+const ALLOWED = new Set(ALLOWED_UPLOAD_EXT);
 
 // Vercel rejects any request body over ~4.3 MB at the platform level (measured against this
 // deployment: 4.25 MB passes, 4.3 MB comes back 413 "FUNCTION_PAYLOAD_TOO_LARGE") — before this
 // route even runs, as plain text rather than JSON. The Go backend itself accepts up to 25 MB
 // (see maxUploadBytes in backend/main.go), but nothing bigger than this ever survives the trip
 // through Vercel to reach it, so this is the real ceiling for uploads made through the website.
-const MAX_BYTES = 4 * 1024 * 1024;
+// The limit lives in lib/image-specs.ts so the admin's pre-flight check can't drift from this.
+const MAX_BYTES = MAX_UPLOAD_BYTES;
 
 export async function POST(request: Request) {
   if (!(await hasValidSession())) {

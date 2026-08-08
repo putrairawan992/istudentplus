@@ -1,8 +1,20 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
+import { createContext, useContext, useRef, useState, useTransition } from "react";
 import type { JsonValue, JsonObject } from "../../../lib/json-tree";
 import { setAtPath, removeAtIndex, insertAtEnd, blankShapeOf } from "../../../lib/json-tree";
+import {
+  IMAGE_EXT,
+  MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_LABEL,
+  VIDEO_EXT,
+  acceptFor,
+  checkImage,
+  describeSpec,
+  formatList,
+  getImageSpec,
+  isVideoField,
+} from "../../../lib/image-specs";
 import ConfirmModal from "./ConfirmModal";
 import { useToast } from "./Toast";
 
@@ -11,10 +23,19 @@ function humanize(key: string) {
   return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
 }
 
+// Which collection is open, so an image field can look up the size rules for its exact slot
+// (a country banner is 2:1, a blog header is 3:2 — same "image" key, different shape). Passed by
+// context rather than threaded through every recursive ObjectFields/FieldEditor call.
+const CollectionContext = createContext<string | undefined>(undefined);
+
 // Field keys that hold an uploadable asset — these render an image/video upload widget.
 const MEDIA_KEY = /(image|photo|thumbnail|thumb|logo|icon|avatar|cover|poster|banner|picture|img|video)/i;
+// Keys the regex above catches but that hold text, not a file: "imageLabel" is the caption drawn
+// over a country card, and "icon" holds an emoji (🎓, 🧳). Both were rendering an upload box with
+// a permanently broken preview, which is exactly the kind of thing that makes the CMS confusing.
+const NOT_MEDIA_KEY = /^(imageLabel|icon)$/;
 function isMediaKey(key?: string) {
-  return !!key && MEDIA_KEY.test(key);
+  return !!key && MEDIA_KEY.test(key) && !NOT_MEDIA_KEY.test(key);
 }
 function isImagePath(v: string) {
   return /\.(jpe?g|png|webp|gif|svg)(\?|#|$)/i.test(v) || (/^https?:\/\//i.test(v) && !/\.(mp4|webm|pdf)(\?|#|$)/i.test(v));
@@ -22,12 +43,6 @@ function isImagePath(v: string) {
 function isVideoPath(v: string) {
   return /\.(mp4|webm)(\?|#|$)/i.test(v);
 }
-
-// Matches app/api/upload/route.ts: Vercel hard-rejects request bodies over ~4.3 MB before our
-// code runs, returning a plain-text "Request Entity Too Large" page rather than JSON — which is
-// what used to make a too-big file crash here with a garbled "Unexpected token 'R'..." error
-// instead of a real message. Checking client-side skips the round trip and that failure mode.
-const MAX_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 // Reads an upload response as JSON, but degrades to the response's status/text instead of
 // throwing a raw parse error when the body isn't JSON (a platform-level 413, a gateway 502, …).
@@ -40,23 +55,58 @@ async function readUploadResponse(res: Response): Promise<{ ok: boolean; error?:
   }
 }
 
+/** Intrinsic size of a picked image, read in the browser before it's uploaded. */
+function readDimensions(file: File): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    // SVG has no meaningful pixel size, and video isn't what the specs describe.
+    if (!file.type.startsWith("image/") || file.type === "image/svg+xml") return resolve(null);
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
 // A media string field: live preview + upload (click or drag-drop) + editable path/URL.
-function ImageField({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
+function ImageField({
+  value,
+  onChange,
+  field,
+}: {
+  value: string | null;
+  onChange: (v: string | null) => void;
+  field?: string;
+}) {
   const str = value ?? "";
+  const collection = useContext(CollectionContext);
+  const spec = getImageSpec(collection, field);
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [warnings, setWarnings] = useState<string[]>([]);
   const [drag, setDrag] = useState(false);
 
   async function upload(file: File) {
     setBusy(true);
     setErr("");
+    setWarnings([]);
     try {
       if (file.size > MAX_UPLOAD_BYTES) {
         throw new Error(
-          `File too large (${(file.size / (1024 * 1024)).toFixed(1)} MB) — max 4 MB. Compress the image or trim the video first.`
+          `File terlalu besar (${(file.size / (1024 * 1024)).toFixed(1)} MB) — maksimal 4 MB. Kompres gambarnya atau potong videonya dulu.`
         );
       }
+      // Warn, don't block: a slightly-off image is the client's call, not something to refuse.
+      const dims = await readDimensions(file);
+      if (dims) setWarnings(checkImage(spec, dims).warnings);
+
       const fd = new FormData();
       fd.set("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
@@ -101,6 +151,39 @@ function ImageField({ value, onChange }: { value: string | null; onChange: (v: s
           onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
           className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
         />
+        {/* The rules for this exact slot, spelled out before anyone picks a file — the whole
+            point is that nobody has to guess and every upload comes out the same shape.
+            Shown for every media field: slots without a size spec still get the limit and
+            the accepted formats, which is what people were missing most. */}
+        <div className="rounded-lg border border-line bg-paper-raise/60 px-3 py-2 text-[12px] leading-relaxed">
+          <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5">
+            {spec && (
+              <>
+                <dt className="text-muted">Ukuran</dt>
+                <dd className="font-semibold text-ink">{describeSpec(spec)}</dd>
+              </>
+            )}
+            <dt className="text-muted">Maks. ukuran file</dt>
+            <dd className="font-semibold text-ink">{MAX_UPLOAD_LABEL}</dd>
+            <dt className="text-muted">Format</dt>
+            <dd className="font-semibold text-ink">
+              {formatList(isVideoField(field) ? VIDEO_EXT : IMAGE_EXT)}
+            </dd>
+            {spec && (
+              <>
+                <dt className="text-muted">Dipakai di</dt>
+                <dd className="text-ink">{spec.usedOn}</dd>
+              </>
+            )}
+          </dl>
+          {spec?.note && <p className="mt-1.5 text-muted">{spec.note}</p>}
+          {isVideoField(field) && (
+            <p className="mt-1.5 text-muted">
+              Batas {MAX_UPLOAD_LABEL} biasanya hanya cukup untuk klip beberapa detik. Untuk video
+              panjang, pakai kolom YouTube — tanpa batas durasi.
+            </p>
+          )}
+        </div>
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
@@ -117,11 +200,17 @@ function ImageField({ value, onChange }: { value: string | null; onChange: (v: s
           )}
           {err && <span className="text-[12px] text-red-600">{err}</span>}
         </div>
+        {warnings.map((w) => (
+          <p key={w} className="rounded-lg bg-amber-50 px-2.5 py-1.5 text-[12px] leading-relaxed text-amber-800">
+            ⚠ {w} <span className="text-amber-700">Gambarnya tetap tersimpan.</span>
+          </p>
+        ))}
       </div>
       <input
         ref={inputRef}
         type="file"
-        accept="image/*,.pdf,.mp4,.webm"
+        // Narrowed per field so the picker can't offer a video for a poster slot (or vice versa).
+        accept={acceptFor(field)}
         className="hidden"
         onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }}
       />
@@ -285,7 +374,7 @@ function FieldEditor({
   const placeholder = label ? `Enter ${humanize(label).toLowerCase()}` : undefined;
 
   if (value === null || typeof value === "string") {
-    if (isMediaKey(label)) return <ImageField value={value} onChange={update} />;
+    if (isMediaKey(label)) return <ImageField value={value} onChange={update} field={label} />;
     if (label && YOUTUBE_KEY.test(label)) return <VideoField value={value} onChange={update} />;
     if (isBgColorField(label, value)) return <BgColorField value={value ?? ""} onChange={update} />;
     return <StringField value={value} onChange={update} placeholder={placeholder} label={label} />;
@@ -543,6 +632,7 @@ export default function CollectionEditor({
   }
 
   return (
+    <CollectionContext.Provider value={collection}>
     <div>
       {/* Top bar — only for lists: add entries + status. Saving lives on each entry (lists)
           or in the sticky bottom bar (single objects), never both. */}
@@ -727,5 +817,6 @@ export default function CollectionEditor({
         </>
       )}
     </div>
+    </CollectionContext.Provider>
   );
 }

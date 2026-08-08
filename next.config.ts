@@ -9,6 +9,8 @@ type RemotePattern = { protocol: "http" | "https"; hostname: string; port?: stri
 
 const remotePatterns: RemotePattern[] = [
   { protocol: "https", hostname: "api.istudentplus.com", pathname: "/media/**" },
+  // YouTube poster frames, used as the webinar banner's fallback when no poster was uploaded.
+  { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
 ];
 
 if (process.env.CONTENT_API_URL) {

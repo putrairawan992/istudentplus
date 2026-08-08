@@ -50,6 +50,18 @@ export function replayOf(w: Webinar) {
   };
 }
 
+/**
+ * A 16:9 still to represent the webinar. Prefers the uploaded poster; falls back to the
+ * YouTube poster frame of whichever video is attached, so a session that has a stream or a
+ * recording still gets a banner without anyone designing artwork for it. Null means the
+ * entry genuinely has no visual and callers should render text only.
+ */
+export function webinarThumbnail(w: Webinar): string | null {
+  if (w.image) return w.image;
+  const videoId = w.liveYoutubeId || w.recordingYoutubeId;
+  return videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : null;
+}
+
 // Status comes from the date itself, so nobody has to remember to flip a flag in the CMS
 // after an event. Undated entries count as upcoming. connection() keeps this out of the
 // prerender — the answer depends on when the page is requested, not when it was built.

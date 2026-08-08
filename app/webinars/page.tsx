@@ -44,7 +44,9 @@ function WebinarCard({ webinar }: { webinar: WebinarWithStatus }) {
         <YouTubeEmbed id={player.id} videoFile={player.videoFile} title={webinar.title} />
       ) : (
         webinar.image && (
-          <div className="relative aspect-[16/7]">
+          // 16:9 so one poster fits everywhere: this card, the homepage banner, and a YouTube
+          // thumbnail if the session is streamed. The old 16:7 matched nothing else.
+          <div className="relative aspect-video">
             <Image src={webinar.image} alt={webinar.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 700px" />
           </div>
         )
