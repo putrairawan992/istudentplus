@@ -14,6 +14,7 @@ import {
   formatList,
   getImageSpec,
   isVideoField,
+  rejectionMessage,
 } from "../../../lib/image-specs";
 import ConfirmModal from "./ConfirmModal";
 import { useToast } from "./Toast";
@@ -88,24 +89,27 @@ function ImageField({
   const collection = useContext(CollectionContext);
   const spec = getImageSpec(collection, field);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [warnings, setWarnings] = useState<string[]>([]);
   const [drag, setDrag] = useState(false);
 
   async function upload(file: File) {
     setBusy(true);
     setErr("");
-    setWarnings([]);
     try {
       if (file.size > MAX_UPLOAD_BYTES) {
         throw new Error(
-          `File terlalu besar (${(file.size / (1024 * 1024)).toFixed(1)} MB) — maksimal 4 MB. Kompres gambarnya atau potong videonya dulu.`
+          `File terlalu besar (${(file.size / (1024 * 1024)).toFixed(1)} MB) — maksimal ${MAX_UPLOAD_LABEL}. Kompres gambarnya atau potong videonya dulu.`
         );
       }
-      // Warn, don't block: a slightly-off image is the client's call, not something to refuse.
+      // Rejected here, before anything is uploaded or saved — an image that would ship
+      // stretched or badly cropped never reaches the server in the first place.
       const dims = await readDimensions(file);
-      if (dims) setWarnings(checkImage(spec, dims).warnings);
+      if (spec && dims) {
+        const { ok, reasons } = checkImage(spec, dims);
+        if (!ok) throw new Error(rejectionMessage(spec, dims, reasons));
+      }
 
       const fd = new FormData();
       fd.set("file", file);
@@ -114,7 +118,11 @@ function ImageField({
       if (!res.ok || !data.ok) throw new Error(data.error || "Upload failed.");
       onChange(data.url as string);
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Upload failed.");
+      const message = e instanceof Error ? e.message : "Gagal mengunggah.";
+      // Toast so it's noticed even when the field is off-screen; the inline copy stays put
+      // after the toast fades, since the message says what size to prepare next.
+      toast("error", message);
+      setErr(message);
     } finally {
       setBusy(false);
     }
@@ -176,7 +184,13 @@ function ImageField({
               </>
             )}
           </dl>
-          {spec?.note && <p className="mt-1.5 text-muted">{spec.note}</p>}
+          {spec && (
+            <p className="mt-1.5 text-muted">
+              Gambar yang terlalu kecil atau bentuknya tidak sesuai akan{" "}
+              <span className="font-semibold text-ink">ditolak</span> supaya tidak tampil pecah di
+              website.{spec.note ? ` ${spec.note}` : ""}
+            </p>
+          )}
           {isVideoField(field) && (
             <p className="mt-1.5 text-muted">
               Batas {MAX_UPLOAD_LABEL} biasanya hanya cukup untuk klip beberapa detik. Untuk video
@@ -198,13 +212,12 @@ function ImageField({
               Remove
             </button>
           )}
-          {err && <span className="text-[12px] text-red-600">{err}</span>}
         </div>
-        {warnings.map((w) => (
-          <p key={w} className="rounded-lg bg-amber-50 px-2.5 py-1.5 text-[12px] leading-relaxed text-amber-800">
-            ⚠ {w} <span className="text-amber-700">Gambarnya tetap tersimpan.</span>
+        {err && (
+          <p className="rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 text-[12px] leading-relaxed text-red-700">
+            ✕ {err}
           </p>
-        ))}
+        )}
       </div>
       <input
         ref={inputRef}

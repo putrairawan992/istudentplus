@@ -111,41 +111,61 @@ export function describeSpec(spec: ImageSpec): string {
   return `${spec.width} × ${spec.height} px (${ratioLabel(spec.width, spec.height)})`;
 }
 
+/**
+ * "16:9" for shapes that reduce cleanly, "≈2,1:1" for the ones that don't. A raw reduction
+ * is useless to read — a 385×181 photo is not meaningfully "385:181" to anyone.
+ */
 function ratioLabel(w: number, h: number): string {
   const g = gcd(w, h);
-  return `${w / g}:${h / g}`;
+  const a = w / g;
+  const b = h / g;
+  if (a <= 20 && b <= 20) return `${a}:${b}`;
+  return `≈${(w / h).toFixed(1).replace(".", ",")}:1`;
 }
 function gcd(a: number, b: number): number {
   return b === 0 ? a : gcd(b, a % b);
 }
 
 /**
- * Checks a picked file against its spec. Returns a blocking `error` only for things that would
- * genuinely fail or look broken, and `warnings` for things worth fixing but still usable —
- * a too-small photo is the client's call, not something to refuse outright.
+ * Checks a picked file against its spec before it is uploaded. Anything that would ship a
+ * visibly broken image — too small to fill its slot, or a shape that forces a heavy crop —
+ * is rejected outright rather than saved with a warning, so bad images can't reach the site
+ * by someone clicking past a notice.
+ *
+ * Slots with no spec accept anything: there is no measured standard to judge them against,
+ * and inventing one would reject valid files.
  */
 export function checkImage(
   spec: ImageSpec | null,
   actual: { width: number; height: number }
-): { warnings: string[] } {
-  if (!spec) return { warnings: [] };
-  const warnings: string[] = [];
+): { ok: boolean; reasons: string[] } {
+  if (!spec) return { ok: true, reasons: [] };
+  const reasons: string[] = [];
 
   if (actual.width < spec.minWidth) {
-    warnings.push(
-      `Lebarnya cuma ${actual.width}px — akan tampil melar dan pecah karena dipakai sampai ${spec.minWidth}px. Idealnya ${describeSpec(spec)}.`
+    reasons.push(
+      `lebarnya cuma ${actual.width}px, sedangkan slot ini menampilkannya sampai ${spec.minWidth}px — gambar akan melar dan pecah`
     );
   }
 
   const want = spec.width / spec.height;
   const got = actual.width / actual.height;
-  // 12% covers the usual "close enough" crops; beyond that object-cover starts cutting off
-  // visibly more than the client would expect.
+  // 12% covers the usual "close enough" crops; beyond that object-cover cuts off visibly
+  // more of the picture than the person uploading it would expect.
   if (Math.abs(got - want) / want > 0.12) {
-    warnings.push(
-      `Perbandingan sisinya ${ratioLabel(actual.width, actual.height)}, sedangkan slotnya ${ratioLabel(spec.width, spec.height)} — sebagian gambar akan terpotong otomatis.`
+    reasons.push(
+      `bentuknya ${ratioLabel(actual.width, actual.height)}, sedangkan slot ini ${ratioLabel(spec.width, spec.height)} — sebagian gambar akan terpotong`
     );
   }
 
-  return { warnings };
+  return { ok: reasons.length === 0, reasons };
+}
+
+/** One sentence a person can act on, for the rejection toast. */
+export function rejectionMessage(
+  spec: ImageSpec,
+  actual: { width: number; height: number },
+  reasons: string[]
+): string {
+  return `Gambar ${actual.width} × ${actual.height} px ditolak: ${reasons.join(", dan ")}. Siapkan ukuran ${describeSpec(spec)} lalu unggah lagi.`;
 }

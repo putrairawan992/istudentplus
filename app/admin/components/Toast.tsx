@@ -39,7 +39,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="pointer-events-none fixed bottom-5 right-5 z-[100] flex flex-col gap-2">
+      {/* Top-right: rejections happen while you're looking at a field near the top of a form,
+          and a message at the bottom of the page was easy to miss. */}
+      <div className="pointer-events-none fixed right-5 top-5 z-[100] flex max-w-[min(26rem,calc(100vw-2.5rem))] flex-col gap-2">
         {toasts.map((t) => (
           <ToastItemView key={t.id} item={t} onDismiss={() => dismiss(t.id)} />
         ))}
@@ -62,13 +64,14 @@ function ToastItemView({
     // trigger enter animation
     requestAnimationFrame(() => setVisible(true));
 
+    // Errors say what to do next and run longer than a "Saved ✓", so they get time to be read.
     const timer = setTimeout(() => {
       setExiting(true);
       setTimeout(onDismiss, 300);
-    }, 3500);
+    }, item.type === "error" ? 8000 : 3500);
 
     return () => clearTimeout(timer);
-  }, [onDismiss]);
+  }, [onDismiss, item.type]);
 
   return (
     <div
@@ -77,17 +80,17 @@ function ToastItemView({
         setExiting(true);
         setTimeout(onDismiss, 300);
       }}
-      className={`pointer-events-auto flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold shadow-lg backdrop-blur transition-all duration-300 ${
+      className={`pointer-events-auto flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 text-sm font-semibold leading-relaxed shadow-lg backdrop-blur transition-all duration-300 ${
         item.type === "success"
           ? "border-emerald-200 bg-emerald-50 text-emerald-800"
           : "border-red-200 bg-red-50 text-red-800"
       } ${
-        visible && !exiting
-          ? "translate-y-0 opacity-100"
-          : "translate-y-2 opacity-0"
+        // Slides in from the right now that it lives at the top edge — sliding up from
+        // below would have it travelling away from where it ends up.
+        visible && !exiting ? "translate-x-0 opacity-100" : "translate-x-3 opacity-0"
       }`}
     >
-      <span>{item.type === "success" ? "✓" : "✕"}</span>
+      <span className="mt-px shrink-0">{item.type === "success" ? "✓" : "✕"}</span>
       <span>{item.message}</span>
     </div>
   );
