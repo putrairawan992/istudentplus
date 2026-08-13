@@ -310,11 +310,33 @@ function isObject(v: JsonValue): v is JsonObject {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
 
-// A field is "wide" (spans the full row) if it renders tall: long text, lists, or nested objects.
-// Short scalars (short strings, numbers) sit two-per-row so entries scroll less.
-function isWideField(v: JsonValue): boolean {
-  if (typeof v === "string") return v.length > 50 || v.includes("\n");
-  if (v === null) return false;
+// "Description" is unambiguously prose everywhere it appears — always a textarea, no matter
+// how short today's value happens to be, so it doesn't clip as someone types a longer one.
+const PROSE_KEY = /^(desc|description)$/i;
+// "Value" is ambiguous: a Key Facts row ("AUD 20,000 – AUD 45,000 / year") and a homepage stat
+// ("9.3K") are the same {label, value} shape with very different content. They don't overlap
+// in length in the data on this site (stats top out at 4 chars, Key Facts values start at 7),
+// so a low length floor tells them apart without needing to know which array either came from.
+const SHORT_VALUE_KEY = /^value$/i;
+const SHORT_VALUE_FLOOR = 5;
+
+// The one place that decides "does this string get an <input> or a <textarea>" — shared by
+// the field itself (StringField) and the layout around it (isWideField), so a field that's
+// about to render as a textarea can't end up squeezed into a half-width column because its
+// current value happens to be short.
+function isTextareaValue(v: string | null, label?: string): boolean {
+  const str = v ?? "";
+  if (str.length > 50 || str.includes("\n")) return true;
+  if (!label) return false;
+  if (PROSE_KEY.test(label)) return true;
+  if (SHORT_VALUE_KEY.test(label)) return str.length > SHORT_VALUE_FLOOR;
+  return false;
+}
+
+// A field is "wide" (spans the full row) if it renders tall: a textarea, a list, or a nested
+// object. Short scalars (short strings, numbers) sit two-per-row so entries scroll less.
+function isWideField(v: JsonValue, label?: string): boolean {
+  if (typeof v === "string" || v === null) return isTextareaValue(v as string | null, label);
   if (typeof v === "number") return false;
   return true; // arrays and objects
 }
@@ -331,28 +353,25 @@ function entryTitle(item: JsonValue, fallback: string): string {
   return typeof firstStr === "string" ? (firstStr.length > 60 ? firstStr.slice(0, 60) + "…" : firstStr) : fallback;
 }
 
-// Free-text fields get a textarea no matter how short today's value happens to be — a
-// one-line input crops them ("AUD 20,000 – AUD 45,000 / yea…") and you can't see what you edit.
-const MULTILINE_KEY = /^(value|desc|description)$/i;
-
 function StringField({
   value,
   onChange,
   placeholder,
   label,
+  rows = 3,
 }: {
   value: string | null;
   onChange: (v: string | null) => void;
   placeholder?: string;
   label?: string;
+  rows?: number;
 }) {
   const str = value ?? "";
-  const long = str.length > 50 || str.includes("\n") || (!!label && MULTILINE_KEY.test(label));
-  if (long) {
+  if (isTextareaValue(value, label)) {
     return (
       <textarea
         value={str}
-        rows={3}
+        rows={rows}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
         className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
@@ -407,8 +426,13 @@ function FieldEditor({
   if (Array.isArray(value)) {
     const itemsArePrimitive = value.length === 0 || typeof value[0] !== "object" || value[0] === null;
     if (itemsArePrimitive) {
+      // A list like Languages or Client Countries is short tags, best packed 3-per-row. A list
+      // like About Story is paragraphs — the same 1/3-width, 3-row box was squeezing multi-
+      // sentence prose into a tiny scrollable slot. Judge by what's actually in the array
+      // rather than the field name, so any future long-text list gets this for free.
+      const isProse = value.some((v) => typeof v === "string" && (v.length > 80 || v.includes("\n")));
       return (
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <div className={isProse ? "flex flex-col gap-3" : "grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3"}>
           {value.map((item, i) => (
             <div key={i} className="flex gap-2">
               <div className="flex-1">
@@ -416,6 +440,7 @@ function FieldEditor({
                   value={item as string | null}
                   onChange={(v) => setRoot(setAtPath(root, [...path, i], v))}
                   placeholder={placeholder}
+                  rows={isProse ? 6 : 3}
                 />
               </div>
               <button
@@ -430,7 +455,7 @@ function FieldEditor({
           <button
             type="button"
             onClick={() => setRoot(insertAtEnd(root, path, ""))}
-            className="justify-self-start text-[13px] font-semibold text-accent hover:underline sm:col-span-2 lg:col-span-3"
+            className={`justify-self-start text-[13px] font-semibold text-accent hover:underline ${isProse ? "" : "sm:col-span-2 lg:col-span-3"}`}
           >
             + Add {label ? humanize(label).toLowerCase() : "item"}
           </button>
@@ -491,7 +516,7 @@ function ObjectFields({
   return (
     <div className="grid grid-cols-1 gap-x-5 gap-y-3.5 sm:grid-cols-2">
       {Object.keys(value).map((key) => (
-        <div key={key} className={isWideField(value[key]) || isMediaKey(key) ? "sm:col-span-2" : ""}>
+        <div key={key} className={isWideField(value[key], key) || isMediaKey(key) ? "sm:col-span-2" : ""}>
           <label className="mb-1 block text-[12.5px] font-bold text-muted">{humanize(key)}</label>
           <FieldEditor value={value[key]} path={[...path, key]} root={root} setRoot={setRoot} label={key} />
         </div>

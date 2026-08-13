@@ -42,36 +42,31 @@ export default async function ServicesPage() {
       />
       <Header />
       <main>
-        <section className="pt-16 pb-14">
-          <div className="mx-auto max-w-3xl px-7 text-center">
-            <div className="mb-4.5 inline-flex items-center gap-2 rounded-full bg-sky-ink px-3 py-1 text-xs font-bold uppercase tracking-widest text-sky">
-              Services
-            </div>
-            <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
-              Two services that get you from <span className="text-accent">interest</span> to
-              <span className="text-accent"> offer letter</span>.
-            </h1>
-          </div>
-        </section>
-
-        {VIDEO && (
-          <section className="py-8">
-            <div className="mx-auto max-w-3xl px-7">
-              <div className="mb-8 text-center">
-                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">Watch</div>
-                <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
-                  Our services in <span className="text-accent">a minute</span>.
-                </h2>
-                <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
-                  See how our visa and admission support works, end to end.
-                </p>
+        {/* The "Two services that get you from interest to offer letter." hero was removed on
+            client feedback — the page now opens straight on the services video. The h1 moved
+            onto that section so the page still has exactly one top-level heading. */}
+        <section className="pt-16 pb-8">
+          <div className="mx-auto max-w-3xl px-7">
+            <div className={`text-center ${VIDEO ? "mb-8" : ""}`}>
+              <div className="mb-4.5 inline-flex items-center gap-2 rounded-full bg-sky-ink px-3 py-1 text-xs font-bold uppercase tracking-widest text-sky">
+                Services
               </div>
+              {/* The heading stays outside the VIDEO check so the page keeps its h1 even if
+                  the video is ever unpublished from the CMS. */}
+              <h1 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
+                Our services in <span className="text-accent">a minute</span>.
+              </h1>
+              <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
+                See how our visa and admission support works, end to end.
+              </p>
+            </div>
+            {VIDEO && (
               <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
                 <YouTubeEmbed id={VIDEO.youtubeId} videoFile={VIDEO.videoFile} title={VIDEO.title} />
               </div>
-            </div>
-          </section>
-        )}
+            )}
+          </div>
+        </section>
 
         {/* Visa & Admission */}
         <section id="visa-admission" className="scroll-mt-20 py-16">
@@ -135,7 +130,10 @@ export default async function ServicesPage() {
         {/* Admission Counselling */}
         <section id="admission-counselling" className="scroll-mt-20 bg-paper-raise py-16">
           <div className="mx-auto max-w-[1400px] px-7">
-            <div className="mb-8 max-w-xl">
+            {/* Centred column: the steps used to run the full 1400px width, leaving a wide
+                empty gutter on the right that read as a mistake. The step text itself stays
+                left-aligned — a centred list with icons would be unreadable. */}
+            <div className="mx-auto mb-8 max-w-2xl text-center">
               <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
                 Student Visa Admission Counselling
               </div>
@@ -148,7 +146,7 @@ export default async function ServicesPage() {
               </p>
             </div>
 
-            <div className="relative mb-8 flex flex-col gap-2.5 before:absolute before:bottom-6 before:left-[21px] before:top-6 before:w-px before:bg-line before:content-['']">
+            <div className="relative mx-auto mb-8 flex max-w-3xl flex-col gap-2.5 before:absolute before:bottom-6 before:left-[21px] before:top-6 before:w-px before:bg-line before:content-['']">
               {ADMISSION_STEPS.map((step, i) => (
                 <div
                   key={step.title}

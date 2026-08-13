@@ -51,6 +51,16 @@ export function replayOf(w: Webinar) {
 }
 
 /**
+ * The most recent finished webinar that has a recording to play. Used to feature a real
+ * webinar elsewhere on the site without hardcoding a video id — as the team adds webinars
+ * through the CMS, whatever is featured follows along on its own.
+ */
+export async function latestRecordedWebinar(webinars: Webinar[]): Promise<WebinarWithStatus | null> {
+  const { past } = await splitByDate(webinars); // already newest-first
+  return past.find((w) => w.recordingYoutubeId || w.recordingVideoFile) ?? null;
+}
+
+/**
  * A 16:9 still to represent the webinar. Prefers the uploaded poster; falls back to the
  * YouTube poster frame of whichever video is attached, so a session that has a stream or a
  * recording still gets a banner without anyone designing artwork for it. Null means the

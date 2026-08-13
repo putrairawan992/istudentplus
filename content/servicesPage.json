@@ -21,19 +21,19 @@
       "q": "Are your services free?"
     },
     {
-      "q": "How much financial readiness should I prepare?",
-      "a": "Requirements vary by visa type and destination, but as a general guide you should be able to show enough funds to cover tuition plus at least a year of living costs. Your counselor will confirm the exact figure for your specific visa and destination."
+      "a": "Requirements vary by visa type and destination, but as a general guide you should be able to show enough funds to cover tuition plus at least a year of living costs. Your counselor will confirm the exact figure for your specific visa and destination.",
+      "q": "How much financial readiness should I prepare?"
     },
     {
-      "q": "What English test is eligible in the Australian education system?",
-      "a": "Australian institutions generally accept IELTS, PTE Academic, TOEFL iBT, and Cambridge English (C1 Advanced). Accepted tests and minimum scores vary by university and course, so check with your counselor for your specific program."
+      "a": "Australian institutions generally accept IELTS, PTE Academic, TOEFL iBT, and Cambridge English (C1 Advanced). Accepted tests and minimum scores vary by university and course, so check with your counselor for your specific program.",
+      "q": "What English test is eligible in the Australian education system?"
     },
     {
-      "q": "How do I prepare for my English test?",
       "a": "We offer English test preparation support to help you reach the score your program requires.",
+      "q": "How do I prepare for my English test?",
       "link": {
-        "text": "See our Language Programs",
-        "href": "/language-programs"
+        "href": "/language-programs",
+        "text": "See our Language Programs"
       }
     }
   ],
@@ -73,7 +73,7 @@
       "description": "Respond to any additional document requests."
     },
     {
-      "title": "Prepare for Australia",
+      "title": "Pre Departure Preparation",
       "description": "Arrange accommodation, flights and pre-departure support."
     },
     {

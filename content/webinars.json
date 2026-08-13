@@ -1,26 +1,79 @@
 [
   {
-    "title": "Kuliah di Australia 2027: Jalur Masuk, Biaya, dan Beasiswa",
-    "date": "2026-08-14T19:00:00+07:00",
-    "durationMinutes": 90,
-    "speaker": "Tim Konselor iStudentPlus",
+    "date": "2026-07-05T12:00:00+07:00",
+    "image": "https://api.istudentplus.com/media/20260811-957d3255c31ca6bb.png",
+    "title": "Education Pathways After WHV & for Future Student",
+    "speaker": "Cindy Christella (Founder of iStudentPlus)",
     "platform": "Zoom",
-    "description": "Bahas tuntas syarat masuk universitas di Australia, perkiraan biaya hidup, dan beasiswa yang masih dibuka tahun ini. Ada sesi tanya jawab di akhir acara.",
-    "image": "/destinations/australia.jpg",
-    "recordingYoutubeId": "",
+    "description": "WHV ending soon? Or still unsure which course is right for your future in Australia? Join our FREE iStudentPlus Webinar and learn how to choose the right study pathway based on your background, goals, and career opportunities in Australia 👀✨",
+    "durationMinutes": 90,
     "recordingVideoFile": "",
-    "liveYoutubeId": ""
+    "recordingYoutubeId": "VgRf9rjG_3Q"
   },
   {
-    "title": "Persiapan IELTS dari Nol sampai Band 7",
-    "date": "2026-06-20T19:30:00+07:00",
-    "durationMinutes": 60,
-    "speaker": "Instruktur IELTS iStudentPlus",
+    "date": "2026-05-31T12:00:00+07:00",
+    "image": "https://api.istudentplus.com/media/20260811-f42b357e67c5238c.png",
+    "title": "Student Life in Melbourne: Is it Fun or Struggle?",
+    "speaker": "Litzy Angelia (Student at CBM)",
     "platform": "Zoom",
-    "description": "Strategi belajar IELTS untuk pemula, kesalahan yang paling sering menurunkan skor, dan simulasi soal Speaking.",
-    "image": "",
-    "recordingYoutubeId": "dLYatad-L_8",
+    "description": "Curious about what it’s really like to live as an international student in Melbourne? Watch this webinar iStudentPlus X CBM Melbourne! Scholarship Opportunity up to AUD 1000 💸!",
+    "durationMinutes": 120,
     "recordingVideoFile": "",
-    "liveYoutubeId": ""
+    "recordingYoutubeId": "jINf10f6FNw"
+  },
+  {
+    "date": "2026-04-18T12:00:00+07:00",
+    "image": "https://api.istudentplus.com/media/20260811-7aef132f4a10d868.png",
+    "title": "How Childcare Study Can Upgrade Your Career",
+    "speaker": "Ghaida Roshuna",
+    "platform": "Zoom",
+    "description": "Discover how studying childcare abroad can open doors to international career opportunities ✨",
+    "durationMinutes": 90,
+    "recordingVideoFile": "",
+    "recordingYoutubeId": "NuX75bPEltg"
+  },
+  {
+    "date": "2026-03-28T12:00:00+07:00",
+    "image": "https://api.istudentplus.com/media/20260811-07b7181a99a698f1.png",
+    "title": "Study Childcare & Aged Care as a PR Pathway in Australia",
+    "speaker": "Angela (Times Academy)",
+    "platform": "Zoom",
+    "description": "Discover study and career opportunities in Childcare & Aged Care in Australia (a high-demand sector with potential PR pathways) ✨",
+    "durationMinutes": 120,
+    "recordingVideoFile": "",
+    "recordingYoutubeId": "qW60wRVOngE"
+  },
+  {
+    "date": "2025-11-29T13:00:00+07:00",
+    "image": "https://api.istudentplus.com/media/20260811-1d4b31adb6b4ddd4.png",
+    "title": "Build Your Cybersecurity & AI Career in Australia",
+    "speaker": "Yen Bui (SHEA)",
+    "platform": "Zoom",
+    "description": "Want to study Cybersecurity & AI in Australia at an affordable cost ? Watch the webinar with iStudentPlus x SHEA (Skyline Higher Education Australia) and learn how you can start your global IT career by studying in Australia!",
+    "durationMinutes": 120,
+    "recordingVideoFile": "",
+    "recordingYoutubeId": "3zWydIkSX9c"
+  },
+  {
+    "date": "2025-11-08T10:00:00+07:00",
+    "image": "https://api.istudentplus.com/media/20260811-ebfd5b9beacc6594.png",
+    "title": "Build Your Career in Business, Tourism & Cookery",
+    "speaker": "Noon Hansakulnusorn (SBTA & SELA)",
+    "platform": "Zoom",
+    "description": "Get exclusive insights from SBTA & SELA, one of Australia's leading colleges that help international students prepare for a global career. 🌏",
+    "durationMinutes": 150,
+    "recordingVideoFile": "",
+    "recordingYoutubeId": "eyMfgq5QppU"
+  },
+  {
+    "date": "2026-08-15T12:00:00+07:00",
+    "image": "https://api.istudentplus.com/media/20260810-7993cbadf037b0fe.png",
+    "title": "Study and Build Your Career in Australia Through Trade Courses!",
+    "speaker": "Dessy (Everthought Education)",
+    "platform": "Zoom",
+    "description": "Still looking for a study pathway that offers practical skills and strong career opportunities after graduation? Join the FREE Webinar by iStudentPlus x Everthought Education!",
+    "durationMinutes": 90,
+    "recordingVideoFile": "",
+    "recordingYoutubeId": ""
   }
 ]

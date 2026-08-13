@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CourseFilter from "../components/CourseFilter";
@@ -21,7 +22,7 @@ type CoursesPage = {
 export default async function CoursesPage() {
   const {
     qualifications: QUALIFICATIONS,
-    popularFields: POPULAR_FIELDS,
+    // popularFields is still in the CMS but no longer rendered — see the note further down.
     vetLevels: VET_LEVELS,
     vetFields: VET_FIELDS,
     highSchool: HIGH_SCHOOL,
@@ -37,7 +38,8 @@ export default async function CoursesPage() {
               Courses &amp; Universities
             </div>
             <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
-              Six qualification types, <span className="text-accent">one decision</span> to make.
+              Choose your program to suit your{" "}
+              <span className="text-accent">long term goals</span>.
             </h1>
           </div>
         </section>
@@ -56,25 +58,28 @@ export default async function CoursesPage() {
           </div>
         </section>
 
-        <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-[1400px] px-7">
-            <h2 className="mb-6 text-2xl font-extrabold tracking-tight">
-              Popular fields among Indonesian students
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {POPULAR_FIELDS.map((row) => (
-                <div key={row.level} className="rounded-2xl border border-line bg-card p-6">
-                  <h3 className="mb-3 font-bold">{row.level}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {row.fields.map((f) => (
-                      <span key={f} className="rounded-full bg-paper-raise px-3 py-1 text-[12.5px] font-medium">
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
+        {/* "Popular fields among Indonesian students" used to sit here. Removed on client
+            feedback (flagged twice — as mergeable with the cards above and as redundant with
+            the VET breakdown below). The `popularFields` data is left in the CMS in case they
+            want it back somewhere else. */}
+
+        {/* From here down the page is Australia-specific, which wasn't stated anywhere before. */}
+        <section className="bg-paper-raise py-14">
+          <div className="mx-auto max-w-3xl px-7 text-center">
+            <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">
+              Focus: Australia
             </div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-balance sm:text-3xl">
+              A closer look at studying in Australia.
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
+              The sections below break down the Australian pathways in detail — the destination
+              most of our students choose. Other destinations are covered on the{" "}
+              <Link href="/study-abroad" className="font-semibold text-accent hover:underline">
+                Study Abroad
+              </Link>{" "}
+              pages.
+            </p>
           </div>
         </section>
 

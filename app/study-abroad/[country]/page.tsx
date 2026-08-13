@@ -19,12 +19,19 @@ export async function generateMetadata({ params }: { params: Promise<{ country: 
   };
 }
 
-const OVERVIEW_LABELS: { key: keyof import("../data").CountryOverview; label: string }[] = [
-  { key: "livingCost", label: "Living Cost" },
-  { key: "career", label: "Career Orientation" },
-  { key: "admission", label: "Admission Process" },
-  { key: "accommodation", label: "Accommodation" },
-  { key: "culture", label: "Culture & Lifestyle" },
+// Living Cost leads because it's the first thing people ask, and the two entries that have
+// supporting detail (the monthly cost table, the visa checklist) now carry it inside them
+// instead of repeating it in a separate section further down the page.
+const OVERVIEW_LABELS: {
+  key: keyof import("../data").CountryOverview;
+  label: string;
+  icon: string;
+}[] = [
+  { key: "livingCost", label: "Living Cost", icon: "💰" },
+  { key: "admission", label: "Student Visa Requirement", icon: "📋" },
+  { key: "career", label: "Career Orientation", icon: "💼" },
+  { key: "accommodation", label: "Accommodation", icon: "🏠" },
+  { key: "culture", label: "Culture & Lifestyle", icon: "🌏" },
 ];
 
 export default async function CountryPage({ params }: { params: Promise<{ country: string }> }) {
@@ -39,8 +46,11 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
       <main>
         <section className={`bg-gradient-to-b py-16 text-white ${country.gradient}`}>
           <div className="mx-auto max-w-4xl px-7 text-center">
+            {/* The country's `tag` used to be appended here, rendering "Study Abroad · Open".
+                "Open" reads as a claim about intakes or applications being open, which isn't
+                something this page can promise per country — dropped as misleading. */}
             <div className="mb-4.5 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
-              Study Abroad · {country.tag}
+              Study Abroad
             </div>
             <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
               Study in {country.name}
@@ -94,70 +104,67 @@ export default async function CountryPage({ params }: { params: Promise<{ countr
           </section>
         )}
 
+        {/* Expand/collapse via native <details> — same approach as the consultation form's
+            disclosure, so this needs no client component and works without JavaScript. */}
         <section className="bg-paper-raise py-16">
-          <div className="mx-auto max-w-[1400px] px-7">
+          <div className="mx-auto max-w-4xl px-7">
             <h2 className="mb-6 text-2xl font-extrabold tracking-tight">Overview</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {OVERVIEW_LABELS.map(({ key, label }) => (
-                <div key={key} className="rounded-2xl border border-line bg-card p-6">
-                  <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
-                    {label}
+            <div className="flex flex-col gap-3">
+              {OVERVIEW_LABELS.map(({ key, label, icon }, i) => (
+                <details
+                  key={key}
+                  open={i === 0}
+                  className="group overflow-hidden rounded-2xl border border-line bg-card [&_summary::-webkit-details-marker]:hidden"
+                >
+                  <summary className="flex cursor-pointer list-none items-center gap-3.5 px-6 py-4">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-paper-raise text-lg">
+                      {icon}
+                    </span>
+                    <span className="flex-1 font-bold">{label}</span>
+                    <span className="text-muted transition-transform group-open:rotate-180">▾</span>
+                  </summary>
+                  <div className="border-t border-line px-6 py-5">
+                    <p className="text-[14.5px] leading-relaxed text-muted">{country.overview[key]}</p>
+
+                    {/* The monthly table belongs with Living Cost, not in a section of its own. */}
+                    {key === "livingCost" && country.livingCosts && (
+                      <div className="mt-5 overflow-hidden rounded-xl border border-line">
+                        <table className="w-full border-collapse text-sm">
+                          <thead>
+                            <tr className="border-b border-line bg-paper-raise/60 text-left text-xs uppercase tracking-wide text-muted">
+                              <th className="px-4 py-2 font-semibold">Expense</th>
+                              <th className="px-4 py-2 font-semibold">Cost range (monthly)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {country.livingCosts.map((row, r) => (
+                              <tr key={row.expense} className={r % 2 === 1 ? "bg-paper-raise/40" : ""}>
+                                <td className="px-4 py-2.5 font-semibold">{row.expense}</td>
+                                <td className="px-4 py-2.5 font-mono text-muted">{row.range}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* "…then proceed with the check points" — the visa checklist, in place. */}
+                    {key === "admission" && country.visaRequirements && (
+                      <ul className="mt-5 flex flex-col gap-2.5">
+                        {country.visaRequirements.map((req) => (
+                          <li key={req} className="flex gap-2.5 text-[13.5px] leading-relaxed text-muted">
+                            <span className="mt-0.5 text-emerald-600">✓</span>
+                            {req}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                  <p className="text-[14.5px] leading-relaxed text-muted">{country.overview[key]}</p>
-                </div>
+                </details>
               ))}
             </div>
           </div>
         </section>
-
-        {(country.livingCosts || country.visaRequirements) && (
-          <section className="py-16">
-            <div className="mx-auto grid max-w-[1400px] gap-6 px-7 lg:grid-cols-2">
-              {country.livingCosts && (
-                <div className="overflow-hidden rounded-2xl border border-line bg-card">
-                  <div className="px-6 pb-2 pt-5">
-                    <h3 className="text-lg font-extrabold">Cost of Living in {country.name}</h3>
-                    <p className="mt-1 text-[13px] text-muted">Approximate monthly expenses.</p>
-                  </div>
-                  <table className="w-full border-collapse text-sm">
-                    <thead>
-                      <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-muted">
-                        <th className="px-6 py-2 font-semibold">Expense</th>
-                        <th className="px-6 py-2 font-semibold">Cost range (monthly)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {country.livingCosts.map((row, i) => (
-                        <tr key={row.expense} className={i % 2 === 1 ? "bg-paper-raise/60" : ""}>
-                          <td className="px-6 py-2.5 font-semibold">{row.expense}</td>
-                          <td className="px-6 py-2.5 font-mono text-muted">{row.range}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              {country.visaRequirements && (
-                <div className="rounded-2xl border border-line bg-card p-6">
-                  <h3 className="mb-1 text-lg font-extrabold">
-                    Student Visa Requirements
-                  </h3>
-                  <p className="mb-4 text-[13px] text-muted">
-                    What you need before applying — we help you prepare every item.
-                  </p>
-                  <ul className="flex flex-col gap-2.5">
-                    {country.visaRequirements.map((req) => (
-                      <li key={req} className="flex gap-2.5 text-[13.5px] leading-relaxed text-muted">
-                        <span className="mt-0.5 text-emerald-600">✓</span>
-                        {req}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
 
         <section className="py-16">
           <div className="mx-auto max-w-[1400px] px-7 text-center">

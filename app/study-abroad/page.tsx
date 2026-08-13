@@ -5,6 +5,8 @@ import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import { getCountries } from "./data";
 import { getVideo } from "../../lib/videos";
+import { readContent } from "../../lib/content";
+import { latestRecordedWebinar, type Webinar } from "../webinars/shared";
 import { getWhatsAppUrl } from "../../lib/whatsapp";
 
 export const metadata: Metadata = {
@@ -16,6 +18,9 @@ export const metadata: Metadata = {
 export default async function StudyAbroadPage() {
   const COUNTRIES = await getCountries();
   const VIDEO = await getVideo("Study Info");
+  // The webinar shown alongside it isn't pinned to one video: it's whichever finished webinar
+  // has the newest recording, so it stays current as the team publishes more.
+  const WEBINAR = await latestRecordedWebinar(await readContent<Webinar[]>("webinars"));
   const WHATSAPP_URL = await getWhatsAppUrl();
   return (
     <>
@@ -33,25 +38,8 @@ export default async function StudyAbroadPage() {
           </div>
         </section>
 
-        {VIDEO && (
-          <section className="py-8">
-            <div className="mx-auto max-w-3xl px-7">
-              <div className="mb-8 text-center">
-                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">Watch</div>
-                <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
-                  Study in <span className="text-accent">Australia, China &amp; Japan</span>.
-                </h2>
-                <p className="mx-auto mt-3 max-w-lg text-[15px] leading-relaxed text-muted">
-                  A quick guide to our most-requested study destinations.
-                </p>
-              </div>
-              <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
-                <YouTubeEmbed id={VIDEO.youtubeId} videoFile={VIDEO.videoFile} title={VIDEO.title} />
-              </div>
-            </div>
-          </section>
-        )}
-
+        {/* Destinations come before the videos: someone landing here is picking a country,
+            and the videos are supporting material for that choice. */}
         <section className="pb-16">
           <div className="mx-auto max-w-[1400px] px-7">
             <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -86,6 +74,62 @@ export default async function StudyAbroadPage() {
             </div>
           </div>
         </section>
+
+        {(VIDEO || WEBINAR) && (
+          <section className="bg-paper-raise py-16">
+            <div className="mx-auto max-w-[1400px] px-7">
+              <div className="mb-9 text-center">
+                <div className="mb-2.5 text-xs font-bold uppercase tracking-widest text-accent">Watch</div>
+                <h2 className="text-3xl font-extrabold tracking-tight text-balance sm:text-4xl">
+                  See it from <span className="text-accent">people who went</span>.
+                </h2>
+              </div>
+              {/* Two videos side by side: a real webinar on the left, the destinations guide on
+                  the right. Falls back to a single centred column if either one is missing. */}
+              <div
+                className={`mx-auto grid gap-6 ${VIDEO && WEBINAR ? "lg:grid-cols-2" : "max-w-3xl"}`}
+              >
+                {WEBINAR && (
+                  <div className="flex flex-col overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+                    <YouTubeEmbed
+                      id={WEBINAR.recordingYoutubeId}
+                      videoFile={WEBINAR.recordingVideoFile}
+                      title={WEBINAR.title}
+                    />
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="text-[11px] font-bold uppercase tracking-widest text-accent">
+                        Rekaman webinar
+                      </div>
+                      <h3 className="mt-1.5 text-lg font-extrabold leading-snug">{WEBINAR.title}</h3>
+                      <Link
+                        href="/webinars"
+                        className="mt-4 self-start rounded-full bg-ink px-5 py-2.5 text-[13.5px] font-semibold text-white transition-transform hover:scale-[1.03]"
+                      >
+                        Lihat semua webinar →
+                      </Link>
+                    </div>
+                  </div>
+                )}
+                {VIDEO && (
+                  <div className="flex flex-col overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
+                    <YouTubeEmbed id={VIDEO.youtubeId} videoFile={VIDEO.videoFile} title={VIDEO.title} />
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="text-[11px] font-bold uppercase tracking-widest text-accent">
+                        Panduan destinasi
+                      </div>
+                      <h3 className="mt-1.5 text-lg font-extrabold leading-snug">
+                        Study in Australia, China &amp; Japan
+                      </h3>
+                      <p className="mt-2 text-[14.5px] leading-relaxed text-muted">
+                        A quick guide to our most-requested study destinations.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="bg-paper-raise py-16">
           <div className="mx-auto max-w-[1400px] px-7 text-center">
