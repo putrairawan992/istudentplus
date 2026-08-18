@@ -3,28 +3,46 @@
     "id": "general-english",
     "name": "General English",
     "overview": "A comprehensive foundation across all four language skills, for everyday communication, travel, work, or further study — with personalized teacher feedback throughout.",
-    "features": ["Placement evaluation", "International certification from Australia"],
-    "duration": "1 month · 20 sessions · 90 minutes each · 5 days per week"
+    "features": [
+      "Placement evaluation",
+      "International certification from Australia"
+    ],
+    "duration": "1 month · 20 sessions · 90 minutes each · 5 days per week",
+    "bg": "bg-[#FBDCE5]"
   },
   {
     "id": "ielts",
     "name": "IELTS Preparation",
     "overview": "Exam-focused preparation for the International English Language Testing System, used for university admission and visa applications across most English-speaking destinations.",
-    "features": ["Placement evaluation", "Comprehensive handbook", "Complimentary weekly counseling", "Pre-test and post-test evaluations"],
-    "duration": "6 weeks · 30 sessions · 90 minutes each · 5 times a week"
+    "features": [
+      "Placement evaluation",
+      "Comprehensive handbook",
+      "Complimentary weekly counseling",
+      "Pre-test and post-test evaluations"
+    ],
+    "duration": "6 weeks · 30 sessions · 90 minutes each · 5 times a week",
+    "bg": "bg-[#FDF3C7]"
   },
   {
     "id": "conversation-class",
     "name": "Conversation Class",
     "overview": "Focused on speaking confidence and fluency — smaller, discussion-driven sessions rather than grammar drills.",
-    "features": ["Instructor who is a native speaker", "Comprehensive handbook", "Progress assessments"],
-    "duration": "3 months · 26 sessions · 90 minutes per session · 3 times a week"
+    "features": [
+      "Instructor who is a native speaker",
+      "Comprehensive handbook",
+      "Progress assessments"
+    ],
+    "duration": "3 months · 26 sessions · 90 minutes per session · 3 times a week",
+    "bg": "bg-[#D9F3EC]"
   },
   {
     "id": "jlpt",
     "name": "JLPT Preparation",
     "overview": "Preparation for the Japanese Language Proficiency Test (N5–N1), the standard benchmark for language schools and employers in Japan.",
-    "features": ["Level-based classes covering vocabulary, grammar, reading, and listening"],
-    "duration": "Ask a counselor which level and intake matches your current Japanese ability"
+    "features": [
+      "Level-based classes covering vocabulary, grammar, reading, and listening"
+    ],
+    "duration": "Ask a counselor which level and intake matches your current Japanese ability",
+    "bg": "bg-[#E6E1F7]"
   }
 ]

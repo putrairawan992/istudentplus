@@ -3,7 +3,7 @@ import Link from "next/link";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
-import { getCountries } from "./data";
+import { getVisibleCountries } from "./data";
 import { getVideo } from "../../lib/videos";
 import { readContent } from "../../lib/content";
 import { latestRecordedWebinar, type Webinar } from "../webinars/shared";
@@ -12,11 +12,11 @@ import { getWhatsAppUrl } from "../../lib/whatsapp";
 export const metadata: Metadata = {
   title: "Study Abroad",
   description:
-    "Explore study destinations — Australia, UK, USA, Canada, China, and Japan — with guidance from iStudentPlus counselors.",
+    "Explore study destinations — Australia, Japan, and China — with guidance from iStudentPlus counselors.",
 };
 
 export default async function StudyAbroadPage() {
-  const COUNTRIES = await getCountries();
+  const COUNTRIES = await getVisibleCountries();
   const VIDEO = await getVideo("Study Info");
   // The webinar shown alongside it isn't pinned to one video: it's whichever finished webinar
   // has the newest recording, so it stays current as the team publishes more.
@@ -49,24 +49,24 @@ export default async function StudyAbroadPage() {
                   href={`/study-abroad/${dest.slug}`}
                   className={`relative flex aspect-2/1 flex-col justify-end overflow-hidden rounded-2xl bg-gradient-to-b p-4 text-white transition-transform hover:scale-[1.02] ${dest.gradient}`}
                 >
+                  {/* One render path for every card: photo (if any) + a label rendered in the
+                      page's own type. `imageLabel` is left empty for the photos that still have
+                      their caption baked into the bitmap — filling it in would print the name
+                      twice. Those files need reshooting at 1200×600 without text; see
+                      docs/HISTORY.md §37. */}
                   {dest.image && (
                     /* eslint-disable-next-line @next/next/no-img-element */
                     <img
                       src={dest.image}
-                      alt={`Study in ${dest.name}`}
+                      alt={dest.imageLabel ? "" : `Study in ${dest.name}`}
                       className="absolute inset-0 h-full w-full object-cover"
                     />
                   )}
-                  {dest.imageLabel && (
-                    <span className="relative text-lg font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-                      {dest.imageLabel}
-                    </span>
-                  )}
-                  {!dest.image && (
+                  {(dest.imageLabel || !dest.image) && (
                     <>
                       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/85" />
-                      <h4 className="relative text-lg font-bold">{dest.name}</h4>
-                      <span className="relative text-xs opacity-85">{dest.cities}</span>
+                      <h3 className="relative text-lg font-bold">{dest.imageLabel || dest.name}</h3>
+                      {!dest.image && <span className="relative text-xs opacity-85">{dest.cities}</span>}
                     </>
                   )}
                 </Link>

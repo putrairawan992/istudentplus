@@ -4,7 +4,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ConsultationForm from "./components/ConsultationForm";
 import YouTubeEmbed from "./components/YouTubeEmbed";
-import { getCountries } from "./study-abroad/data";
+import { getVisibleCountries } from "./study-abroad/data";
 import { readContent } from "../lib/content";
 import { getVideo } from "../lib/videos";
 import { schedule, splitByDate, webinarThumbnail, type Webinar } from "./webinars/shared";
@@ -78,9 +78,9 @@ export default async function Home() {
   const { upcoming } = await splitByDate(await readContent<Webinar[]>("webinars"));
   const nextWebinar = upcoming[0];
   const nextWebinarThumb = nextWebinar ? webinarThumbnail(nextWebinar) : null;
-  const DESTINATIONS = (await getCountries()).filter((c) =>
-    ["australia", "japan", "uk", "canada"].includes(c.slug)
-  );
+  // Whatever the CMS lists as visible, in its own expertise order — the old hardcoded slug
+  // list had UK and Canada in it, which are exactly the two the client wanted out of sight.
+  const DESTINATIONS = await getVisibleCountries();
   const STEPS_VIDEO = await getVideo("Step by Step");
   const LANGUAGE_PROGRAMS = LANGUAGE_PROGRAM_ITEMS.map((p) => ({
     name: p.name,

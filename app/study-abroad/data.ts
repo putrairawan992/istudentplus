@@ -16,6 +16,10 @@ export type Country = {
   gradient: string;
   image?: string;
   imageLabel?: string;
+  /** Kept out of every list on the site, but the page itself still works if someone has the
+      link — the client wants UK/USA/Canada out of the way until there's real experience behind
+      them, not deleted. Uncheck it in the CMS to bring a country back. */
+  hidden?: boolean;
   whyStudy: string;
   overview: CountryOverview;
   featuredPrograms?: { name: string; description: string; href: string }[];
@@ -26,6 +30,16 @@ export type Country = {
 
 export function getCountries(): Promise<Country[]> {
   return readContent<Country[]>("countries");
+}
+
+/**
+ * Countries as visitors should see them listed: `hidden` ones filtered out, in the CMS's own
+ * order — which is expertise order (Australia, Japan, China), not alphabetical. Use this for
+ * every menu, grid and sidebar; use `getCountries` only where a country page has to resolve
+ * regardless, e.g. `generateStaticParams`.
+ */
+export async function getVisibleCountries(): Promise<Country[]> {
+  return (await getCountries()).filter((c) => !c.hidden);
 }
 
 export async function getCountry(slug: string) {

@@ -11,7 +11,7 @@ const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 const API_URL = process.env.CONTENT_API_URL;
 const API_TOKEN = process.env.CONTENT_API_TOKEN;
 
-const SOURCES = ["consultation", "contact", "webinar", "checklist"] as const;
+const SOURCES = ["consultation", "contact", "webinar", "checklist", "inquiry"] as const;
 
 type Lead = {
   id: string;

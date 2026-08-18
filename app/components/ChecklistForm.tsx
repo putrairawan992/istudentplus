@@ -5,7 +5,7 @@ import { useState } from "react";
 const inputClass =
   "w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent";
 
-// Same click-to-reveal pattern as the webinar RegisterForm: the checklist "form" is really a
+// Same click-to-reveal pattern as LeadForm: the checklist "form" is really a
 // lead capture (source "checklist") — the team follows up by email, there's no automated PDF
 // delivery yet since that needs an email-sending service the project doesn't have configured.
 export default function ChecklistForm() {

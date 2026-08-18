@@ -1,11 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { readContent } from "../../lib/content";
+import { getVisibleCountries } from "../study-abroad/data";
 
 type Social = { label: string; href: string };
 
 export default async function Footer() {
-  const SETTINGS = await readContent<{ socials: Social[]; whatsapp: string }>("settings");
+  const [SETTINGS, COUNTRIES] = await Promise.all([
+    readContent<{ socials: Social[]; whatsapp: string }>("settings"),
+    getVisibleCountries(),
+  ]);
   const SOCIALS = [...SETTINGS.socials, { label: "WhatsApp", href: SETTINGS.whatsapp }];
 
   return (
@@ -29,12 +33,17 @@ export default async function Footer() {
             <h5 className="mb-3.5 text-xs font-semibold uppercase tracking-wide text-muted">
               Study Abroad
             </h5>
-            <Link href="/study-abroad/australia" className="mb-2.5 block text-[13.5px] hover:text-accent">
-              Australia
-            </Link>
-            <Link href="/study-abroad/uk" className="mb-2.5 block text-[13.5px] hover:text-accent">
-              UK
-            </Link>
+            {/* From the CMS, like the header's submenu — this list used to be Australia and UK
+                hardcoded, and UK is one of the countries the client wants out of sight. */}
+            {COUNTRIES.map((country) => (
+              <Link
+                key={country.slug}
+                href={`/study-abroad/${country.slug}`}
+                className="mb-2.5 block text-[13.5px] hover:text-accent"
+              >
+                {country.name}
+              </Link>
+            ))}
             <Link href="/study-abroad" className="mb-2.5 block text-[13.5px] hover:text-accent">
               All destinations
             </Link>

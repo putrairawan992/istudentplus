@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import LeadForm from "../components/LeadForm";
 import { readContent } from "../../lib/content";
 import { getWhatsAppUrl } from "../../lib/whatsapp";
 
@@ -11,7 +12,16 @@ export const metadata: Metadata = {
     "General English, Conversation Class, IELTS, and JLPT preparation with iStudentPlus — placement evaluation, international certification from Australia, and native-speaker instructors.",
 };
 
-type LanguageProgram = { id: string; name: string; overview: string; features: string[]; duration: string };
+type LanguageProgram = {
+  id: string;
+  name: string;
+  overview: string;
+  features: string[];
+  duration: string;
+  /** Tailwind background class, same palette as the Services cards (`homeServices`). The client
+      asked for colour coding here so the programs stop reading as one block of identical cards. */
+  bg?: string;
+};
 type Instructor = { name: string; photo: string };
 type EnglishSkill = { name: string; description: string };
 
@@ -41,30 +51,54 @@ export default async function LanguageProgramsPage() {
         <section className="pb-16">
           <div className="mx-auto flex max-w-[1400px] flex-col gap-6 px-7">
             {PROGRAMS.map((program) => (
-              <div key={program.id} id={program.id} className="scroll-mt-20 rounded-2xl border border-line bg-card p-7">
+              <div
+                key={program.id}
+                id={program.id}
+                className={`scroll-mt-20 rounded-2xl border border-line p-7 ${program.bg ?? "bg-card"}`}
+              >
                 <h2 className="mb-2 text-xl font-extrabold">{program.name}</h2>
-                <p className="mb-5 max-w-2xl text-[15px] leading-relaxed text-muted">{program.overview}</p>
+                <p className="mb-5 max-w-2xl text-[15px] leading-relaxed text-ink/70">{program.overview}</p>
                 <div className="mb-5 flex flex-wrap gap-2">
                   {program.features.map((feature) => (
-                    <span key={feature} className="rounded-full bg-paper-raise px-3.5 py-1.5 text-[12.5px] font-medium">
+                    <span key={feature} className="rounded-full bg-white/70 px-3.5 py-1.5 text-[12.5px] font-medium">
                       ✓ {feature}
                     </span>
                   ))}
                 </div>
-                <div className="rounded-xl bg-sky-ink px-4.5 py-3 text-[13.5px] font-semibold text-ink">
+                <div className="rounded-xl bg-white/70 px-4.5 py-3 text-[13.5px] font-semibold text-ink">
                   <span className="mr-2 text-xs font-bold uppercase tracking-wide text-sky">Duration</span>
                   {program.duration}
                 </div>
                 {program.id === "general-english" && (
                   <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     {ENGLISH_SKILLS.map((skill) => (
-                      <div key={skill.name} className="rounded-xl bg-paper-raise p-4">
+                      <div key={skill.name} className="rounded-xl bg-white/70 p-4">
                         <div className="mb-1 font-bold">{skill.name}</div>
-                        <p className="text-[12px] leading-relaxed text-muted">{skill.description}</p>
+                        <p className="text-[12px] leading-relaxed text-ink/70">{skill.description}</p>
                       </div>
                     ))}
                   </div>
                 )}
+                {/* The old site let people see a price and register here; there is no bookable
+                    program behind this page yet, so the honest equivalent is an enquiry that
+                    reaches the team — it lands in /admin/leads tagged with the program, and
+                    nobody has to invent a price to make the page work. */}
+                <LeadForm
+                  source="inquiry"
+                  subjectKey="program"
+                  subject={program.name}
+                  labels={{
+                    open: `Ask about ${program.name}`,
+                    submit: "Send enquiry",
+                    submitting: "Sending…",
+                    cancel: "Cancel",
+                    success: "✓ Got it — a counselor will reach out about this program.",
+                    failure: "Could not send the enquiry.",
+                    namePlaceholder: "Your full name",
+                    emailPlaceholder: "Email address",
+                    whatsappPlaceholder: "WhatsApp number (optional)",
+                  }}
+                />
               </div>
             ))}
           </div>

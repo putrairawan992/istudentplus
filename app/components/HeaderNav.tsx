@@ -12,16 +12,10 @@ type NavItem = {
   children?: { label: string; href: string }[];
 };
 
-const COUNTRIES = [
-  { label: "Australia", slug: "australia" },
-  { label: "UK", slug: "uk" },
-  { label: "USA", slug: "usa" },
-  { label: "Canada", slug: "canada" },
-  { label: "China", slug: "china" },
-  { label: "Japan", slug: "japan" },
-];
+export type NavCountry = { label: string; slug: string };
 
-const NAV_ITEMS: NavItem[] = [
+// Built per render from the CMS's country list (order and visibility live there, not here).
+const navItems = (countries: NavCountry[]): NavItem[] => [
   {
     label: "About Us",
     href: "/about",
@@ -34,9 +28,14 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "Study Abroad",
     href: "/study-abroad",
-    children: COUNTRIES.map((c) => ({ label: c.label, href: `/study-abroad/${c.slug}` })),
+    children: [
+      ...countries.map((c) => ({ label: c.label, href: `/study-abroad/${c.slug}` })),
+      // Courses & Universities is Australia-only content, so it sits inside Study Abroad
+      // instead of taking a top-level slot. Promote it back out when other countries have
+      // real course data.
+      { label: "Courses & Universities", href: "/courses" },
+    ],
   },
-  { label: "Courses & Universities", href: "/courses" },
   {
     label: "Language Programs",
     href: "/language-programs",
@@ -147,8 +146,9 @@ function AuthControl({ isAdmin, className }: { isAdmin: boolean; className?: str
   );
 }
 
-export default function HeaderNav({ isAdmin }: { isAdmin: boolean }) {
+export default function HeaderNav({ isAdmin, countries }: { isAdmin: boolean; countries: NavCountry[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const items = navItems(countries);
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur">
@@ -164,7 +164,7 @@ export default function HeaderNav({ isAdmin }: { isAdmin: boolean }) {
           />
         </Link>
         <nav className="hidden gap-4 text-sm font-medium text-muted xl:flex">
-          {NAV_ITEMS.map((item) => (
+          {items.map((item) => (
             <NavLink key={item.label} item={item} />
           ))}
         </nav>
@@ -192,7 +192,7 @@ export default function HeaderNav({ isAdmin }: { isAdmin: boolean }) {
       {menuOpen && (
         <div className="border-t border-line bg-paper px-7 py-3 xl:hidden">
           <nav className="flex flex-col divide-y divide-line">
-            {NAV_ITEMS.map((item) => (
+            {items.map((item) => (
               <MobileNavItem key={item.label} item={item} onNavigate={() => setMenuOpen(false)} />
             ))}
           </nav>

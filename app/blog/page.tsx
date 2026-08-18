@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
 import { getWhatsAppUrl } from "../../lib/whatsapp";
-import { getCountries } from "../study-abroad/data";
+import { getVisibleCountries } from "../study-abroad/data";
 import { CATEGORIES, PAGE_SIZE, categoryLabel, formatDate, type Article } from "./shared";
 
 export const metadata: Metadata = {
@@ -31,9 +31,7 @@ export default async function BlogPage({
   const paged = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
   const pageHref = (n: number) =>
     `/blog?${new URLSearchParams({ ...(category ? { category } : {}), ...(n > 1 ? { page: String(n) } : {}) })}`;
-  const POPULAR_DESTINATIONS = (await getCountries()).filter((c) =>
-    ["australia", "japan", "uk", "canada"].includes(c.slug)
-  );
+  const POPULAR_DESTINATIONS = await getVisibleCountries();
 
   return (
     <>
@@ -80,7 +78,7 @@ export default async function BlogPage({
                   <div className="flex flex-col">
                     {paged.map((article) => (
                       <a
-                        key={article.title}
+                        key={article.slug ?? article.title}
                         href={article.slug ? `/blog/${article.slug}` : "#"}
                         className="group flex gap-5 border-b border-line py-6 first:pt-0 last:border-b-0"
                       >

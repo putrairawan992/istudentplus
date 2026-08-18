@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { readContent } from "../lib/content";
 import { SITE_URL } from "../lib/site";
-import { getCountries } from "./study-abroad/data";
+import { getVisibleCountries } from "./study-abroad/data";
 import type { Article } from "./blog/shared";
 
 // Built from the live content, not a hardcoded list: the 277 migrated posts (§38) and the
@@ -15,7 +15,7 @@ import type { Article } from "./blog/shared";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [articles, countries] = await Promise.all([
     readContent<Article[]>("blog"),
-    getCountries(),
+    getVisibleCountries(),
   ]);
 
   const staticPaths = [

@@ -4,11 +4,14 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
-import RegisterForm from "./RegisterForm";
+import { SITE_URL as siteUrl } from "../../lib/site";
+import LeadForm from "../components/LeadForm";
 import {
+  groupByTheme,
   replayOf,
   schedule,
   splitByDate,
+  webinarThumbnail,
   type Webinar,
   type WebinarStatus,
   type WebinarWithStatus,
@@ -38,45 +41,89 @@ function WebinarCard({ webinar }: { webinar: WebinarWithStatus }) {
         ? { id: replay.youtubeId, videoFile: replay.videoFile }
         : null;
 
-  return (
-    <article className="overflow-hidden rounded-2xl border border-line bg-card">
-      {player ? (
-        <YouTubeEmbed id={player.id} videoFile={player.videoFile} title={webinar.title} />
-      ) : (
-        webinar.image && (
-          // 16:9 so one poster fits everywhere: this card, the homepage banner, and a YouTube
-          // thumbnail if the session is streamed. The old 16:7 matched nothing else.
-          <div className="relative aspect-video">
-            <Image src={webinar.image} alt={webinar.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 700px" />
-          </div>
-        )
-      )}
-      <div className="p-5 sm:p-6">
-        <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wide">
-          <span className={`rounded-full px-2.5 py-1 ${BADGE[status].className}`}>{BADGE[status].label}</span>
-          {webinar.platform && <span className="text-muted">{webinar.platform}</span>}
-        </div>
-        <h3 className="mt-2.5 text-lg font-extrabold leading-snug">{webinar.title}</h3>
-        {when && <p className="mt-1 text-[13px] font-semibold text-muted">{when}</p>}
-        {webinar.speaker && <p className="mt-0.5 text-[13px] text-muted">Pembicara: {webinar.speaker}</p>}
-        {webinar.description && (
-          <p className="mt-3 text-[14.5px] leading-relaxed text-muted">{webinar.description}</p>
-        )}
+  const poster = webinarThumbnail(webinar);
+  // A session that is on right now is the page: it keeps the full-width, poster-on-top layout.
+  // Everything else is a compact row — poster beside the text, several visible without
+  // scrolling, which is what the client asked for after scrolling past one poster at a time.
+  const isLive = status === "live";
 
-        {status === "past" ? (
-          !player && <p className="mt-4 text-[13px] text-muted">Rekaman belum tersedia.</p>
-        ) : player ? (
-          // The stream is already playing above; asking them to register now helps nobody.
-          <p className="mt-4 text-[13px] font-semibold text-muted">Sesi sedang berlangsung — tonton di atas.</p>
-        ) : (
-          <RegisterForm webinar={webinar.title} />
-        )}
+  return (
+    <article
+      className={`overflow-hidden rounded-2xl border border-line bg-card ${isLive ? "lg:col-span-2" : ""}`}
+    >
+      <div className={isLive ? "" : "sm:flex sm:items-start"}>
+        <div className={isLive ? "" : "sm:w-60 sm:shrink-0 lg:w-64"}>
+          {player ? (
+            <YouTubeEmbed id={player.id} videoFile={player.videoFile} title={webinar.title} />
+          ) : (
+            poster && (
+              // 16:9 so one poster fits everywhere: this card, the homepage banner, and a
+              // YouTube thumbnail if the session is streamed.
+              <div className="relative aspect-video">
+                <Image
+                  src={poster}
+                  alt={webinar.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, 256px"
+                />
+              </div>
+            )
+          )}
+        </div>
+        <div className="min-w-0 flex-1 p-5">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-wide">
+            <span className={`rounded-full px-2.5 py-1 ${BADGE[status].className}`}>{BADGE[status].label}</span>
+            {webinar.platform && <span className="text-muted">{webinar.platform}</span>}
+          </div>
+          <h3 className="mt-2.5 text-[17px] font-extrabold leading-snug">{webinar.title}</h3>
+          {when && <p className="mt-1 text-[12.5px] font-semibold text-muted">{when}</p>}
+          {webinar.speaker && <p className="mt-0.5 text-[12.5px] text-muted">Pembicara: {webinar.speaker}</p>}
+          {webinar.description && (
+            <p className="mt-2 line-clamp-2 text-[13.5px] leading-relaxed text-muted">
+              {webinar.description}
+            </p>
+          )}
+
+          {status === "past" ? (
+            !player && <p className="mt-4 text-[13px] text-muted">Rekaman belum tersedia.</p>
+          ) : player ? (
+            // The stream is already playing above; asking them to register now helps nobody.
+            <p className="mt-4 text-[13px] font-semibold text-muted">Sesi sedang berlangsung — tonton di atas.</p>
+          ) : (
+            <LeadForm source="webinar" subjectKey="webinar" subject={webinar.title} />
+          )}
+        </div>
       </div>
     </article>
   );
 }
 
-const siteUrl = "https://www.istudentplus.com";
+// One theme = one block, so the two Childcare sessions read as a pair instead of two unrelated
+// posters. Themes come from the CMS; anything untagged lands in "Lainnya".
+function ThemedGroups({ webinars }: { webinars: WebinarWithStatus[] }) {
+  const groups = groupByTheme(webinars);
+  return (
+    <div className="flex flex-col gap-8">
+      {groups.map(([theme, items]) => (
+        <div key={theme}>
+          {/* A single group with no real theme needs no label above it. */}
+          {!(groups.length === 1 && theme === "Lainnya") && (
+            <h3 className="mb-3 text-[13px] font-extrabold text-ink">
+              {theme}
+              <span className="ml-2 text-[12px] font-semibold text-muted">{items.length} sesi</span>
+            </h3>
+          )}
+          <div className="grid gap-4 lg:grid-cols-2">
+            {items.map((w) => (
+              <WebinarCard key={w.title} webinar={w} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // GEO/SEO: one schema.org Event per dated webinar, so search/AI engines can surface it
 // directly (date, format, organizer) instead of only the page's plain text.
@@ -111,9 +158,9 @@ export default async function WebinarsPage() {
         />
       )}
       <Header />
-      <main className="mx-auto max-w-3xl px-5 py-10 sm:px-7 sm:py-14">
+      <main className="mx-auto max-w-[1200px] px-5 py-10 sm:px-7 sm:py-14">
         <h1 className="text-3xl font-extrabold sm:text-4xl">Webinar</h1>
-        <p className="mt-2 text-[15px] leading-relaxed text-muted">
+        <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-muted">
           Sesi online gratis seputar kuliah di luar negeri, beasiswa, dan persiapan bahasa. Daftar
           dengan email — link acaranya kami kirim sebelum hari-H.
         </p>
@@ -125,22 +172,14 @@ export default async function WebinarsPage() {
               Belum ada jadwal baru. Cek lagi nanti, atau lihat rekaman di bawah.
             </p>
           ) : (
-            <div className="flex flex-col gap-5">
-              {upcoming.map((w) => (
-                <WebinarCard key={w.title} webinar={w} />
-              ))}
-            </div>
+            <ThemedGroups webinars={upcoming} />
           )}
         </section>
 
         {past.length > 0 && (
           <section className="mt-10">
             <h2 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted">Sudah lewat</h2>
-            <div className="flex flex-col gap-5">
-              {past.map((w) => (
-                <WebinarCard key={w.title} webinar={w} />
-              ))}
-            </div>
+            <ThemedGroups webinars={past} />
           </section>
         )}
       </main>

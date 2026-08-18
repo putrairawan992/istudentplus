@@ -8,7 +8,8 @@
     "description": "WHV ending soon? Or still unsure which course is right for your future in Australia? Join our FREE iStudentPlus Webinar and learn how to choose the right study pathway based on your background, goals, and career opportunities in Australia 👀✨",
     "durationMinutes": 90,
     "recordingVideoFile": "",
-    "recordingYoutubeId": "VgRf9rjG_3Q"
+    "recordingYoutubeId": "VgRf9rjG_3Q",
+    "theme": "Pathway & Visa"
   },
   {
     "date": "2026-05-31T12:00:00+07:00",
@@ -19,7 +20,8 @@
     "description": "Curious about what it’s really like to live as an international student in Melbourne? Watch this webinar iStudentPlus X CBM Melbourne! Scholarship Opportunity up to AUD 1000 💸!",
     "durationMinutes": 120,
     "recordingVideoFile": "",
-    "recordingYoutubeId": "jINf10f6FNw"
+    "recordingYoutubeId": "jINf10f6FNw",
+    "theme": "Kehidupan Mahasiswa"
   },
   {
     "date": "2026-04-18T12:00:00+07:00",
@@ -30,7 +32,8 @@
     "description": "Discover how studying childcare abroad can open doors to international career opportunities ✨",
     "durationMinutes": 90,
     "recordingVideoFile": "",
-    "recordingYoutubeId": "NuX75bPEltg"
+    "recordingYoutubeId": "NuX75bPEltg",
+    "theme": "Childcare & Aged Care"
   },
   {
     "date": "2026-03-28T12:00:00+07:00",
@@ -41,7 +44,8 @@
     "description": "Discover study and career opportunities in Childcare & Aged Care in Australia (a high-demand sector with potential PR pathways) ✨",
     "durationMinutes": 120,
     "recordingVideoFile": "",
-    "recordingYoutubeId": "qW60wRVOngE"
+    "recordingYoutubeId": "qW60wRVOngE",
+    "theme": "Childcare & Aged Care"
   },
   {
     "date": "2025-11-29T13:00:00+07:00",
@@ -52,7 +56,8 @@
     "description": "Want to study Cybersecurity & AI in Australia at an affordable cost ? Watch the webinar with iStudentPlus x SHEA (Skyline Higher Education Australia) and learn how you can start your global IT career by studying in Australia!",
     "durationMinutes": 120,
     "recordingVideoFile": "",
-    "recordingYoutubeId": "3zWydIkSX9c"
+    "recordingYoutubeId": "3zWydIkSX9c",
+    "theme": "Karier & Kejuruan"
   },
   {
     "date": "2025-11-08T10:00:00+07:00",
@@ -63,7 +68,8 @@
     "description": "Get exclusive insights from SBTA & SELA, one of Australia's leading colleges that help international students prepare for a global career. 🌏",
     "durationMinutes": 150,
     "recordingVideoFile": "",
-    "recordingYoutubeId": "eyMfgq5QppU"
+    "recordingYoutubeId": "eyMfgq5QppU",
+    "theme": "Karier & Kejuruan"
   },
   {
     "date": "2026-08-15T12:00:00+07:00",
@@ -74,6 +80,7 @@
     "description": "Still looking for a study pathway that offers practical skills and strong career opportunities after graduation? Join the FREE Webinar by iStudentPlus x Everthought Education!",
     "durationMinutes": 90,
     "recordingVideoFile": "",
-    "recordingYoutubeId": ""
+    "recordingYoutubeId": "",
+    "theme": "Karier & Kejuruan"
   }
 ]

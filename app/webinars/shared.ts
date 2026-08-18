@@ -2,6 +2,9 @@ import { connection } from "next/server";
 
 export type Webinar = {
   title: string;
+  /** Groups the listing so related sessions sit together instead of forcing a scroll past one
+      full-width poster at a time. Editable in the CMS; untagged entries fall into "Lainnya". */
+  theme?: string;
   date?: string;
   durationMinutes?: number;
   speaker?: string;
@@ -70,6 +73,19 @@ export function webinarThumbnail(w: Webinar): string | null {
   if (w.image) return w.image;
   const videoId = w.liveYoutubeId || w.recordingYoutubeId;
   return videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : null;
+}
+
+/**
+ * Groups a list by its `theme`, preserving the order the list already came in (so the
+ * newest-first / soonest-first sorting survives) and keeping untagged entries last.
+ */
+export function groupByTheme(webinars: WebinarWithStatus[]) {
+  const groups = new Map<string, WebinarWithStatus[]>();
+  for (const w of webinars) {
+    const key = w.theme?.trim() || "Lainnya";
+    (groups.get(key) ?? groups.set(key, []).get(key)!).push(w);
+  }
+  return [...groups].sort(([a], [b]) => (a === "Lainnya" ? 1 : b === "Lainnya" ? -1 : 0));
 }
 
 // Status comes from the date itself, so nobody has to remember to flip a flag in the CMS
