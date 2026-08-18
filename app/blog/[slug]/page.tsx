@@ -57,15 +57,24 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
               </div>
             )}
 
-            <div className="flex flex-col gap-4.5">
-              {(article.content && article.content.length > 0 ? article.content : [article.excerpt]).map(
-                (para, i) => (
-                  <p key={i} className="text-[16px] leading-relaxed text-ink">
-                    {para}
-                  </p>
-                )
-              )}
-            </div>
+            {article.html ? (
+              /* Migrated WordPress bodies are HTML (headings, lists, tables, links). Sanitized
+                 at migration time — tags and attributes are whitelisted there, not here. */
+              <div
+                className="article-body mx-auto max-w-3xl"
+                dangerouslySetInnerHTML={{ __html: article.html }}
+              />
+            ) : (
+              <div className="mx-auto flex max-w-3xl flex-col gap-4.5">
+                {(article.content && article.content.length > 0 ? article.content : [article.excerpt]).map(
+                  (para, i) => (
+                    <p key={i} className="text-[16px] leading-relaxed text-ink">
+                      {para}
+                    </p>
+                  )
+                )}
+              </div>
+            )}
 
             <div className="mt-12 flex flex-col items-center gap-4 rounded-2xl bg-ink px-8 py-10 text-center text-white">
               <h2 className="text-xl font-extrabold">Have a question this article didn&apos;t answer?</h2>

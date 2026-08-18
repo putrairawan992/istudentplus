@@ -29,8 +29,58 @@ if (process.env.CONTENT_API_URL) {
   }
 }
 
+// The old WordPress site served every post at the site root (/some-post-slug/) and its
+// archives at /category/<slug>/. Once istudentplus.com points at this app, every one of those
+// URLs 404s — and they are what Google has indexed — so each migrated post gets a permanent
+// redirect to its new /blog/<slug> home. Generated from the migrated collection rather than a
+// /:slug wildcard, which would swallow /about, /services and every other real route.
+import fs from "fs";
+import path from "path";
+
+// Old category slug -> the bucket it was merged into (see docs/HISTORY.md §38).
+const OLD_CATEGORY_BUCKETS: Record<string, string> = {
+  visa: "immigration",
+  "visa-immigration": "immigration",
+  ielts: "english-ielts",
+  "english-study": "english-ielts",
+  "study-in-australia": "destinations",
+  destinations: "destinations",
+  "popular-countries": "destinations",
+  "study-abroad": "destinations",
+  "course-providers": "destinations",
+  "study-tips": "study-tips",
+  "student-life": "student-life",
+  tours: "student-life",
+  indonesia: "student-life",
+};
+
+function migratedPostRedirects() {
+  try {
+    const file = path.join(process.cwd(), "content", "blog.json");
+    const posts = JSON.parse(fs.readFileSync(file, "utf-8")) as { slug?: string }[];
+    return posts
+      .filter((p) => p.slug)
+      .map((p) => ({ source: `/${p.slug}`, destination: `/blog/${p.slug}`, permanent: true }));
+  } catch {
+    // No local copy (content comes from the API): skip rather than fail the build.
+    return [];
+  }
+}
+
 const nextConfig: NextConfig = {
   images: { remotePatterns },
+  async redirects() {
+    return [
+      ...migratedPostRedirects(),
+      ...Object.entries(OLD_CATEGORY_BUCKETS).map(([oldSlug, bucket]) => ({
+        source: `/category/${oldSlug}`,
+        destination: `/blog?category=${bucket}`,
+        permanent: true,
+      })),
+      // Demo-theme categories and anything else under /category/ lands on the blog index.
+      { source: "/category/:slug", destination: "/blog", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

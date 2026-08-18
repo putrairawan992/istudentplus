@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CATEGORIES } from "../blog/shared";
 
 type NavItem = {
   label: string;
@@ -49,12 +50,8 @@ const NAV_ITEMS: NavItem[] = [
   {
     label: "Blog",
     href: "/blog",
-    children: [
-      { label: "Recent News", href: "/blog?category=recent-news" },
-      { label: "Immigration", href: "/blog?category=immigration" },
-      { label: "Student Life", href: "/blog?category=student-life" },
-      { label: "Study Tips", href: "/blog?category=study-tips" },
-    ],
+    /* Straight from the blog's own category list — the two used to drift apart. */
+    children: CATEGORIES.map((c) => ({ label: c.label, href: `/blog?category=${c.slug}` })),
   },
   { label: "Webinar", href: "/webinars" },
   { label: "Forum", href: "/threads" },

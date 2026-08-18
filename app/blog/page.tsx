@@ -7,7 +7,7 @@ import YouTubeEmbed from "../components/YouTubeEmbed";
 import { readContent } from "../../lib/content";
 import { getWhatsAppUrl } from "../../lib/whatsapp";
 import { getCountries } from "../study-abroad/data";
-import { CATEGORIES, categoryLabel, formatDate, type Article } from "./shared";
+import { CATEGORIES, PAGE_SIZE, categoryLabel, formatDate, type Article } from "./shared";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -19,13 +19,18 @@ type Video = { series: string; title: string; youtubeId?: string | null; videoFi
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; page?: string }>;
 }) {
-  const { category } = await searchParams;
+  const { category, page } = await searchParams;
   const WHATSAPP_URL = await getWhatsAppUrl();
   const ARTICLES = await readContent<Article[]>("blog");
   const VIDEO_SERIES = await readContent<Video[]>("videoSeries");
   const filtered = category ? ARTICLES.filter((a) => a.category === category) : ARTICLES;
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const current = Math.min(Math.max(1, Number(page) || 1), pageCount);
+  const paged = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const pageHref = (n: number) =>
+    `/blog?${new URLSearchParams({ ...(category ? { category } : {}), ...(n > 1 ? { page: String(n) } : {}) })}`;
   const POPULAR_DESTINATIONS = (await getCountries()).filter((c) =>
     ["australia", "japan", "uk", "canada"].includes(c.slug)
   );
@@ -71,9 +76,9 @@ export default async function BlogPage({
                   ))}
                 </div>
 
-                {filtered.length > 0 ? (
+                {paged.length > 0 ? (
                   <div className="flex flex-col">
-                    {filtered.map((article) => (
+                    {paged.map((article) => (
                       <a
                         key={article.title}
                         href={article.slug ? `/blog/${article.slug}` : "#"}
@@ -103,6 +108,28 @@ export default async function BlogPage({
                   <p className="rounded-2xl border border-dashed border-line p-6.5 text-sm text-muted">
                     No articles in this category yet — check back soon.
                   </p>
+                )}
+
+                {pageCount > 1 && (
+                  <nav className="mt-8 flex items-center justify-between gap-3 text-[13.5px] font-semibold">
+                    {current > 1 ? (
+                      <Link href={pageHref(current - 1)} className="rounded-full border border-line px-4 py-2 text-ink hover:bg-paper-raise">
+                        ← Newer
+                      </Link>
+                    ) : (
+                      <span />
+                    )}
+                    <span className="text-muted">
+                      Page {current} of {pageCount} · {filtered.length} articles
+                    </span>
+                    {current < pageCount ? (
+                      <Link href={pageHref(current + 1)} className="rounded-full border border-line px-4 py-2 text-ink hover:bg-paper-raise">
+                        Older →
+                      </Link>
+                    ) : (
+                      <span />
+                    )}
+                  </nav>
                 )}
               </div>
 
