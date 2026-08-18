@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import FloatWhatsApp from "./components/FloatWhatsApp";
-
-const siteUrl = "https://www.istudentplus.com";
+import { SITE_URL as siteUrl } from "../lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
