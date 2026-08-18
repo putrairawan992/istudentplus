@@ -16,6 +16,13 @@ import {
   isVideoField,
   rejectionMessage,
 } from "../../../lib/image-specs";
+import {
+  fromInputValue,
+  granularityOf,
+  isDateKey,
+  isPickable,
+  toInputValue,
+} from "../../../lib/date-fields";
 import ConfirmModal from "./ConfirmModal";
 import { useToast } from "./Toast";
 
@@ -389,6 +396,38 @@ function StringField({
   );
 }
 
+// A date field: the browser's own picker instead of hand-typed ISO text. Webinars get a
+// date-and-time picker (their schedule is to the minute, in WIB); a blog date gets a calendar.
+// The stored string keeps exactly the shape it had — `+07:00` and all — so nothing downstream
+// changes, and it stays visible under the input because that's the value the guide talks about.
+function DateField({
+  value,
+  onChange,
+  collection,
+}: {
+  value: string | null;
+  onChange: (v: string | null) => void;
+  collection?: string;
+}) {
+  const granularity = granularityOf(value, collection);
+  return (
+    <div>
+      <input
+        type={granularity === "datetime" ? "datetime-local" : "date"}
+        value={toInputValue(value, granularity)}
+        onChange={(e) => onChange(fromInputValue(e.target.value, granularity))}
+        className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+      />
+      {granularity === "datetime" && (
+        <p className="mt-1 text-[12px] text-muted">
+          Waktu WIB (GMT+7).{" "}
+          {value ? <>Tersimpan sebagai <code className="text-[11px]">{value}</code></> : "Belum diisi."}
+        </p>
+      )}
+    </div>
+  );
+}
+
 function FieldEditor({
   value,
   path,
@@ -402,6 +441,7 @@ function FieldEditor({
   setRoot: (v: JsonValue) => void;
   label?: string;
 }) {
+  const collection = useContext(CollectionContext);
   const update = (v: JsonValue) => setRoot(setAtPath(root, path, v));
   const placeholder = label ? `Enter ${humanize(label).toLowerCase()}` : undefined;
 
@@ -409,6 +449,11 @@ function FieldEditor({
     if (isMediaKey(label)) return <ImageField value={value} onChange={update} field={label} />;
     if (label && YOUTUBE_KEY.test(label)) return <VideoField value={value} onChange={update} />;
     if (isBgColorField(label, value)) return <BgColorField value={value ?? ""} onChange={update} />;
+    // A value no picker can represent (someone typed "besok pagi") keeps the text box, so it can
+    // be read and corrected rather than silently blanked by a control that can't hold it.
+    if (isDateKey(label) && isPickable(value)) {
+      return <DateField value={value} onChange={update} collection={collection} />;
+    }
     return <StringField value={value} onChange={update} placeholder={placeholder} label={label} />;
   }
 
