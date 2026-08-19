@@ -1,8 +1,15 @@
 "use client";
 
-import { createContext, useContext, useRef, useState, useTransition } from "react";
+import { createContext, useContext, useMemo, useRef, useState, useTransition } from "react";
 import type { JsonValue, JsonObject } from "../../../lib/json-tree";
-import { setAtPath, removeAtIndex, insertAtEnd, blankShapeOf } from "../../../lib/json-tree";
+import {
+  setAtPath,
+  removeAtIndex,
+  insertAtEnd,
+  blankShapeOf,
+  unionShapeOf,
+  mergeWithModel,
+} from "../../../lib/json-tree";
 import {
   IMAGE_EXT,
   MAX_UPLOAD_BYTES,
@@ -16,6 +23,7 @@ import {
   isVideoField,
   rejectionMessage,
 } from "../../../lib/image-specs";
+import { sectionsOf } from "../../../lib/form-sections";
 import {
   fromInputValue,
   granularityOf,
@@ -35,6 +43,12 @@ function humanize(key: string) {
 // (a country banner is 2:1, a blog header is 3:2 — same "image" key, different shape). Passed by
 // context rather than threaded through every recursive ObjectFields/FieldEditor call.
 const CollectionContext = createContext<string | undefined>(undefined);
+
+// The current list's union shape (see unionShapeOf) — every field any entry in this collection
+// has, used so every entry shows the same tabs and an empty array field has a real template to
+// offer when someone adds its first item. `{}` for single-object collections, where there's only
+// one instance and nothing to reconcile against.
+const ModelContext = createContext<JsonObject>({});
 
 // Field keys that hold an uploadable asset — these render an image/video upload widget.
 const MEDIA_KEY = /(image|photo|thumbnail|thumb|logo|icon|avatar|cover|poster|banner|picture|img|video)/i;
@@ -442,6 +456,7 @@ function FieldEditor({
   label?: string;
 }) {
   const collection = useContext(CollectionContext);
+  const model = useContext(ModelContext);
   const update = (v: JsonValue) => setRoot(setAtPath(root, path, v));
   const placeholder = label ? `Enter ${humanize(label).toLowerCase()}` : undefined;
 
@@ -457,6 +472,22 @@ function FieldEditor({
     return <StringField value={value} onChange={update} placeholder={placeholder} label={label} />;
   }
 
+  // Was falling through to the final `return null` — a "Hidden" checkbox never rendered at all,
+  // so a field that exists in the data was invisible and unreachable in the CMS.
+  if (typeof value === "boolean") {
+    return (
+      <label className="flex items-center gap-2 py-2 text-sm text-ink">
+        <input
+          type="checkbox"
+          checked={value}
+          onChange={(e) => update(e.target.checked)}
+          className="h-4 w-4 rounded border-line accent-accent"
+        />
+        {value ? "Yes" : "No"}
+      </label>
+    );
+  }
+
   if (typeof value === "number") {
     return (
       <input
@@ -469,7 +500,13 @@ function FieldEditor({
   }
 
   if (Array.isArray(value)) {
-    const itemsArePrimitive = value.length === 0 || typeof value[0] !== "object" || value[0] === null;
+    // An empty array can't say what it should hold — every entry in this list without a single
+    // Featured Program looked exactly like an empty tag list otherwise, and got that UI instead
+    // of the "+ Add entry" card editor. The model's own example (see mergeWithModel) is what
+    // another entry in the same collection actually stores there.
+    const modelExample = label ? model[label] : undefined;
+    const sample = value.length > 0 ? value[0] : Array.isArray(modelExample) ? modelExample[0] : undefined;
+    const itemsArePrimitive = sample === undefined || sample === null || typeof sample !== "object";
     if (itemsArePrimitive) {
       // A list like Languages or Client Countries is short tags, best packed 3-per-row. A list
       // like About Story is paragraphs — the same 1/3-width, 3-row box was squeezing multi-
@@ -508,6 +545,11 @@ function FieldEditor({
       );
     }
     // array of objects — two per row so long lists (stats, offices) scroll less
+    // An entry that doesn't have this field yet (see mergeWithModel) shows it as empty rather
+    // than missing; the model supplies what its first item should look like — e.g. Australia's
+    // {label, value} Key Fact shape — so "+ Add entry" here doesn't hand back a card with no
+    // fields to fill in just because this particular entry has never had one before.
+    const modelTemplate = label && Array.isArray(model[label]) ? (model[label] as JsonValue[])[0] : undefined;
     return (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {value.map((item, i) => (
@@ -527,7 +569,7 @@ function FieldEditor({
         ))}
         <button
           type="button"
-          onClick={() => setRoot(insertAtEnd(root, path, blankShapeOf(value[0] ?? {})))}
+          onClick={() => setRoot(insertAtEnd(root, path, blankShapeOf(value[0] ?? modelTemplate ?? {})))}
           className="justify-self-start text-[13px] font-semibold text-accent hover:underline sm:col-span-2"
         >
           + Add entry
@@ -552,20 +594,88 @@ function ObjectFields({
   path,
   root,
   setRoot,
+  keys,
+}: {
+  value: JsonObject;
+  path: (string | number)[];
+  root: JsonValue;
+  setRoot: (v: JsonValue) => void;
+  /** Render only these fields. Used by the tab strip; defaults to the whole object. */
+  keys?: string[];
+}) {
+  return (
+    <div className="grid grid-cols-1 gap-x-5 gap-y-3.5 sm:grid-cols-2">
+      {(keys ?? Object.keys(value)).map((key) => (
+        <div key={key} className={isWideField(value[key], key) || isMediaKey(key) ? "sm:col-span-2" : ""}>
+          <label className="mb-1 block text-[12.5px] font-bold text-muted">{humanize(key)}</label>
+          <FieldEditor value={value[key]} path={[...path, key]} root={root} setRoot={setRoot} label={key} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Media/video fields are the tall ones — a preview box plus the size rules for the slot. */
+function isMediaish(key: string) {
+  return isMediaKey(key) || YOUTUBE_KEY.test(key);
+}
+
+/** The tab strip. One `ObjectFields` at a time; the data behind all tabs is one object, so Save
+    writes every tab whether or not it's the one on screen. Grouping lives in lib/form-sections. */
+function TabbedFields({
+  value,
+  path,
+  root,
+  setRoot,
 }: {
   value: JsonObject;
   path: (string | number)[];
   root: JsonValue;
   setRoot: (v: JsonValue) => void;
 }) {
+  // Widened to every field this collection's other entries have, so every entry gets the same
+  // tabs in the same order — a field this one doesn't have yet renders blank rather than its tab
+  // just not existing. `root`/`path`/`setRoot` stay the real data throughout: this only changes
+  // what's read for display, not what a field write targets.
+  const model = useContext(ModelContext);
+  const merged = mergeWithModel(value, model);
+  const sections = sectionsOf(merged, isMediaish);
+  const [active, setActive] = useState(0);
+
+  if (sections.length < 2) {
+    return <ObjectFields value={merged} path={path} root={root} setRoot={setRoot} />;
+  }
+
+  // A section that disappeared (an emptied list) must not leave a blank pane behind.
+  const current = sections[Math.min(active, sections.length - 1)];
+
   return (
-    <div className="grid grid-cols-1 gap-x-5 gap-y-3.5 sm:grid-cols-2">
-      {Object.keys(value).map((key) => (
-        <div key={key} className={isWideField(value[key], key) || isMediaKey(key) ? "sm:col-span-2" : ""}>
-          <label className="mb-1 block text-[12.5px] font-bold text-muted">{humanize(key)}</label>
-          <FieldEditor value={value[key]} path={[...path, key]} root={root} setRoot={setRoot} label={key} />
-        </div>
-      ))}
+    <div>
+      <div role="tablist" aria-label="Sections" className="mb-4 flex flex-wrap gap-1.5 border-b border-line pb-3">
+        {sections.map((section, i) => {
+          const selected = section === current;
+          return (
+            <button
+              key={section.label}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              onClick={() => setActive(i)}
+              className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
+                selected ? "bg-ink text-white" : "border border-line text-muted hover:bg-paper-raise"
+              }`}
+            >
+              {section.label}
+              {section.keys.length === 1 && Array.isArray(merged[section.keys[0]]) && (
+                <span className={`ml-1.5 text-[11px] ${selected ? "text-white/70" : "text-muted"}`}>
+                  {(merged[section.keys[0]] as JsonValue[]).length}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <ObjectFields value={merged} path={path} root={root} setRoot={setRoot} keys={current.keys} />
     </div>
   );
 }
@@ -592,13 +702,18 @@ export default function CollectionEditor({
   const [removeBusy, setRemoveBusy] = useState(false);
   const [reorderBusy, setReorderBusy] = useState(false);
   const { toast } = useToast();
-  // Collapse list entries by default when there are more than a few, so the page stays scannable.
-  const [openIdx, setOpenIdx] = useState<Set<number>>(() => {
-    if (!Array.isArray(initialData) || initialData.length > 3) return new Set();
-    return new Set(initialData.map((_, i) => i));
+  // Accordion, not a checklist: only one entry open at a time, everywhere in the admin. A
+  // short list (≤3) starts with its single entry open; anything longer starts fully closed so
+  // opening #2 doesn't leave #1's fields sitting expanded above it.
+  const [openIdx, setOpenIdx] = useState<number | null>(() => {
+    if (Array.isArray(initialData) && initialData.length === 1) return 0;
+    return null;
   });
 
   const isList = Array.isArray(data);
+  // Every field any entry in this list has, so every entry's tabs match (see unionShapeOf).
+  // {} for a single-object collection — nothing to reconcile against with only one instance.
+  const model = useMemo(() => (isList ? unionShapeOf(data as JsonValue[]) : {}), [isList, data]);
 
   function edit(v: JsonValue) {
     setData(v);
@@ -607,11 +722,7 @@ export default function CollectionEditor({
   }
 
   function toggle(i: number) {
-    setOpenIdx((prev) => {
-      const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
-      return next;
-    });
+    setOpenIdx((prev) => (prev === i ? null : i));
   }
 
   function handleRemove(index: number, entryLabel: string) {
@@ -661,12 +772,8 @@ export default function CollectionEditor({
         setData(next);
         setDirty(false);
         setStatus("saved");
-        // The open/closed entries follow their content, not their old position.
-        setOpenIdx((prev) => {
-          const out = new Set<number>();
-          prev.forEach((i) => out.add(i === index ? target : i === target ? index : i));
-          return out;
-        });
+        // The open entry follows its content, not its old position.
+        setOpenIdx((prev) => (prev === index ? target : prev === target ? index : prev));
       } else {
         toast("error", res.error || "Failed to reorder.");
       }
@@ -694,19 +801,16 @@ export default function CollectionEditor({
   // row at the bottom of a possibly-long list and forcing a scroll to find it.
   function openAddModal() {
     if (!Array.isArray(data)) return;
-    setDraft(blankShapeOf(data.length > 0 ? data[0] : {}));
+    // The union model, not just the first entry — so a new entry starts with every tab the rest
+    // of the collection has, even if entry #1 happens to be one of the thinner ones.
+    setDraft(blankShapeOf(model));
     setShowAddModal(true);
   }
 
   function confirmAddEntry() {
     if (!Array.isArray(data)) return;
     edit([draft, ...data]);
-    setOpenIdx((prev) => {
-      const shifted = new Set<number>();
-      prev.forEach((i) => shifted.add(i + 1));
-      shifted.add(0); // open the new entry at the top
-      return shifted;
-    });
+    setOpenIdx(0); // the new entry lands at the top and is the one open
     setShowAddModal(false);
   }
 
@@ -716,6 +820,7 @@ export default function CollectionEditor({
 
   return (
     <CollectionContext.Provider value={collection}>
+    <ModelContext.Provider value={model}>
     <div>
       {/* Top bar — only for lists: add entries + status. Saving lives on each entry (lists)
           or in the sticky bottom bar (single objects), never both. */}
@@ -773,7 +878,7 @@ export default function CollectionEditor({
             </div>
             <div className="flex-1 overflow-y-auto bg-paper-raise p-6">
               {isObject(draft) && Object.keys(draft).length > 0 ? (
-                <ObjectFields value={draft} path={[]} root={draft} setRoot={setDraft} />
+                <TabbedFields value={draft} path={[]} root={draft} setRoot={setDraft} />
               ) : (
                 <p className="text-sm text-muted">
                   This collection has no existing entries to model a new one on yet.
@@ -808,7 +913,7 @@ export default function CollectionEditor({
             </p>
           )}
           {(data as JsonValue[]).map((item, i) => {
-            const isOpen = openIdx.has(i);
+            const isOpen = openIdx === i;
             return (
               <div key={i} className="overflow-hidden rounded-2xl border border-line bg-card">
                 <div className="flex items-center gap-3 px-4 py-3">
@@ -857,7 +962,7 @@ export default function CollectionEditor({
                 </div>
                 {isOpen && (
                   <div className="border-t border-line p-5">
-                    <ObjectFields value={item as JsonObject} path={[i]} root={data} setRoot={edit} />
+                    <TabbedFields value={item as JsonObject} path={[i]} root={data} setRoot={edit} />
                     <div className="mt-4 flex items-center justify-end gap-3 border-t border-line pt-4">
                       {status === "saved" && <span className="text-[13px] font-semibold text-emerald-600">Saved ✓</span>}
                       {status === "error" && <span className="text-[13px] font-semibold text-red-600">Failed to save</span>}
@@ -879,7 +984,7 @@ export default function CollectionEditor({
       ) : (
         <>
           <div className="rounded-2xl border border-line bg-card p-5 pb-6">
-            <ObjectFields value={data as JsonObject} path={[]} root={data} setRoot={edit} />
+            <TabbedFields value={data as JsonObject} path={[]} root={data} setRoot={edit} />
           </div>
           <div className="h-20" /> {/* spacer so the fixed bar never covers the last field */}
           {/* Fixed bottom save bar — always visible; offset past the sidebar on desktop */}
@@ -900,6 +1005,7 @@ export default function CollectionEditor({
         </>
       )}
     </div>
+    </ModelContext.Provider>
     </CollectionContext.Provider>
   );
 }
