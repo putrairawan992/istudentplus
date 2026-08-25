@@ -1,11 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import type { Locale } from "@/lib/i18n";
+import type { Dictionary } from "@/lib/dictionary";
 
 const inputClass =
   "w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent";
 
-export default function ContactForm() {
+export default function ContactForm({
+  lang,
+  copy,
+  fallbackError,
+}: {
+  lang: Locale;
+  copy: Dictionary["forms"]["contact"];
+  fallbackError: string;
+}) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -16,16 +26,17 @@ export default function ContactForm() {
     const form = e.currentTarget;
     const formData = new FormData(form);
     formData.set("source", "contact");
+    formData.set("lang", lang);
 
     try {
       const res = await fetch("/api/leads", { method: "POST", body: formData });
       const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || "Something went wrong.");
+      if (!res.ok || !data.ok) throw new Error(data.error || fallbackError);
       setStatus("success");
       form.reset();
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : fallbackError);
     }
   }
 
@@ -33,8 +44,8 @@ export default function ContactForm() {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-line bg-card p-10 text-center">
         <div className="mb-2 text-2xl">✓</div>
-        <h3 className="mb-1.5 text-lg font-extrabold">Message sent!</h3>
-        <p className="text-sm text-muted">A counselor will get back to you soon.</p>
+        <h3 className="mb-1.5 text-lg font-extrabold">{copy.successTitle}</h3>
+        <p className="text-sm text-muted">{copy.successBody}</p>
       </div>
     );
   }
@@ -43,37 +54,37 @@ export default function ContactForm() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 rounded-2xl border border-line bg-card p-7">
       <div>
         <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
-          Full name
+          {copy.name}
         </label>
-        <input id="name" name="name" type="text" required placeholder="Your name" className={inputClass} />
+        <input id="name" name="name" type="text" required placeholder={copy.namePlaceholder} className={inputClass} />
       </div>
       <div>
         <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-          Email
+          {copy.email}
         </label>
-        <input id="email" name="email" type="email" required placeholder="you@example.com" className={inputClass} />
+        <input id="email" name="email" type="email" required placeholder={copy.emailPlaceholder} className={inputClass} />
       </div>
       <div>
         <label htmlFor="destination" className="mb-1.5 block text-sm font-semibold">
-          Interested destination
+          {copy.destination}
         </label>
         <input
           id="destination"
           name="destination"
           type="text"
-          placeholder="e.g. Australia, Korea, Japan"
+          placeholder={copy.destinationPlaceholder}
           className={inputClass}
         />
       </div>
       <div>
         <label htmlFor="message" className="mb-1.5 block text-sm font-semibold">
-          Message
+          {copy.message}
         </label>
         <textarea
           id="message"
           name="message"
           rows={4}
-          placeholder="Tell us about your study plans"
+          placeholder={copy.messagePlaceholder}
           className={inputClass}
         />
       </div>
@@ -85,7 +96,7 @@ export default function ContactForm() {
         disabled={status === "loading"}
         className="rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.02] disabled:opacity-60"
       >
-        {status === "loading" ? "Sending…" : "Send message"}
+        {status === "loading" ? copy.submitting : copy.submit}
       </button>
     </form>
   );
