@@ -4,7 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CATEGORIES } from "../blog/shared";
+import {
+  LOCALES,
+  LOCALE_LABELS,
+  localePath,
+  switchLocalePath,
+  type Locale,
+} from "@/lib/i18n";
+import type { Dictionary } from "@/lib/dictionary";
 
 type NavItem = {
   label: string;
@@ -13,48 +20,67 @@ type NavItem = {
 };
 
 export type NavCountry = { label: string; slug: string };
+export type NavCategory = { label: string; slug: string };
+
+type NavCopy = {
+  nav: Dictionary["nav"];
+  language: Dictionary["language"];
+  common: Pick<Dictionary["common"], "bookFreeConsultation">;
+};
 
 // Built per render from the CMS's country list (order and visibility live there, not here).
-const navItems = (countries: NavCountry[]): NavItem[] => [
-  {
-    label: "About Us",
-    href: "/about",
-    children: [
-      { label: "About Us", href: "/about" },
-      { label: "Our Services", href: "/services" },
-      { label: "Contact Us", href: "/contact" },
-    ],
-  },
-  {
-    label: "Study Abroad",
-    href: "/study-abroad",
-    children: [
-      ...countries.map((c) => ({ label: c.label, href: `/study-abroad/${c.slug}` })),
-      // Courses & Universities is Australia-only content, so it sits inside Study Abroad
-      // instead of taking a top-level slot. Promote it back out when other countries have
-      // real course data.
-      { label: "Courses & Universities", href: "/courses" },
-    ],
-  },
-  {
-    label: "Language Programs",
-    href: "/language-programs",
-    children: [
-      { label: "General English", href: "/language-programs#general-english" },
-      { label: "Conversation Class", href: "/language-programs#conversation-class" },
-      { label: "IELTS", href: "/language-programs#ielts" },
-      { label: "JLPT", href: "/language-programs#jlpt" },
-    ],
-  },
-  {
-    label: "Blog",
-    href: "/blog",
-    /* Straight from the blog's own category list — the two used to drift apart. */
-    children: CATEGORIES.map((c) => ({ label: c.label, href: `/blog?category=${c.slug}` })),
-  },
-  { label: "Webinar", href: "/webinars" },
-  { label: "Forum", href: "/threads" },
-];
+// Every href goes through localePath so a click from an Indonesian page stays Indonesian.
+const navItems = (
+  locale: Locale,
+  d: NavCopy,
+  countries: NavCountry[],
+  categories: NavCategory[]
+): NavItem[] => {
+  const p = (path: string) => localePath(locale, path);
+  return [
+    {
+      label: d.nav.aboutUs,
+      href: p("/about"),
+      children: [
+        { label: d.nav.aboutUs, href: p("/about") },
+        { label: d.nav.ourServices, href: p("/services") },
+        { label: d.nav.contactUs, href: p("/contact") },
+      ],
+    },
+    {
+      label: d.nav.studyAbroad,
+      href: p("/study-abroad"),
+      children: [
+        ...countries.map((c) => ({ label: c.label, href: p(`/study-abroad/${c.slug}`) })),
+        // Courses & Universities is Australia-only content, so it sits inside Study Abroad
+        // instead of taking a top-level slot. Promote it back out when other countries have
+        // real course data.
+        { label: d.nav.coursesUniversities, href: p("/courses") },
+      ],
+    },
+    {
+      label: d.nav.languagePrograms,
+      href: p("/language-programs"),
+      children: [
+        { label: d.nav.generalEnglish, href: p("/language-programs#general-english") },
+        { label: d.nav.conversationClass, href: p("/language-programs#conversation-class") },
+        { label: d.nav.ielts, href: p("/language-programs#ielts") },
+        { label: d.nav.jlpt, href: p("/language-programs#jlpt") },
+      ],
+    },
+    {
+      label: d.nav.blog,
+      href: p("/blog"),
+      /* Straight from the blog's own category list — the two used to drift apart. */
+      children: categories.map((c) => ({
+        label: c.label,
+        href: p(`/blog?category=${c.slug}`),
+      })),
+    },
+    { label: d.nav.webinar, href: p("/webinars") },
+    { label: d.nav.forum, href: p("/threads") },
+  ];
+};
 
 function NavLink({ item }: { item: NavItem }) {
   if (!item.children) {
@@ -122,14 +148,64 @@ function MobileNavItem({ item, onNavigate }: { item: NavItem; onNavigate: () => 
   );
 }
 
+/**
+ * EN ↔ ID on the current page, not on the home page — someone reading a country page wants
+ * that country page in the other language. A plain link per locale, so it works with
+ * JavaScript off and search engines can follow it.
+ */
+function LangSwitcher({
+  locale,
+  d,
+  className = "",
+}: {
+  locale: Locale;
+  d: NavCopy;
+  className?: string;
+}) {
+  const pathname = usePathname();
+  return (
+    <div
+      className={`flex items-center gap-0.5 rounded-full border border-line p-0.5 text-[12px] font-bold ${className}`}
+      aria-label={d.language.label}
+    >
+      {LOCALES.map((l) => {
+        const active = l === locale;
+        return (
+          <Link
+            key={l}
+            href={switchLocalePath(l, pathname)}
+            hrefLang={l}
+            aria-current={active ? "true" : undefined}
+            title={d.language.names[l]}
+            className={`rounded-full px-2 py-1 transition-colors ${
+              active ? "bg-ink text-white" : "text-muted hover:text-ink"
+            }`}
+          >
+            {LOCALE_LABELS[l]}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 // Signed-in staff get a way out from wherever they are; everyone else gets the way in.
 // The logout form comes back to the current page instead of dumping you on the login screen.
-function AuthControl({ isAdmin, className }: { isAdmin: boolean; className?: string }) {
+// The CMS itself is English-only, so these links stay unprefixed.
+function AuthControl({
+  isAdmin,
+  d,
+  className,
+}: {
+  isAdmin: boolean;
+  d: NavCopy;
+  className?: string;
+}) {
   const pathname = usePathname();
   if (!isAdmin) {
     return (
       <Link href="/admin/login" className={className}>
-        Login
+        {d.nav.login}
       </Link>
     );
   }
@@ -137,23 +213,35 @@ function AuthControl({ isAdmin, className }: { isAdmin: boolean; className?: str
     <form action="/admin/logout" method="post" className="flex items-center gap-3">
       <input type="hidden" name="redirectTo" value={pathname} />
       <Link href="/admin" className={className}>
-        Admin
+        {d.nav.admin}
       </Link>
       <button type="submit" className={className}>
-        Log out
+        {d.nav.logout}
       </button>
     </form>
   );
 }
 
-export default function HeaderNav({ isAdmin, countries }: { isAdmin: boolean; countries: NavCountry[] }) {
+export default function HeaderNav({
+  isAdmin,
+  countries,
+  categories,
+  locale,
+  d,
+}: {
+  isAdmin: boolean;
+  countries: NavCountry[];
+  categories: NavCategory[];
+  locale: Locale;
+  d: NavCopy;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const items = navItems(countries);
+  const items = navItems(locale, d, countries, categories);
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur">
       <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-5 px-7 py-3.5">
-        <Link href="/" className="shrink-0">
+        <Link href={localePath(locale, "/")} className="shrink-0">
           <Image
             src="/icon-istudentplus.png"
             alt="iStudentPlus"
@@ -169,19 +257,20 @@ export default function HeaderNav({ isAdmin, countries }: { isAdmin: boolean; co
           ))}
         </nav>
         <div className="flex shrink-0 items-center gap-4">
+          <LangSwitcher locale={locale} d={d} className="hidden sm:flex" />
           <div className="hidden sm:block">
-            <AuthControl isAdmin={isAdmin} className="text-sm font-medium text-muted hover:text-ink" />
+            <AuthControl isAdmin={isAdmin} d={d} className="text-sm font-medium text-muted hover:text-ink" />
           </div>
           <Link
-            href="/#consultation"
+            href={localePath(locale, "/#consultation")}
             className="hidden rounded-full bg-accent px-4.5 py-2.5 text-[13.5px] font-semibold text-white shadow-sm shadow-accent/30 transition-transform hover:scale-[1.03] sm:inline-block"
           >
-            Book Free Consultation
+            {d.common.bookFreeConsultation}
           </Link>
           <button
             type="button"
             onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Toggle menu"
+            aria-label={d.nav.toggleMenu}
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-line xl:hidden"
           >
             <span className="text-lg">{menuOpen ? "✕" : "☰"}</span>
@@ -197,15 +286,16 @@ export default function HeaderNav({ isAdmin, countries }: { isAdmin: boolean; co
             ))}
           </nav>
           <div className="mt-3 flex flex-col gap-2.5 border-t border-line pt-3">
-            <div className="px-2 py-1">
-              <AuthControl isAdmin={isAdmin} className="text-sm font-medium text-muted" />
+            <div className="flex items-center justify-between px-2 py-1">
+              <AuthControl isAdmin={isAdmin} d={d} className="text-sm font-medium text-muted" />
+              <LangSwitcher locale={locale} d={d} />
             </div>
             <Link
-              href="/#consultation"
+              href={localePath(locale, "/#consultation")}
               onClick={() => setMenuOpen(false)}
               className="rounded-full bg-accent px-4.5 py-2.5 text-center text-[13.5px] font-semibold text-white"
             >
-              Book Free Consultation
+              {d.common.bookFreeConsultation}
             </Link>
           </div>
         </div>

@@ -1,0 +1,484 @@
+{
+  "meta": {
+    "site": {
+      "title": "iStudentPlus — Konsultasi Kuliah di Luar Negeri, 100+ Universitas Partner",
+      "description": "Perjalanan kuliah di luar negerimu mulai dari sini. Informasi lengkap, rekomendasi yang sesuai denganmu, dan pendampingan langsung dari konselor pendidikan kami.",
+      "ogDescription": "Jaringan pelajar global dan media agency dengan kantor di Pangkalpinang dan Makassar, mendampingi siswa dari pendaftaran sampai tiba di kampus tujuan bersama 100+ universitas partner.",
+      "twitterTitle": "iStudentPlus — Konsultasi Kuliah di Luar Negeri",
+      "twitterDescription": "100+ universitas partner. Satu konselor, dari pendaftaran sampai keberangkatan.",
+      "organizationDescription": "Jaringan pelajar global dan media agency yang menyediakan konsultasi pendidikan, pendampingan pengajuan visa, akomodasi mahasiswa, dan persiapan sebelum keberangkatan. Berkantor di Pangkalpinang dan Makassar, Indonesia."
+    },
+    "about": {
+      "title": "Tentang Kami",
+      "description": "iStudentPlus adalah jaringan pelajar global dan media agency dengan kantor di Pangkalpinang dan Makassar, Indonesia — mendorong inklusivitas dan memberdayakan pelajar di seluruh dunia."
+    },
+    "services": {
+      "title": "Layanan",
+      "description": "Pendampingan Visa & Admisi serta Konsultasi Penerimaan dari konsultan pendidikan iStudentPlus."
+    },
+    "contact": {
+      "title": "Kontak",
+      "description": "Jadwalkan konsultasi gratis dengan konselor iStudentPlus lewat WhatsApp, atau hubungi kantor kami di Pangkalpinang dan Makassar."
+    },
+    "courses": {
+      "title": "Program & Universitas",
+      "description": "Bandingkan jalur kualifikasi VET/Diploma, Sarjana, Magister, Doktor, Kursus Bahasa, dan Program Pertukaran."
+    },
+    "languagePrograms": {
+      "title": "Program Bahasa",
+      "description": "General English, Conversation Class, IELTS, dan persiapan JLPT di iStudentPlus — tes penempatan, sertifikasi internasional dari Australia, dan pengajar native speaker."
+    },
+    "studyAbroad": {
+      "title": "Kuliah di Luar Negeri",
+      "description": "Jelajahi negara tujuan studi — Australia, Jepang, dan China — dengan pendampingan konselor iStudentPlus."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Update visa, tips belajar, dan cerita mahasiswa dari tim iStudentPlus."
+    },
+    "webinars": {
+      "title": "Webinar",
+      "description": "Webinar gratis seputar kuliah di luar negeri, beasiswa, dan persiapan bahasa."
+    },
+    "threads": {
+      "title": "Forum Tanya Jawab",
+      "description": "Tanya apa saja soal kuliah di luar negeri — tanpa perlu akun."
+    },
+    "country": {
+      "titleTemplate": "Kuliah di {name}"
+    }
+  },
+
+  "common": {
+    "chatOnWhatsApp": "Chat via WhatsApp",
+    "bookFreeConsultation": "Konsultasi Gratis",
+    "whatsappFloat": "Chat via WhatsApp",
+    "whatsappFloatAria": "Chat dengan konselor lewat WhatsApp",
+    "watch": "Tonton",
+    "browseCoursesUniversities": "Lihat Program & Universitas",
+    "sending": "Mengirim…",
+    "send": "Kirim",
+    "cancel": "Batal",
+    "somethingWentWrong": "Terjadi kesalahan."
+  },
+
+  "language": {
+    "label": "Bahasa",
+    "switchTo": "Ganti ke {language}",
+    "names": {
+      "en": "English",
+      "id": "Bahasa Indonesia"
+    }
+  },
+
+  "nav": {
+    "aboutUs": "Tentang Kami",
+    "ourServices": "Layanan Kami",
+    "contactUs": "Kontak",
+    "studyAbroad": "Kuliah di Luar Negeri",
+    "coursesUniversities": "Program & Universitas",
+    "languagePrograms": "Program Bahasa",
+    "generalEnglish": "General English",
+    "conversationClass": "Conversation Class",
+    "ielts": "IELTS",
+    "jlpt": "JLPT",
+    "blog": "Blog",
+    "webinar": "Webinar",
+    "forum": "Forum",
+    "login": "Masuk",
+    "admin": "Admin",
+    "logout": "Keluar",
+    "toggleMenu": "Buka menu"
+  },
+
+  "footer": {
+    "tagline": "Jaringan Pelajar Global dan Media Agency — berkantor di Pangkalpinang dan Makassar, Indonesia (Jakarta segera menyusul).",
+    "studyAbroad": "Kuliah di Luar Negeri",
+    "allDestinations": "Semua destinasi",
+    "programs": "Program",
+    "services": "Layanan",
+    "coursesUniversities": "Program & Universitas",
+    "languagePrograms": "Program Bahasa",
+    "company": "Perusahaan",
+    "aboutUs": "Tentang Kami",
+    "blog": "Blog",
+    "contactUs": "Kontak",
+    "social": "Sosial Media",
+    "copyright": "© 2026 iStudentPlus"
+  },
+
+  "home": {
+    "heroImageAlt": "Siswa yang bersiap kuliah di luar negeri",
+    "findCourse": "Cari Program →",
+    "bookFreeSession": "Jadwalkan sesi gratis",
+    "nextWebinarLive": "● Sedang berlangsung",
+    "nextWebinarLabel": "Webinar berikutnya",
+    "watchNow": "Tonton sekarang",
+    "viewAndRegister": "Lihat detail & daftar",
+    "stepsTitle": "Lihat bagaimana iStudentPlus mendampingimu, **langkah demi langkah**.",
+    "stepsSubtitle": "Gambaran singkat bagaimana kami menemanimu dari konsultasi pertama sampai diterima di kampus tujuan.",
+    "servicesTitle": "Menemanimu di setiap langkah menuju kuliah di luar negeri.",
+    "servicesSubtitle": "Dapatkan pendampingan yang personal, ramah, dan apa adanya — gratis.",
+    "knowMore": "Selengkapnya >",
+    "journeyTitle": "Perjalanan kuliah di luar negeri, kami ringkas jadi 6 langkah.",
+    "journeySubtitle": "Dari konsultasi pertama sampai tiba di kampus impian, kami dampingi di setiap langkahnya.",
+    "journeySteps": [
+      {
+        "title": "Asesmen Personal",
+        "description": "Menggali tujuan studi, pilihan negara, dan rencana kariermu."
+      },
+      {
+        "title": "Cek Dokumen & Finansial",
+        "description": "Meninjau kesiapan akademik dan finansialmu."
+      },
+      {
+        "title": "Proses Penerimaan",
+        "description": "Mendaftar dan mengamankan LoA dari universitas partner."
+      },
+      {
+        "title": "Visa & Imigrasi",
+        "description": "Pendampingan penuh agar pengajuanmu berjalan lancar."
+      },
+      {
+        "title": "Persiapan Keberangkatan",
+        "description": "Orientasi, akomodasi, dan panduan perjalanan."
+      },
+      {
+        "title": "Mulai Kuliah",
+        "description": "Memulai perjalanan studimu dengan percaya diri."
+      }
+    ],
+    "departuresTitle": "Keberangkatan — Intake 2026",
+    "synced": "DIPERBARUI {date}",
+    "colCity": "Kota",
+    "colProgram": "Program",
+    "colIntake": "Intake",
+    "colStatus": "Status",
+    "statusOpen": "Terbuka",
+    "statusSeats": "3 Kursi",
+    "departures": [
+      { "city": "Melbourne", "program": "VET + Sarjana", "intake": "Feb", "status": "open" },
+      { "city": "Toronto", "program": "Sarjana", "intake": "Sep", "status": "seats" },
+      { "city": "Osaka", "program": "Sekolah Bahasa", "intake": "Apr", "status": "open" },
+      { "city": "London", "program": "Pascasarjana", "intake": "Sep", "status": "open" },
+      { "city": "Beijing", "program": "Bahasa + Universitas", "intake": "Mar", "status": "open" }
+    ],
+    "destinationsKicker": "Negara tujuan siswa kami",
+    "destinationsTitle": "Empat negara paling banyak dicari intake ini.",
+    "studyInAlt": "Kuliah di {name}",
+    "languageKicker": "Lihat program bahasa kami",
+    "languageTitle": "Siap ujian, atau sekadar siap ngobrol.",
+    "seeAllPrograms": "Lihat semua program →",
+    "testimonialsTitle": "Alumni yang sudah berhasil, **ada buktinya**.",
+    "testimonialsSubtitle": "Diterima di 50+ kampus terbaik di 15 negara berbeda.",
+    "lettersOfAcceptance": "Letter of Acceptance:",
+    "consultationKicker": "Konsultasi Gratis",
+    "consultationTitle": "Ceritakan rencana studimu, sisanya kami bantu.",
+    "consultationSubtitle": "Tanpa kewajiban, tanpa biaya untuk berkonsultasi. Konselor kami akan meninjau datamu dan membalas dengan rekomendasi yang sesuai."
+  },
+
+  "about": {
+    "kicker": "Siapa Kami",
+    "title": "Jaringan pelajar global dan **media agency**.",
+    "watchTitle": "Kenalan dulu dengan **iStudentPlus**.",
+    "watchSubtitle": "Perkenalan singkat tentang siapa kami dan bagaimana kami mendampingi siswa.",
+    "visionHeading": "Visi Kami",
+    "visionBecoming": "Menjadi",
+    "visionRank": "#1",
+    "visionSupportSystem": "Support System",
+    "visionTail": "bagi siswa untuk **kuliah di luar negeri** dan **memberi dampak besar**.",
+    "missionHeading": "Misi Kami",
+    "missionPoints": [
+      "**Mendukung sepenuhnya cita-cita** siswa untuk mewujudkan **mimpi kuliah di luar negeri**.",
+      "Menciptakan **suasana belajar yang nyaman, menyenangkan,** dan **bermakna**."
+    ],
+    "certificationsTitle": "Sertifikasi Kami",
+    "certificationsSubtitle": "Member of The Law Society of NSW · QEAC #12929 (Cindy Christella, Qualified Education Agent Counsellor) · ISEAA · Australia FutureUnlimited",
+    "certificationsAlt": "Sertifikasi: Member of The Law Society of NSW, QEAC #12929, ISEAA, Australia FutureUnlimited",
+    "teamTitle": "Tim Kami",
+    "teamSubtitle": "Para konselor di balik pendaftaranmu.",
+    "bioComingSoon": "Foto dan profil segera menyusul.",
+    "countriesTitle": "Siswa yang pernah kami dampingi, per negara",
+    "countriesSubtitle": "Konselor kami berbahasa {languages} — dan telah mendampingi siswa dari:",
+    "spokenLanguages": ["Inggris", "Indonesia", "Mandarin", "Spanyol"],
+    "ctaTitle": "Bicara dengan konselor yang sudah membantu siswa sepertimu."
+  },
+
+  "services": {
+    "kicker": "Layanan",
+    "title": "Layanan kami dalam **satu menit**.",
+    "subtitle": "Lihat bagaimana pendampingan visa dan admisi kami bekerja, dari awal sampai akhir.",
+    "visaKicker": "Visa & Admisi",
+    "visaTitle": "Banyak jalur visa, satu pendampingan sampai selesai.",
+    "visaSubtitle": "Dari visa pelajar sampai pilihan tinggal jangka pendek dan panjang di Australia dan Jepang, kami menemanimu di setiap langkah untuk menetap di negara baru.",
+    "pitfallsTitle": "Hindari alasan penolakan visa yang paling sering terjadi",
+    "checklistPrompt": "Minta checklist dokumen ini sebagai panduan visamu.",
+    "talkToVisaExpert": "Bicara dengan Ahli Visa Kami",
+    "counsellingKicker": "Konsultasi Penerimaan & Visa Pelajar",
+    "counsellingTitle": "Kenali proses konsultasimu, langkah demi langkah.",
+    "counsellingSubtitle": "Kami bantu memilih negara, program, dan universitas yang sejalan dengan rencana karier dan tujuan jangka panjangmu.",
+    "faqTitle": "Pertanyaan yang Sering Diajukan (FAQ)",
+    "bookToday": "Jadwalkan Konsultasi Gratis Sekarang"
+  },
+
+  "contact": {
+    "kicker": "Hubungi Kami",
+    "title": "Jadwalkan sesi **konsultasi** gratis.",
+    "subtitle": "Cara tercepat menghubungi konselor adalah WhatsApp — sebagian besar pertanyaan dijawab di hari yang sama.",
+    "fastest": "Tercepat",
+    "weReplyIn": "Kami membalas dalam",
+    "socialMedia": "Sosial Media"
+  },
+
+  "courses": {
+    "kicker": "Program & Universitas",
+    "title": "Pilih program yang sejalan dengan **tujuan jangka panjangmu**.",
+    "focusKicker": "Fokus: Australia",
+    "focusTitle": "Melihat lebih dekat kuliah di Australia.",
+    "focusBodyBefore": "Bagian di bawah membahas jalur studi di Australia secara detail — negara tujuan yang paling banyak dipilih siswa kami. Negara lain dibahas di halaman ",
+    "focusBodyLink": "Kuliah di Luar Negeri",
+    "focusBodyAfter": ".",
+    "vetTitle": "Program VET (Australia)",
+    "vetSubtitle": "Vocational Education and Training — dikenal juga sebagai TVET atau \"pelatihan keterampilan\" — diselenggarakan oleh institut TAFE, RTO independen, dan universitas dual-sector.",
+    "colQualification": "Kualifikasi",
+    "colDuration": "Durasi",
+    "colOutcome": "Hasil",
+    "highSchoolTitle": "Sekolah Menengah (Australia)",
+    "highSchoolSubtitle": "Dikenal berkualitas dengan pilihan yang beragam — memilih sekolah yang tepat bergantung pada tujuan, lokasi, dan anggaranmu.",
+    "ctaTitle": "Masih menimbang antar kualifikasi?"
+  },
+
+  "languagePrograms": {
+    "kicker": "Kursus Online Kami",
+    "title": "Kuliah di luar negeri, **rasakan bedanya!**",
+    "subtitle": "Prinsip kami: siap ujian — atau sekadar siap ngobrol — sebelum kamu terbang.",
+    "duration": "Durasi",
+    "instructorsKicker": "Profil Pengajar",
+    "instructorsTitle": "Kenali pengajarmu",
+    "instructorRole": "Pengajar Bahasa Inggris",
+    "ctaTitle": "Belum yakin program bahasa mana yang cocok?"
+  },
+
+  "studyAbroad": {
+    "kicker": "Kuliah di Luar Negeri",
+    "title": "Pilih negara tujuan, urusan dokumen serahkan ke **konselor**.",
+    "studyInAlt": "Kuliah di {name}",
+    "watchTitle": "Dengar langsung dari **mereka yang sudah berangkat**.",
+    "webinarReplayKicker": "Rekaman webinar",
+    "seeAllWebinars": "Lihat semua webinar →",
+    "destinationGuideKicker": "Panduan destinasi",
+    "destinationGuideTitle": "Kuliah di Australia, China & Jepang",
+    "destinationGuideBody": "Panduan singkat negara tujuan studi yang paling banyak dicari.",
+    "qualificationTitle": "Belum yakin kualifikasi mana yang sesuai tujuanmu?",
+    "qualificationBody": "Bandingkan jalur VET/Diploma, Sarjana, Magister, Doktor, dan kursus bahasa di halaman Program & Universitas.",
+    "ctaTitle": "Belum yakin negara mana yang cocok? Tanya konselor."
+  },
+
+  "country": {
+    "kicker": "Kuliah di Luar Negeri",
+    "heroTitle": "Kuliah di {name}",
+    "featuredProgramsTitle": "Program populer di {name}",
+    "keyFactsTitle": "Fakta Penting Kuliah di {name}",
+    "overviewTitle": "Ringkasan",
+    "overviewLabels": {
+      "livingCost": "Biaya Hidup",
+      "admission": "Syarat Visa Pelajar",
+      "career": "Orientasi Karier",
+      "accommodation": "Akomodasi",
+      "culture": "Budaya & Gaya Hidup"
+    },
+    "colExpense": "Pengeluaran",
+    "colCostRange": "Kisaran biaya (per bulan)",
+    "qualificationsTitle": "Lihat jenis kualifikasi yang tersedia di {name}",
+    "browseCourses": "Lihat Program & Universitas →",
+    "ctaTitle": "Siap membahas rencana kuliah di {name}?"
+  },
+
+  "blog": {
+    "kicker": "Blog",
+    "title": "Update visa dan cerita **dari perjalanan**.",
+    "all": "Semua",
+    "categories": {
+      "recent-news": "Berita Terbaru",
+      "immigration": "Imigrasi",
+      "destinations": "Destinasi",
+      "english-ielts": "Bahasa Inggris & IELTS",
+      "student-life": "Kehidupan Mahasiswa",
+      "study-tips": "Tips Belajar"
+    },
+    "empty": "Belum ada artikel di kategori ini — cek lagi nanti.",
+    "newer": "← Lebih baru",
+    "older": "Lebih lama →",
+    "pagination": "Halaman {current} dari {total} · {count} artikel",
+    "browseByTopic": "Jelajahi per Topik",
+    "popularDestinations": "Destinasi Populer",
+    "counselingTitle": "Konsultasi 1:1 gratis",
+    "counselingBody": "Tanpa kewajiban, tanpa biaya untuk berkonsultasi. Dapatkan rekomendasi yang sesuai denganmu.",
+    "videosKicker": "Tonton",
+    "videosTitle": "Cerita Luar Negeri & Beasiswa",
+    "ctaTitle": "Ada pertanyaan yang belum terjawab di blog?",
+    "backToBlog": "← Kembali ke Blog",
+    "author": "Tim iStudentPlus",
+    "articleCtaTitle": "Ada pertanyaan yang belum terjawab di artikel ini?"
+  },
+
+  "webinars": {
+    "title": "Webinar",
+    "intro": "Sesi online gratis seputar kuliah di luar negeri, beasiswa, dan persiapan bahasa. Daftar dengan email — link acaranya kami kirim sebelum hari-H.",
+    "upcomingHeading": "Akan datang",
+    "pastHeading": "Sudah lewat",
+    "emptyUpcoming": "Belum ada jadwal baru. Cek lagi nanti, atau lihat rekaman di bawah.",
+    "badgeUpcoming": "Akan datang",
+    "badgeLive": "● Sedang berlangsung",
+    "badgePast": "Sudah lewat",
+    "speaker": "Pembicara: {name}",
+    "noRecording": "Rekaman belum tersedia.",
+    "liveNow": "Sesi sedang berlangsung — tonton di atas.",
+    "otherTheme": "Lainnya",
+    "sessionCount": "{count} sesi",
+    "minutes": "{count} menit",
+    "timezone": "WIB"
+  },
+
+  "threads": {
+    "title": "Forum Tanya Jawab",
+    "intro": "Tanya apa saja soal kuliah di luar negeri, beasiswa, atau visa — tanpa perlu akun. Siapa pun boleh menjawab. Tulisan yang kasar atau spam otomatis ditolak.",
+    "adminNotice": "Mode admin — kamu bisa menyembunyikan, mengedit, memblokir, dan menghapus tulisan. Balasanmu otomatis bertanda “Tim iStudentPlus”.",
+    "namePlaceholder": "Nama (opsional — kosongkan untuk Anonim)",
+    "questionPlaceholder": "Tulis pertanyaanmu di sini…",
+    "answerPlaceholder": "Tulis jawabanmu…",
+    "submitQuestion": "Kirim pertanyaan",
+    "submitReply": "Balas",
+    "submitting": "Mengirim…",
+    "cancel": "Batal",
+    "sendFailed": "Gagal mengirim.",
+    "empty": "Belum ada pertanyaan. Jadi yang pertama!",
+    "reply": "Balas",
+    "officialBadge": "✓ Tim iStudentPlus",
+    "hiddenBadge": "disembunyikan",
+    "mod": {
+      "handleTitle": "Handle moderasi (hash IP)",
+      "show": "Tampilkan",
+      "hide": "Sembunyikan",
+      "edit": "Edit",
+      "editPrompt": "Edit tulisan",
+      "block": "Blokir",
+      "unblock": "Buka blokir",
+      "blockConfirm": "Blokir pengirim ini? Semua tulisannya ikut disembunyikan.",
+      "delete": "Hapus",
+      "deleteConfirm": "Hapus permanen? Balasannya ikut terhapus."
+    },
+    "login": {
+      "open": "Masuk sebagai admin",
+      "heading": "Masuk sebagai admin",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Masuk",
+      "submitting": "Masuk…",
+      "cancel": "Batal"
+    }
+  },
+
+  "forms": {
+    "consultation": {
+      "successTitle": "Terima kasih — sudah kami terima!",
+      "successBody": "Konselor kami akan menghubungimu lewat WhatsApp atau email.",
+      "name": "Nama",
+      "namePlaceholder": "Nama lengkapmu",
+      "email": "Alamat Email",
+      "emailPlaceholder": "kamu@contoh.com",
+      "whatsapp": "Nomor WhatsApp",
+      "whatsappPlaceholder": "+62 8xx xxxx xxxx",
+      "destination": "Negara Tujuan Studi",
+      "destinationPlaceholder": "Pilih negara tujuan",
+      "destinations": ["Australia", "Jepang", "China", "Inggris", "Amerika Serikat", "Kanada", "Lainnya"],
+      "showOptional": "+ Tambah detail studi & CV (opsional)",
+      "hideOptional": "− Sembunyikan detail opsional",
+      "fieldOfStudy": "Bidang Studi yang Diminati",
+      "fieldOfStudyPlaceholder": "Pilih bidang studi",
+      "fieldsOfStudy": ["Bisnis", "IT", "Perhotelan", "Kesehatan", "Bahasa dan Linguistik", "Lainnya"],
+      "qualificationLevel": "Jenjang Kualifikasi yang Diminati",
+      "qualificationLevelPlaceholder": "Pilih jenjang",
+      "qualificationLevels": ["VET atau Diploma", "Sarjana", "Magister", "Doktor", "Kursus Bahasa", "Lainnya"],
+      "latestQualification": "Pendidikan Terakhir",
+      "latestQualificationPlaceholder": "Pilih pendidikan terakhirmu",
+      "latestQualifications": ["SMA/SMK", "VET atau Diploma", "Sarjana", "Magister", "Doktor", "Kursus Bahasa", "Lainnya"],
+      "cv": "Lampirkan CV Terbarumu",
+      "cvHint": "Untuk keperluan asesmen sebelum konsultasi.",
+      "submit": "Jadwalkan Konsultasi Gratis",
+      "submitting": "Mengirim…"
+    },
+    "contact": {
+      "successTitle": "Pesan terkirim!",
+      "successBody": "Konselor kami akan segera menghubungimu.",
+      "name": "Nama lengkap",
+      "namePlaceholder": "Namamu",
+      "email": "Email",
+      "emailPlaceholder": "kamu@contoh.com",
+      "destination": "Negara tujuan yang diminati",
+      "destinationPlaceholder": "mis. Australia, Korea, Jepang",
+      "message": "Pesan",
+      "messagePlaceholder": "Ceritakan rencana studimu",
+      "submit": "Kirim pesan",
+      "submitting": "Mengirim…"
+    },
+    "checklist": {
+      "success": "✓ Sudah kami terima — tim kami akan mengirim checklist ke emailmu.",
+      "open": "Minta Checklist",
+      "namePlaceholder": "Namamu",
+      "emailPlaceholder": "kamu@contoh.com",
+      "submit": "Kirim",
+      "submitting": "Mengirim…"
+    },
+    "webinarLead": {
+      "open": "Daftar gratis",
+      "submit": "Kirim pendaftaran",
+      "submitting": "Mendaftarkan…",
+      "cancel": "Batal",
+      "success": "✓ Pendaftaranmu masuk. Link acaranya kami kirim ke email/WhatsApp sebelum hari-H.",
+      "failure": "Pendaftaran gagal.",
+      "namePlaceholder": "Nama lengkap",
+      "emailPlaceholder": "Email aktif",
+      "whatsappPlaceholder": "Nomor WhatsApp (opsional)"
+    },
+    "programLead": {
+      "open": "Tanya soal {program}",
+      "submit": "Kirim pertanyaan",
+      "submitting": "Mengirim…",
+      "cancel": "Batal",
+      "success": "✓ Sudah kami terima — konselor kami akan menghubungimu soal program ini.",
+      "failure": "Pertanyaan gagal dikirim.",
+      "namePlaceholder": "Nama lengkapmu",
+      "emailPlaceholder": "Alamat email",
+      "whatsappPlaceholder": "Nomor WhatsApp (opsional)"
+    },
+    "courseFilter": {
+      "title": "Cari berdasarkan kualifikasi & negara",
+      "qualification": "Kualifikasi",
+      "qualifications": ["VET atau Diploma", "Sarjana", "Magister", "Doktor", "Kursus Bahasa", "Program Pertukaran"],
+      "country": "Negara",
+      "countries": ["Australia", "Inggris", "Amerika Serikat", "Kanada", "China", "Jepang"],
+      "result": "Kami belum menyediakan database universitas secara langsung — sampaikan ke konselor bahwa kamu sedang mencari {qualification} di {country}, dan mereka akan mengirimkan daftar partner serta persyaratan terkini.",
+      "resultCta": "Jadwalkan konsultasi gratis →",
+      "hint": "Pilih keduanya untuk melihat bagaimana konselor bisa membantu."
+    }
+  },
+
+  "api": {
+    "nameEmailRequired": "Nama dan email wajib diisi.",
+    "sendFailed": "Gagal mengirim.",
+    "serverError": "Server sedang bermasalah, coba lagi nanti.",
+    "threads": {
+      "too_short": "Tulisannya terlalu pendek.",
+      "too_long": "Tulisannya terlalu panjang (maksimal 2000 karakter).",
+      "name_too_long": "Nama terlalu panjang (maksimal 40 karakter).",
+      "profanity": "Ada kata kasar di tulisanmu. Tolong ditulis ulang dengan sopan.",
+      "too_many_links": "Terlalu banyak tautan.",
+      "shouting": "Jangan menulis dengan huruf kapital semua.",
+      "blocked": "Kamu tidak bisa memposting di forum ini.",
+      "rate_limited": "Kamu terlalu cepat memposting. Coba lagi sebentar.",
+      "duplicate": "Kamu baru saja mengirim tulisan yang sama.",
+      "thread_not_found": "Thread tidak ditemukan."
+    }
+  }
+}

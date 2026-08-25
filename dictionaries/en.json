@@ -1,0 +1,484 @@
+{
+  "meta": {
+    "site": {
+      "title": "iStudentPlus — Study Abroad Counseling, 100+ Partner Universities",
+      "description": "Your journey to studying abroad starts here. Access detailed information, personalized recommendations, and expert guidance from our education counselors.",
+      "ogDescription": "A global student network and media agency with offices in Pangkalpinang and Makassar, guiding students from application to arrival across 100+ partner universities.",
+      "twitterTitle": "iStudentPlus — Study Abroad Counseling",
+      "twitterDescription": "100+ partner universities. One counselor, from application to arrival.",
+      "organizationDescription": "Global student network and media agency offering education counseling, visa application support, student accommodation, and pre-departure services. Offices in Pangkalpinang and Makassar, Indonesia."
+    },
+    "about": {
+      "title": "About Us",
+      "description": "iStudentPlus is a global student network and media agency with offices in Pangkalpinang and Makassar, Indonesia — promoting inclusivity and empowering students worldwide."
+    },
+    "services": {
+      "title": "Services",
+      "description": "Visa & Admission support and Admission Counselling from iStudentPlus education consultants."
+    },
+    "contact": {
+      "title": "Contact",
+      "description": "Book a free consultation with an iStudentPlus counselor via WhatsApp, or reach our Pangkalpinang and Makassar offices."
+    },
+    "courses": {
+      "title": "Courses & Universities",
+      "description": "Compare VET/Diploma, Bachelor, Master, PhD, Language Study, and Exchange qualification pathways."
+    },
+    "languagePrograms": {
+      "title": "Language Programs",
+      "description": "General English, Conversation Class, IELTS, and JLPT preparation with iStudentPlus — placement evaluation, international certification from Australia, and native-speaker instructors."
+    },
+    "studyAbroad": {
+      "title": "Study Abroad",
+      "description": "Explore study destinations — Australia, Japan, and China — with guidance from iStudentPlus counselors."
+    },
+    "blog": {
+      "title": "Blog",
+      "description": "Visa updates, study tips, and student stories from the iStudentPlus team."
+    },
+    "webinars": {
+      "title": "Webinar",
+      "description": "Free webinars on studying abroad, scholarships, and language preparation."
+    },
+    "threads": {
+      "title": "Q&A Forum",
+      "description": "Ask anything about studying abroad — no account needed."
+    },
+    "country": {
+      "titleTemplate": "Study in {name}"
+    }
+  },
+
+  "common": {
+    "chatOnWhatsApp": "Chat on WhatsApp",
+    "bookFreeConsultation": "Book Free Consultation",
+    "whatsappFloat": "Chat on WhatsApp",
+    "whatsappFloatAria": "Chat with a counselor on WhatsApp",
+    "watch": "Watch",
+    "browseCoursesUniversities": "Browse Courses & Universities",
+    "sending": "Sending…",
+    "send": "Send",
+    "cancel": "Cancel",
+    "somethingWentWrong": "Something went wrong."
+  },
+
+  "language": {
+    "label": "Language",
+    "switchTo": "Switch to {language}",
+    "names": {
+      "en": "English",
+      "id": "Bahasa Indonesia"
+    }
+  },
+
+  "nav": {
+    "aboutUs": "About Us",
+    "ourServices": "Our Services",
+    "contactUs": "Contact Us",
+    "studyAbroad": "Study Abroad",
+    "coursesUniversities": "Courses & Universities",
+    "languagePrograms": "Language Programs",
+    "generalEnglish": "General English",
+    "conversationClass": "Conversation Class",
+    "ielts": "IELTS",
+    "jlpt": "JLPT",
+    "blog": "Blog",
+    "webinar": "Webinar",
+    "forum": "Forum",
+    "login": "Login",
+    "admin": "Admin",
+    "logout": "Log out",
+    "toggleMenu": "Toggle menu"
+  },
+
+  "footer": {
+    "tagline": "Your Global Student Network and Media Agency — offices in Pangkalpinang and Makassar, Indonesia (Jakarta coming soon).",
+    "studyAbroad": "Study Abroad",
+    "allDestinations": "All destinations",
+    "programs": "Programs",
+    "services": "Services",
+    "coursesUniversities": "Courses & Universities",
+    "languagePrograms": "Language Programs",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "blog": "Blog",
+    "contactUs": "Contact Us",
+    "social": "Social",
+    "copyright": "© 2026 iStudentPlus"
+  },
+
+  "home": {
+    "heroImageAlt": "Student preparing to study abroad",
+    "findCourse": "Find Course →",
+    "bookFreeSession": "Book a free session",
+    "nextWebinarLive": "● Live now",
+    "nextWebinarLabel": "Next webinar",
+    "watchNow": "Watch now",
+    "viewAndRegister": "View details & register",
+    "stepsTitle": "See how iStudentPlus helps you, **step by step**.",
+    "stepsSubtitle": "A quick look at how we guide you from first consultation to enrollment abroad.",
+    "servicesTitle": "With you at every step of your study abroad journey.",
+    "servicesSubtitle": "Get personalised, friendly, honest guidance for free.",
+    "knowMore": "Know more >",
+    "journeyTitle": "Your journey to study abroad, simplified in 6 steps.",
+    "journeySubtitle": "From your first consultation to landing at your dream university, we guide you every step of the way.",
+    "journeySteps": [
+      {
+        "title": "Personal Assessment",
+        "description": "Explore your study goals, country preference, and career path."
+      },
+      {
+        "title": "Document & Finance Check",
+        "description": "Review academic and financial readiness."
+      },
+      {
+        "title": "Admission Process",
+        "description": "Apply and secure offers from partner universities."
+      },
+      {
+        "title": "Visa & Immigration",
+        "description": "Full support for a smooth application process."
+      },
+      {
+        "title": "Pre-Departure Prep",
+        "description": "Orientation, accommodation, and travel guidance."
+      },
+      {
+        "title": "Enrollment Abroad",
+        "description": "Begin your study journey with confidence."
+      }
+    ],
+    "departuresTitle": "Departures — Intake 2026",
+    "synced": "SYNCED {date}",
+    "colCity": "City",
+    "colProgram": "Program",
+    "colIntake": "Intake",
+    "colStatus": "Status",
+    "statusOpen": "Open",
+    "statusSeats": "3 Seats",
+    "departures": [
+      { "city": "Melbourne", "program": "VET + Bachelor", "intake": "Feb", "status": "open" },
+      { "city": "Toronto", "program": "Undergraduate", "intake": "Sep", "status": "seats" },
+      { "city": "Osaka", "program": "Language School", "intake": "Apr", "status": "open" },
+      { "city": "London", "program": "Postgraduate", "intake": "Sep", "status": "open" },
+      { "city": "Beijing", "program": "Language + University", "intake": "Mar", "status": "open" }
+    ],
+    "destinationsKicker": "Where students go",
+    "destinationsTitle": "Four countries, most requested this intake.",
+    "studyInAlt": "Study in {name}",
+    "languageKicker": "Browse our language program",
+    "languageTitle": "Get exam-ready or just conversation-ready.",
+    "seeAllPrograms": "See all programs →",
+    "testimonialsTitle": "Alumni who made it, **on record**.",
+    "testimonialsSubtitle": "Accepted at 50+ top campuses across 15 different countries.",
+    "lettersOfAcceptance": "Letters of Acceptance:",
+    "consultationKicker": "Free Consultation",
+    "consultationTitle": "Tell us your study plans, we'll do the rest.",
+    "consultationSubtitle": "No obligation, no fees to talk. A counselor reviews your details and replies with a personalized recommendation."
+  },
+
+  "about": {
+    "kicker": "Who We Are",
+    "title": "A global student network and **media agency**.",
+    "watchTitle": "Get to know **iStudentPlus**.",
+    "watchSubtitle": "A quick introduction to who we are and how we support students.",
+    "visionHeading": "Our Vision",
+    "visionBecoming": "Becoming",
+    "visionRank": "#1",
+    "visionSupportSystem": "Support System",
+    "visionTail": "for students to **study overseas** and **make a big impact**.",
+    "missionHeading": "Our Mission",
+    "missionPoints": [
+      "**Fully supporting the ambition** of students to reach their **dream of studying abroad**.",
+      "Creating a **comfortable, fun,** and **meaningful learning atmosphere**."
+    ],
+    "certificationsTitle": "Our Certifications",
+    "certificationsSubtitle": "Member of The Law Society of NSW · QEAC #12929 (Cindy Christella, Qualified Education Agent Counsellor) · ISEAA · Australia FutureUnlimited",
+    "certificationsAlt": "Certifications: Member of The Law Society of NSW, QEAC #12929, ISEAA, Australia FutureUnlimited",
+    "teamTitle": "Our Team",
+    "teamSubtitle": "The counselors behind your application.",
+    "bioComingSoon": "Photo and bio coming soon.",
+    "countriesTitle": "Students we've worked with, by country",
+    "countriesSubtitle": "Our counselors speak {languages} — and have supported students from:",
+    "spokenLanguages": ["English", "Bahasa Indonesia", "Chinese", "Spanish"],
+    "ctaTitle": "Talk to a counselor who's helped students like you."
+  },
+
+  "services": {
+    "kicker": "Services",
+    "title": "Our services in **a minute**.",
+    "subtitle": "See how our visa and admission support works, end to end.",
+    "visaKicker": "Visa & Admission",
+    "visaTitle": "Multiple visa pathways, one end-to-end guide.",
+    "visaSubtitle": "From student visas to short and long-stay options across Australia and Japan, we walk with you through every step of settling into a new country.",
+    "pitfallsTitle": "Avoid the most common visa rejection reasons",
+    "checklistPrompt": "Inquire this document checklist as your visa guidance.",
+    "talkToVisaExpert": "Talk to Our Visa Expert",
+    "counsellingKicker": "Student Visa Admission Counselling",
+    "counsellingTitle": "Get to know your counseling process, step by step.",
+    "counsellingSubtitle": "We help you choose the right country, program, and university aligned with your career and long-term goals.",
+    "faqTitle": "Frequently Asked Questions (FAQ)",
+    "bookToday": "Book a Free Consultation Today"
+  },
+
+  "contact": {
+    "kicker": "Get In Touch",
+    "title": "Book a free **consultation** session.",
+    "subtitle": "The fastest way to reach a counselor is WhatsApp — most questions get answered same day.",
+    "fastest": "Fastest",
+    "weReplyIn": "We reply in",
+    "socialMedia": "Social Media"
+  },
+
+  "courses": {
+    "kicker": "Courses & Universities",
+    "title": "Choose your program to suit your **long term goals**.",
+    "focusKicker": "Focus: Australia",
+    "focusTitle": "A closer look at studying in Australia.",
+    "focusBodyBefore": "The sections below break down the Australian pathways in detail — the destination most of our students choose. Other destinations are covered on the ",
+    "focusBodyLink": "Study Abroad",
+    "focusBodyAfter": " pages.",
+    "vetTitle": "VET Courses (Australia)",
+    "vetSubtitle": "Vocational Education and Training — also known as TVET or \"skills training\" — delivered by TAFE institutes, independent RTOs, and dual-sector universities.",
+    "colQualification": "Qualification",
+    "colDuration": "Duration",
+    "colOutcome": "Outcome",
+    "highSchoolTitle": "High School (Australia)",
+    "highSchoolSubtitle": "Known for quality and diverse options — choosing the right school depends on your goals, location, and budget.",
+    "ctaTitle": "Still deciding between qualifications?"
+  },
+
+  "languagePrograms": {
+    "kicker": "Our Online Courses",
+    "title": "Study abroad, **experience differently!**",
+    "subtitle": "Our philosophy: get exam-ready — or just conversation-ready — before you fly.",
+    "duration": "Duration",
+    "instructorsKicker": "Teacher Profiles",
+    "instructorsTitle": "Meet your instructors",
+    "instructorRole": "English Teacher",
+    "ctaTitle": "Not sure which language program fits?"
+  },
+
+  "studyAbroad": {
+    "kicker": "Study Abroad",
+    "title": "Pick a destination, then let a **counselor** handle the paperwork.",
+    "studyInAlt": "Study in {name}",
+    "watchTitle": "See it from **people who went**.",
+    "webinarReplayKicker": "Webinar replay",
+    "seeAllWebinars": "See all webinars →",
+    "destinationGuideKicker": "Destination guide",
+    "destinationGuideTitle": "Study in Australia, China & Japan",
+    "destinationGuideBody": "A quick guide to our most-requested study destinations.",
+    "qualificationTitle": "Not sure which qualification fits your goal?",
+    "qualificationBody": "Compare VET/Diploma, Bachelor, Master, PhD, and language-study pathways on the Courses & Universities page.",
+    "ctaTitle": "Not sure which country fits? Ask a counselor."
+  },
+
+  "country": {
+    "kicker": "Study Abroad",
+    "heroTitle": "Study in {name}",
+    "featuredProgramsTitle": "Popular programs in {name}",
+    "keyFactsTitle": "Key Facts to Study in {name}",
+    "overviewTitle": "Overview",
+    "overviewLabels": {
+      "livingCost": "Living Cost",
+      "admission": "Student Visa Requirement",
+      "career": "Career Orientation",
+      "accommodation": "Accommodation",
+      "culture": "Culture & Lifestyle"
+    },
+    "colExpense": "Expense",
+    "colCostRange": "Cost range (monthly)",
+    "qualificationsTitle": "See qualification types available in {name}",
+    "browseCourses": "Browse Courses & Universities →",
+    "ctaTitle": "Ready to talk about studying in {name}?"
+  },
+
+  "blog": {
+    "kicker": "Blog",
+    "title": "Visa updates and stories from **the road**.",
+    "all": "All",
+    "categories": {
+      "recent-news": "Recent News",
+      "immigration": "Immigration",
+      "destinations": "Destinations",
+      "english-ielts": "English & IELTS",
+      "student-life": "Student Life",
+      "study-tips": "Study Tips"
+    },
+    "empty": "No articles in this category yet — check back soon.",
+    "newer": "← Newer",
+    "older": "Older →",
+    "pagination": "Page {current} of {total} · {count} articles",
+    "browseByTopic": "Browse by Topic",
+    "popularDestinations": "Popular Destinations",
+    "counselingTitle": "Free 1:1 counseling",
+    "counselingBody": "No obligation, no fees to talk. Get a personalized recommendation.",
+    "videosKicker": "Watch",
+    "videosTitle": "Abroad Stories & Scholarships",
+    "ctaTitle": "Have a question a blog post didn't answer?",
+    "backToBlog": "← Back to Blog",
+    "author": "iStudentPlus Team",
+    "articleCtaTitle": "Have a question this article didn't answer?"
+  },
+
+  "webinars": {
+    "title": "Webinar",
+    "intro": "Free online sessions on studying abroad, scholarships, and language preparation. Register with your email — we send the joining link before the day.",
+    "upcomingHeading": "Upcoming",
+    "pastHeading": "Past",
+    "emptyUpcoming": "No new sessions scheduled. Check back later, or watch a replay below.",
+    "badgeUpcoming": "Upcoming",
+    "badgeLive": "● Live now",
+    "badgePast": "Ended",
+    "speaker": "Speaker: {name}",
+    "noRecording": "Recording not available yet.",
+    "liveNow": "Session in progress — watch above.",
+    "otherTheme": "Other",
+    "sessionCount": "{count} sessions",
+    "minutes": "{count} min",
+    "timezone": "WIB"
+  },
+
+  "threads": {
+    "title": "Q&A Forum",
+    "intro": "Ask anything about studying abroad, scholarships, or visas — no account needed. Anyone can answer. Abusive or spam posts are rejected automatically.",
+    "adminNotice": "Admin mode — you can hide, edit, block, and delete posts. Your replies are marked “iStudentPlus Team” automatically.",
+    "namePlaceholder": "Name (optional — leave blank for Anonymous)",
+    "questionPlaceholder": "Write your question here…",
+    "answerPlaceholder": "Write your answer…",
+    "submitQuestion": "Post question",
+    "submitReply": "Reply",
+    "submitting": "Sending…",
+    "cancel": "Cancel",
+    "sendFailed": "Could not send.",
+    "empty": "No questions yet. Be the first!",
+    "reply": "Reply",
+    "officialBadge": "✓ iStudentPlus Team",
+    "hiddenBadge": "hidden",
+    "mod": {
+      "handleTitle": "Moderation handle (IP hash)",
+      "show": "Show",
+      "hide": "Hide",
+      "edit": "Edit",
+      "editPrompt": "Edit post",
+      "block": "Block",
+      "unblock": "Unblock",
+      "blockConfirm": "Block this author? All of their posts get hidden too.",
+      "delete": "Delete",
+      "deleteConfirm": "Delete permanently? Its replies go too."
+    },
+    "login": {
+      "open": "Sign in as admin",
+      "heading": "Sign in as admin",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "cancel": "Cancel"
+    }
+  },
+
+  "forms": {
+    "consultation": {
+      "successTitle": "Thanks — we got it!",
+      "successBody": "A counselor will reach out on WhatsApp or email soon.",
+      "name": "Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "you@example.com",
+      "whatsapp": "WhatsApp Number",
+      "whatsappPlaceholder": "+62 8xx xxxx xxxx",
+      "destination": "Preferred Study Destination",
+      "destinationPlaceholder": "Select a destination",
+      "destinations": ["Australia", "Japan", "China", "UK", "USA", "Canada", "Others"],
+      "showOptional": "+ Add study details & CV (optional)",
+      "hideOptional": "− Hide optional details",
+      "fieldOfStudy": "Preferred Field of Study",
+      "fieldOfStudyPlaceholder": "Select a field",
+      "fieldsOfStudy": ["Business", "IT", "Hospitality", "Health", "Language and Linguistic", "Others"],
+      "qualificationLevel": "Preferred Level of Qualification",
+      "qualificationLevelPlaceholder": "Select a level",
+      "qualificationLevels": ["VET or Diploma", "Bachelor Degree", "Master Degree", "PhD", "Language Study", "Others"],
+      "latestQualification": "Latest Qualification",
+      "latestQualificationPlaceholder": "Select your latest qualification",
+      "latestQualifications": ["High School", "VET or Diploma", "Bachelor Degree", "Master Degree", "PhD", "Language Study", "Others"],
+      "cv": "Attach Your Most Updated CV",
+      "cvHint": "For assessment purposes prior to your consultation.",
+      "submit": "Book My Free Consultation",
+      "submitting": "Sending…"
+    },
+    "contact": {
+      "successTitle": "Message sent!",
+      "successBody": "A counselor will get back to you soon.",
+      "name": "Full name",
+      "namePlaceholder": "Your name",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "destination": "Interested destination",
+      "destinationPlaceholder": "e.g. Australia, Korea, Japan",
+      "message": "Message",
+      "messagePlaceholder": "Tell us about your study plans",
+      "submit": "Send message",
+      "submitting": "Sending…"
+    },
+    "checklist": {
+      "success": "✓ Got it — our team will email your checklist shortly.",
+      "open": "Get the Checklist",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Send",
+      "submitting": "Sending…"
+    },
+    "webinarLead": {
+      "open": "Register for free",
+      "submit": "Send registration",
+      "submitting": "Registering…",
+      "cancel": "Cancel",
+      "success": "✓ You're registered. We'll send the joining link to your email or WhatsApp before the session.",
+      "failure": "Registration failed.",
+      "namePlaceholder": "Full name",
+      "emailPlaceholder": "Email address",
+      "whatsappPlaceholder": "WhatsApp number (optional)"
+    },
+    "programLead": {
+      "open": "Ask about {program}",
+      "submit": "Send enquiry",
+      "submitting": "Sending…",
+      "cancel": "Cancel",
+      "success": "✓ Got it — a counselor will reach out about this program.",
+      "failure": "Could not send the enquiry.",
+      "namePlaceholder": "Your full name",
+      "emailPlaceholder": "Email address",
+      "whatsappPlaceholder": "WhatsApp number (optional)"
+    },
+    "courseFilter": {
+      "title": "Browse by qualification & country",
+      "qualification": "Qualification",
+      "qualifications": ["VET or Diploma", "Bachelor Degree", "Master Degree", "PhD", "Language Study", "Exchange Program"],
+      "country": "Country",
+      "countries": ["Australia", "UK", "USA", "Canada", "China", "Japan"],
+      "result": "We don't publish a live university database yet — tell a counselor you're looking at {qualification} in {country} and they'll send you the current partner list and requirements.",
+      "resultCta": "Book a free consultation →",
+      "hint": "Pick both to see how a counselor can help."
+    }
+  },
+
+  "api": {
+    "nameEmailRequired": "Name and email are required.",
+    "sendFailed": "Could not send.",
+    "serverError": "The server is having trouble — please try again shortly.",
+    "threads": {
+      "too_short": "That post is too short.",
+      "too_long": "That post is too long (2000 characters max).",
+      "name_too_long": "That name is too long (40 characters max).",
+      "profanity": "There's abusive language in your post. Please rewrite it politely.",
+      "too_many_links": "Too many links.",
+      "shouting": "Please don't write in all capitals.",
+      "blocked": "You can't post on this forum.",
+      "rate_limited": "You're posting too quickly. Try again in a moment.",
+      "duplicate": "You just sent the same post.",
+      "thread_not_found": "That thread no longer exists."
+    }
+  }
+}

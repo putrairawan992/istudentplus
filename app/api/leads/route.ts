@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 import { appendContent } from "../../../lib/content";
+import { DEFAULT_LOCALE, hasLocale } from "../../../lib/i18n";
+import { getDictionary } from "../../../lib/dictionary";
 
 const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 
@@ -19,6 +21,8 @@ type Lead = {
   submittedAt: string;
   name: string;
   email: string;
+  /** Which language the visitor was reading the site in — i.e. which one to reply in. */
+  lang: string;
   fields: Record<string, string>;
   cvFilename: string | null;
 };
@@ -53,12 +57,17 @@ export async function POST(request: Request) {
   const source = (SOURCES as readonly string[]).includes(raw) ? (raw as Lead["source"]) : "consultation";
   const name = String(form.get("name") || "").trim();
   const email = String(form.get("email") || "").trim();
+  // Every form posts the locale it was rendered in, so this route's own validation messages
+  // come back in the language the visitor is reading.
+  const rawLang = String(form.get("lang") || "");
+  const lang = hasLocale(rawLang) ? rawLang : DEFAULT_LOCALE;
 
   if (!name || !email) {
-    return NextResponse.json({ ok: false, error: "Name and email are required." }, { status: 400 });
+    const d = await getDictionary(lang);
+    return NextResponse.json({ ok: false, error: d.api.nameEmailRequired }, { status: 400 });
   }
 
-  const knownKeys = new Set(["source", "name", "email", "cv"]);
+  const knownKeys = new Set(["source", "name", "email", "cv", "lang"]);
   const fields: Record<string, string> = {};
   for (const [key, value] of form.entries()) {
     if (!knownKeys.has(key) && typeof value === "string") {
@@ -78,6 +87,7 @@ export async function POST(request: Request) {
     submittedAt: new Date().toISOString(),
     name,
     email,
+    lang,
     fields,
     cvFilename,
   };

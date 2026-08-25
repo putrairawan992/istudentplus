@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { DEFAULT_LOCALE, localeKey, type Locale } from "./i18n";
+import { overlay } from "./translation-overlay";
 
 const CONTENT_DIR = path.join(process.cwd(), "content");
 
@@ -25,11 +27,12 @@ export type CollectionKey =
   | "videoSeries"
   | "webinars";
 
-function filePath(key: CollectionKey) {
+function filePath(key: string) {
   return path.join(CONTENT_DIR, `${key}.json`);
 }
 
-export async function readContent<T>(key: CollectionKey): Promise<T> {
+/** One document by its raw storage key. `null` when it doesn't exist yet. */
+async function readDocument<T>(key: string): Promise<T | null> {
   if (API_URL) {
     // Always send the token: most collections are public, but "leads" holds visitor PII and
     // the API now requires auth to read it. This only ever runs server-side.
@@ -37,11 +40,29 @@ export async function readContent<T>(key: CollectionKey): Promise<T> {
       cache: "no-store",
       headers: { Authorization: `Bearer ${API_TOKEN}` },
     });
+    // A translation nobody has started yet is a 404, not a failure.
+    if (res.status === 404) return null;
     if (!res.ok) throw new Error(`readContent ${key}: ${res.status}`);
     return (await res.json()) as T;
   }
-  const raw = fs.readFileSync(filePath(key), "utf-8");
-  return JSON.parse(raw) as T;
+  const file = filePath(key);
+  if (!fs.existsSync(file)) return null;
+  return JSON.parse(fs.readFileSync(file, "utf-8")) as T;
+}
+
+export async function readContent<T>(
+  key: CollectionKey,
+  locale: Locale = DEFAULT_LOCALE
+): Promise<T> {
+  const base = await readDocument<T>(key);
+  if (base === null) throw new Error(`readContent ${key}: missing`);
+  if (locale === DEFAULT_LOCALE) return base;
+  return overlay(base, await readDocument<unknown>(localeKey(key, locale)));
+}
+
+/** The stored document for one locale, with no English laid under it — what the CMS edits. */
+export async function readRawContent<T>(key: CollectionKey, locale: Locale): Promise<T | null> {
+  return readDocument<T>(localeKey(key, locale));
 }
 
 // Atomically prepends one item to an array collection. Prefer this over readContent +
@@ -64,15 +85,20 @@ export async function appendContent<T>(key: CollectionKey, item: T): Promise<voi
   await writeContent(key, list);
 }
 
-export async function writeContent<T>(key: CollectionKey, data: T): Promise<void> {
+export async function writeContent<T>(
+  key: CollectionKey,
+  data: T,
+  locale: Locale = DEFAULT_LOCALE
+): Promise<void> {
+  const storageKey = localeKey(key, locale);
   if (API_URL) {
-    const res = await fetch(`${API_URL}/content/${key}`, {
+    const res = await fetch(`${API_URL}/content/${storageKey}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${API_TOKEN}` },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error(`writeContent ${key}: ${res.status}`);
+    if (!res.ok) throw new Error(`writeContent ${storageKey}: ${res.status}`);
     return;
   }
-  fs.writeFileSync(filePath(key), JSON.stringify(data, null, 2) + "\n", "utf-8");
+  fs.writeFileSync(filePath(storageKey), JSON.stringify(data, null, 2) + "\n", "utf-8");
 }
