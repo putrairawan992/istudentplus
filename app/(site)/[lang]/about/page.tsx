@@ -9,6 +9,8 @@ import { readContent } from "@/lib/content";
 import { getVideo } from "@/lib/videos";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, fmt, hasLocale } from "@/lib/i18n";
+import Media from "@/app/components/Media";
+import { anyMedia, hasMedia, type Media as MediaValue } from "@/lib/media";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/about">): Promise<Metadata> {
   const { lang } = await params;
@@ -21,8 +23,8 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/about">): 
   };
 }
 
-type TeamMember = { name: string; role: string; photo: string | null; bio: string | null };
-type Settings = {
+type TeamMember = MediaValue & { name: string; role: string; photo: string | null; bio: string | null };
+type Settings = MediaValue & {
   languages: string[];
   clientCountries: string[];
   aboutStory: string[];
@@ -47,6 +49,7 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
   const CLIENT_COUNTRIES = SETTINGS.clientCountries;
   const WHATSAPP_URL = SETTINGS.whatsapp;
   const VIDEO = await getVideo("About Us", lang);
+  const teamHaveMedia = anyMedia(TEAM);
 
   return (
     <>
@@ -68,6 +71,19 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
                 {paragraph}
               </p>
             ))}
+            {/* The Site Settings record's own picture. It closes the story rather than opening
+                the page, because the "About Us" video below is the section that wants to be
+                the first thing seen when one is published. */}
+            {hasMedia(SETTINGS) && (
+              <Media
+                media={SETTINGS}
+                alt={d.about.title}
+                ratio="wide"
+                rounded="rounded-3xl"
+                className="mt-9"
+                sizes="(min-width: 768px) 768px, 100vw"
+              />
+            )}
           </div>
         </section>
 
@@ -149,7 +165,22 @@ export default async function AboutPage({ params }: PageProps<"/[lang]/about">) 
             <p className="mb-8 max-w-xl text-[15.5px] leading-relaxed text-muted">{d.about.teamSubtitle}</p>
             <div className="grid gap-5 sm:grid-cols-2">
               {TEAM.map((member) => (
-                <div key={member.name} className="rounded-2xl border border-line bg-card p-7">
+                <div key={member.name} className="overflow-hidden rounded-2xl border border-line bg-card p-7">
+                  {/* Separate from the round portrait above: this is the member's own picture
+                      or intro clip, not their headshot. Reserved so the two columns stay level. */}
+                  {teamHaveMedia && (
+                    <div className="-mx-7 -mt-7 mb-5">
+                      <Media
+                        media={member}
+                        alt={member.name}
+                        ratio="wide"
+                        reserve
+                        placeholder={member.name}
+                        rounded="rounded-none"
+                        sizes="(min-width: 640px) 46vw, 92vw"
+                      />
+                    </div>
+                  )}
                   <div className="mb-4 flex items-center gap-4">
                     {member.photo ? (
                       <Image

@@ -6,17 +6,19 @@ import Footer from "@/app/components/Footer";
 import Marked from "@/app/components/Marked";
 import ConsultationForm from "@/app/components/ConsultationForm";
 import YouTubeEmbed from "@/app/components/YouTubeEmbed";
+import Media from "@/app/components/Media";
 import { getVisibleCountries } from "@/lib/countries";
 import { readContent } from "@/lib/content";
 import { getVideo } from "@/lib/videos";
 import { schedule, splitByDate, webinarThumbnail, type Webinar } from "@/lib/webinars";
 import { getDictionary } from "@/lib/dictionary";
 import { fmt, hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { anyMedia, type Media as MediaValue } from "@/lib/media";
 
 type Stat = { value: string; label: string };
 type Settings = { stats: Stat[]; heroTitle: string; heroSubtitle: string };
-type HomeService = { name: string; description: string; href: string; bg: string };
-type Testimonial = {
+type HomeService = MediaValue & { name: string; description: string; href: string; bg: string };
+type Testimonial = MediaValue & {
   name: string;
   photo: string;
   badge: string;
@@ -59,6 +61,9 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   // list had UK and Canada in it, which are exactly the two the client wanted out of sight.
   const DESTINATIONS = await getVisibleCountries(lang);
   const STEPS_VIDEO = await getVideo("Step by Step", lang);
+  // Decided once per grid, from the data: see the note on anyMedia in lib/media.ts.
+  const servicesHaveMedia = anyMedia(HOME_SERVICES);
+  const testimonialsHaveMedia = anyMedia(TESTIMONIALS);
   const LANGUAGE_PROGRAMS = LANGUAGE_PROGRAM_ITEMS.map((program) => ({
     name: program.name,
     href: p(`/language-programs#${program.id}`),
@@ -210,14 +215,29 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               <h2 className="mb-3 text-3xl font-extrabold tracking-tight">{d.home.servicesTitle}</h2>
               <p className="text-[15.5px] leading-relaxed text-muted">{d.home.servicesSubtitle}</p>
             </div>
+            {/* All four cards share one row at lg and the "know more" label is pinned to the
+                bottom of each, so a picture on one card and not the next opens a visible gap
+                under the other three. `reserve` keeps the box on every card once any of them
+                has one — see lib/media.ts. */}
             <div className="reveal grid gap-4.5 sm:grid-cols-2 lg:grid-cols-4">
               {HOME_SERVICES.map((service) => (
                 <a
                   key={service.name}
                   href={p(service.href)}
-                  className={`flex flex-col justify-between rounded-2xl p-6 text-ink transition-transform hover:scale-[1.02] ${service.bg}`}
+                  className={`group flex flex-col justify-between overflow-hidden rounded-2xl p-6 text-ink transition-transform hover:scale-[1.02] ${service.bg}`}
                 >
                   <div>
+                    <Media
+                      media={service}
+                      alt={service.name}
+                      ratio="photo"
+                      reserve={servicesHaveMedia}
+                      placeholder={service.name}
+                      zoomOnHover
+                      rounded="rounded-xl"
+                      className="mb-4"
+                      sizes="(min-width: 1024px) 22vw, (min-width: 640px) 45vw, 90vw"
+                    />
                     <h4 className="mb-2 text-[16.5px] font-extrabold">{service.name}</h4>
                     <p className="mb-6 text-[13.5px] leading-relaxed opacity-70">{service.description}</p>
                   </div>
@@ -374,7 +394,22 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             </div>
             <div className="reveal grid gap-5 lg:grid-cols-3">
               {TESTIMONIALS.map((t) => (
-                <div key={t.name} className="flex flex-col rounded-3xl bg-card p-6.5 shadow-sm">
+                <div key={t.name} className="flex flex-col overflow-hidden rounded-3xl bg-card p-6.5 shadow-sm">
+                  {/* Bleeds to the card edge: -m-6.5 cancels the padding, mb-5 puts it back
+                      under the block. Reserved across the row so the three cards stay level. */}
+                  {testimonialsHaveMedia && (
+                    <div className="-mx-6.5 -mt-6.5 mb-5">
+                      <Media
+                        media={t}
+                        alt={t.name}
+                        ratio="wide"
+                        reserve
+                        placeholder={t.name}
+                        rounded="rounded-none"
+                        sizes="(min-width: 1024px) 32vw, 92vw"
+                      />
+                    </div>
+                  )}
                   <div className="mb-4 flex items-center gap-3.5">
                     <Image
                       src={t.photo}

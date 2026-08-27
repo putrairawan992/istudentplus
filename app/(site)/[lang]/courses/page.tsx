@@ -9,6 +9,8 @@ import { readContent } from "@/lib/content";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, hasLocale, localePath } from "@/lib/i18n";
+import Media from "@/app/components/Media";
+import { hasMedia, type Media as MediaValue } from "@/lib/media";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/courses">): Promise<Metadata> {
   const { lang } = await params;
@@ -27,20 +29,21 @@ type CoursesPage = {
   vetLevels: { level: string; duration: string; outcome: string }[];
   vetFields: string[];
   highSchool: { years: string; description: string }[];
-};
+} & MediaValue;
 
 export default async function CoursesPage({ params }: PageProps<"/[lang]/courses">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   const d = await getDictionary(lang);
 
+  const PAGE = await readContent<CoursesPage>("coursesPage", lang);
   const {
     qualifications: QUALIFICATIONS,
     // popularFields is still in the CMS but no longer rendered — see the note further down.
     vetLevels: VET_LEVELS,
     vetFields: VET_FIELDS,
     highSchool: HIGH_SCHOOL,
-  } = await readContent<CoursesPage>("coursesPage", lang);
+  } = PAGE;
   const WHATSAPP_URL = await getWhatsAppUrl();
 
   return (
@@ -55,6 +58,19 @@ export default async function CoursesPage({ params }: PageProps<"/[lang]/courses
             <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
               <Marked text={d.courses.title} />
             </h1>
+            {/* Optional, set on the Courses & Universities record itself. Held in the same
+                max-w-3xl column as the heading so it can never run wider than the title. */}
+            {hasMedia(PAGE) && (
+              <Media
+                media={PAGE}
+                alt={d.courses.title}
+                ratio="wide"
+                rounded="rounded-3xl"
+                className="mt-8"
+                priority
+                sizes="(min-width: 768px) 768px, 100vw"
+              />
+            )}
           </div>
         </section>
 

@@ -10,6 +10,8 @@ import { categoryLabel, formatDate, relatedArticles, type Article } from "@/lib/
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, hasLocale, localePath, LOCALE_TAGS, type Locale } from "@/lib/i18n";
 import { SITE_URL as siteUrl } from "@/lib/site";
+import Media from "@/app/components/Media";
+import { anyMedia } from "@/lib/media";
 
 async function getArticle(slug: string, locale: Locale) {
   const articles = await readContent<Article[]>("blog", locale);
@@ -66,6 +68,7 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
   const WHATSAPP_URL = await getWhatsAppUrl();
   const date = formatDate(article.date, lang);
   const related = relatedArticles(articles, article);
+  const relatedHaveMedia = anyMedia(related);
 
   return (
     <>
@@ -133,8 +136,24 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
                     <Link
                       key={r.slug}
                       href={localePath(lang, `/blog/${r.slug}`)}
-                      className="group flex flex-col rounded-xl border border-line bg-card p-4 transition-colors hover:border-accent"
+                      className="group flex flex-col overflow-hidden rounded-xl border border-line bg-card p-4 transition-colors hover:border-accent"
                     >
+                      {/* Three across at sm — reserved, so a post with a thumbnail doesn't push
+                          its neighbours' titles out of line. */}
+                      {relatedHaveMedia && (
+                        <div className="-mx-4 -mt-4 mb-3">
+                          <Media
+                            media={r}
+                            alt={r.title}
+                            ratio="photo"
+                            reserve
+                            placeholder={categoryLabel(r.category, d.blog.categories)}
+                            rounded="rounded-none"
+                            zoomOnHover
+                            sizes="(min-width: 640px) 33vw, 92vw"
+                          />
+                        </div>
+                      )}
                       <span className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-accent">
                         {categoryLabel(r.category, d.blog.categories)}
                       </span>

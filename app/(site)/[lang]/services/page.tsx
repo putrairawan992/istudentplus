@@ -5,11 +5,13 @@ import Footer from "@/app/components/Footer";
 import Marked from "@/app/components/Marked";
 import YouTubeEmbed from "@/app/components/YouTubeEmbed";
 import ChecklistForm from "@/app/components/ChecklistForm";
+import Media from "@/app/components/Media";
 import { readContent } from "@/lib/content";
 import { getVideo } from "@/lib/videos";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, hasLocale, localePath } from "@/lib/i18n";
+import { anyMedia, hasMedia, type Media as MediaValue } from "@/lib/media";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/services">): Promise<Metadata> {
   const { lang } = await params;
@@ -22,10 +24,10 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/services">
   };
 }
 
-type VisaService = { name: string; intro: string; points: string[]; icon?: string };
+type VisaService = MediaValue & { name: string; intro: string; points: string[]; icon?: string };
 type AdmissionStep = { title: string; description: string };
 type Faq = { q: string; a: string; link?: { text: string; href: string } };
-type ServicesPageContent = { pitfalls: string[]; admissionSteps: AdmissionStep[]; faqs: Faq[] };
+type ServicesPageContent = MediaValue & { pitfalls: string[]; admissionSteps: AdmissionStep[]; faqs: Faq[] };
 
 export default async function ServicesPage({ params }: PageProps<"/[lang]/services">) {
   const { lang } = await params;
@@ -33,10 +35,11 @@ export default async function ServicesPage({ params }: PageProps<"/[lang]/servic
   const d = await getDictionary(lang);
 
   const VISA_SERVICES = await readContent<VisaService[]>("visaServices", lang);
-  const { pitfalls: PITFALLS, admissionSteps: ADMISSION_STEPS, faqs: FAQS } =
-    await readContent<ServicesPageContent>("servicesPage", lang);
+  const PAGE = await readContent<ServicesPageContent>("servicesPage", lang);
+  const { pitfalls: PITFALLS, admissionSteps: ADMISSION_STEPS, faqs: FAQS } = PAGE;
   const VIDEO = await getVideo("Services", lang);
   const WHATSAPP_URL = await getWhatsAppUrl();
+  const visaHaveMedia = anyMedia(VISA_SERVICES);
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -74,10 +77,23 @@ export default async function ServicesPage({ params }: PageProps<"/[lang]/servic
                 {d.services.subtitle}
               </p>
             </div>
-            {VIDEO && (
+            {VIDEO ? (
               <div className="overflow-hidden rounded-3xl border border-line bg-card shadow-sm">
                 <YouTubeEmbed id={VIDEO.youtubeId} videoFile={VIDEO.videoFile} title={VIDEO.title} />
               </div>
+            ) : (
+              /* Falls back to whatever was put on the Services Page record itself. Only one of
+                 the two ever shows — a hero with two players in it is noise, not richness. */
+              hasMedia(PAGE) && (
+                <Media
+                  media={PAGE}
+                  alt={d.services.title}
+                  ratio="wide"
+                  rounded="rounded-3xl"
+                  priority
+                  sizes="(min-width: 768px) 768px, 100vw"
+                />
+              )
             )}
           </div>
         </section>
@@ -95,7 +111,22 @@ export default async function ServicesPage({ params }: PageProps<"/[lang]/servic
 
             <div className="mb-4.5 grid gap-4.5 sm:grid-cols-2 lg:grid-cols-3">
               {VISA_SERVICES.map((service) => (
-                <div key={service.name} className="rounded-2xl border border-line bg-card p-6">
+                <div key={service.name} className="overflow-hidden rounded-2xl border border-line bg-card p-6">
+                  {/* Three across at lg with point lists of different lengths — reserved so the
+                      icons below stay on one line across the row. */}
+                  {visaHaveMedia && (
+                    <div className="-mx-6 -mt-6 mb-5">
+                      <Media
+                        media={service}
+                        alt={service.name}
+                        ratio="photo"
+                        reserve
+                        placeholder={service.name}
+                        rounded="rounded-none"
+                        sizes="(min-width: 1024px) 30vw, (min-width: 640px) 46vw, 90vw"
+                      />
+                    </div>
+                  )}
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-xl">
                     {service.icon || "📄"}
                   </div>

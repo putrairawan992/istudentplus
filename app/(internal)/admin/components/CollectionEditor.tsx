@@ -10,6 +10,7 @@ import {
   unionShapeOf,
   mergeWithModel,
 } from "@/lib/json-tree";
+import { MEDIA_FIELDS } from "@/lib/media";
 import {
   IMAGE_EXT,
   MAX_UPLOAD_BYTES,
@@ -21,6 +22,7 @@ import {
   formatList,
   getImageSpec,
   isVideoField,
+  VIDEO_GUIDANCE,
   rejectionMessage,
 } from "@/lib/image-specs";
 import { sectionsOf } from "@/lib/form-sections";
@@ -49,6 +51,19 @@ const CollectionContext = createContext<string | undefined>(undefined);
 // offer when someone adds its first item. `{}` for single-object collections, where there's only
 // one instance and nothing to reconcile against.
 const ModelContext = createContext<JsonObject>({});
+
+/**
+ * Two collections are left out of the media trio (lib/media.ts):
+ *  - `leads` is an inbox of visitor submissions, not content. An upload box on a lead record
+ *    invites someone to attach a file to a stranger's enquiry, which is not a thing.
+ *  - `webinars` already carries all three concepts under its own names (`image`,
+ *    `recordingYoutubeId`, `recordingVideoFile`); adding the trio would give it five media
+ *    fields and no way to guess which pair wins.
+ */
+const NO_MEDIA_TRIO = new Set(["leads", "webinars"]);
+function hasMediaTrio(collection?: string) {
+  return !!collection && !NO_MEDIA_TRIO.has(collection);
+}
 
 // Field keys that hold an uploadable asset — these render an image/video upload widget.
 const MEDIA_KEY = /(image|photo|thumbnail|thumb|logo|icon|avatar|cover|poster|banner|picture|img|video)/i;
@@ -272,7 +287,7 @@ function VideoField({ value, onChange }: { value: string | null; onChange: (v: s
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
       <div className="grid h-16 w-28 shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-paper text-center text-[10px] text-muted">
         {id && !broken ? (
           // eslint-disable-next-line @next/next/no-img-element -- external YouTube thumbnail
@@ -286,13 +301,26 @@ function VideoField({ value, onChange }: { value: string | null; onChange: (v: s
           <span>No preview</span>
         )}
       </div>
-      <input
-        type="text"
-        value={id}
-        placeholder="Paste a YouTube URL or video ID"
-        onChange={(e) => handleChange(e.target.value)}
-        className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
-      />
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <input
+          type="text"
+          value={id}
+          placeholder="Paste a YouTube URL or video ID"
+          onChange={(e) => handleChange(e.target.value)}
+          className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+        {/* The video half of the house standard. The upload field next to it already prints its
+            own rules; this one had none, which is why people were pasting 4:3 uploads. */}
+        <div className="rounded-lg border border-line bg-paper-raise/60 px-3 py-2 text-[12px] leading-relaxed">
+          <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5">
+            <dt className="text-muted">Bentuk</dt>
+            <dd className="font-semibold text-ink">{VIDEO_GUIDANCE.ratio} (landscape)</dd>
+            <dt className="text-muted">Disarankan</dt>
+            <dd className="font-semibold text-ink">{VIDEO_GUIDANCE.preferred}</dd>
+          </dl>
+          <p className="mt-1.5 text-muted">{VIDEO_GUIDANCE.note}</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -718,9 +746,16 @@ export default function CollectionEditor({
   });
 
   const isList = Array.isArray(data);
-  // Every field any entry in this list has, so every entry's tabs match (see unionShapeOf).
-  // {} for a single-object collection — nothing to reconcile against with only one instance.
-  const model = useMemo(() => (isList ? unionShapeOf(data as JsonValue[]) : {}), [isList, data]);
+  // Every field any entry in this list has, so every entry's tabs match (see unionShapeOf),
+  // widened with the media trio so anything in the CMS can be given a picture or a video
+  // without a code change (lib/media.ts). The union goes on top: a collection that already
+  // stores an image keeps its own value as the field's example, not the blank one.
+  // For a single-object collection there is nothing to reconcile, but the trio still applies —
+  // it is what puts an image slot on Site Settings, Services Page and Courses Page at all.
+  const model = useMemo(() => {
+    if (!hasMediaTrio(collection)) return isList ? unionShapeOf(data as JsonValue[]) : {};
+    return { ...MEDIA_FIELDS, ...(isList ? unionShapeOf(data as JsonValue[]) : {}) };
+  }, [isList, data, collection]);
 
   function edit(v: JsonValue) {
     setData(v);

@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Marked from "@/app/components/Marked";
-import YouTubeEmbed from "@/app/components/YouTubeEmbed";
 import { readContent } from "@/lib/content";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { getVisibleCountries } from "@/lib/countries";
@@ -19,6 +18,8 @@ import {
 } from "@/lib/blog";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, fmt, hasLocale, localePath } from "@/lib/i18n";
+import Media from "@/app/components/Media";
+import { type Media as MediaValue } from "@/lib/media";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/blog">): Promise<Metadata> {
   const { lang } = await params;
@@ -31,7 +32,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/blog">): P
   };
 }
 
-type Video = { series: string; title: string; youtubeId?: string | null; videoFile?: string | null };
+type Video = MediaValue & { series: string; title: string };
 
 export default async function BlogPage({ params, searchParams }: PageProps<"/[lang]/blog">) {
   const { lang } = await params;
@@ -283,8 +284,18 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {VIDEO_SERIES.map((video) => (
-                <div key={video.youtubeId} className="overflow-hidden rounded-xl border border-line bg-card">
-                  <YouTubeEmbed id={video.youtubeId} videoFile={video.videoFile} title={video.title} />
+                <div key={video.title} className="overflow-hidden rounded-xl border border-line bg-card">
+                  {/* Was YouTube-or-nothing. A card can now carry an uploaded still instead,
+                      which is what makes a video card publishable before the video exists. */}
+                  <Media
+                    media={video}
+                    alt={video.title}
+                    ratio="wide"
+                    reserve
+                    placeholder={video.series}
+                    rounded="rounded-none"
+                    sizes="(min-width: 1024px) 23vw, (min-width: 640px) 46vw, 92vw"
+                  />
                   <div className="p-4">
                     <div className="mb-1 text-[11px] font-bold uppercase tracking-wide text-accent">
                       {video.series}

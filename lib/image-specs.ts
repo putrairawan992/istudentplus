@@ -99,6 +99,79 @@ const SPECS: Record<string, ImageSpec> = {
     usedOn: "profil pengajar di halaman Language Programs",
     note: "Ditampilkan sebagai lingkaran — pastikan wajah ada di tengah.",
   },
+
+  // --- the `image` slot opened up on every remaining collection -------------------------
+  // Every one of these renders through <Media> at a declared aspect ratio, so the spec is the
+  // ratio the card holds plus enough pixels for a 2x screen at the widest the card ever gets.
+  // Grouped by that ratio rather than by page, because that is what decides whether a photo
+  // survives the crop.
+  "homeServices.image": {
+    width: 1200,
+    height: 800,
+    minWidth: 600,
+    usedOn: "kartu layanan di Beranda",
+    note: "Muncul di atas judul kartu. Kartu-kartu ini sebaris — isi gambarnya untuk semua kartu, atau tidak sama sekali, supaya tingginya seragam.",
+  },
+  "visaServices.image": {
+    width: 1200,
+    height: 800,
+    minWidth: 600,
+    usedOn: "kartu layanan visa di halaman Services",
+  },
+  "languagePrograms.image": {
+    width: 1600,
+    height: 900,
+    minWidth: 800,
+    usedOn: "bagian program di halaman Language Programs",
+    note: "Ditampilkan lebar di samping keterangan program, jadi pakai foto suasana kelas, bukan potret.",
+  },
+  "englishSkills.image": {
+    width: 1200,
+    height: 800,
+    minWidth: 500,
+    usedOn: "kartu 4 keterampilan di halaman Language Programs",
+  },
+  "coursesPage.image": {
+    width: 1600,
+    height: 900,
+    minWidth: 900,
+    usedOn: "bagian atas halaman Courses & Universities",
+  },
+  "servicesPage.image": {
+    width: 1600,
+    height: 900,
+    minWidth: 900,
+    usedOn: "bagian atas halaman Services",
+  },
+  "settings.image": {
+    width: 1600,
+    height: 900,
+    minWidth: 900,
+    usedOn: "bagian cerita di halaman About Us",
+    note: "Kolom About Story Image. Kosongkan bila belum ada foto — bagiannya tetap rapi tanpa gambar.",
+  },
+  "videoSeries.image": {
+    width: 1280,
+    height: 720,
+    minWidth: 720,
+    usedOn: "kartu video di halaman Blog",
+    note: "Hanya dipakai bila kartunya tidak memakai YouTube — video YouTube membawa thumbnail-nya sendiri.",
+  },
+};
+
+/**
+ * The house standard for the video half of the trio, shown next to every YouTube / Video File
+ * slot in the CMS. Not a size check — a 4MB upload cap already decides what can go through the
+ * website — but the advice that stops someone uploading a 40-minute recording and waiting.
+ */
+export const VIDEO_GUIDANCE = {
+  ratio: "16:9",
+  preferred: "YouTube",
+  maxUploadLabel: MAX_UPLOAD_LABEL,
+  note:
+    "Video panjang sebaiknya diunggah ke YouTube lalu tempel alamatnya di kolom YouTube — tidak ada batas ukuran, dan halaman tetap ringan karena pemutarnya baru dimuat saat diklik. Kolom Video File hanya untuk klip pendek (di bawah " +
+    MAX_UPLOAD_LABEL +
+    ", biasanya beberapa detik) dalam format MP4 atau WEBM, 16:9.",
 };
 
 export function getImageSpec(collection: string | undefined, field: string | undefined): ImageSpec | null {
