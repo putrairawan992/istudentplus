@@ -6,13 +6,35 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import { readContent } from "@/lib/content";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
-import { categoryLabel, formatDate, type Article } from "@/lib/blog";
+import { categoryLabel, formatDate, relatedArticles, type Article } from "@/lib/blog";
 import { getDictionary } from "@/lib/dictionary";
-import { alternatesFor, hasLocale, localePath, type Locale } from "@/lib/i18n";
+import { alternatesFor, hasLocale, localePath, LOCALE_TAGS, type Locale } from "@/lib/i18n";
+import { SITE_URL as siteUrl } from "@/lib/site";
 
 async function getArticle(slug: string, locale: Locale) {
   const articles = await readContent<Article[]>("blog", locale);
   return articles.find((a) => a.slug === slug);
+}
+
+/* GEO/SEO: the 277 migrated posts carried no structured data across, so Google and the AI
+   answer engines saw 277 pages of anonymous prose. BlogPosting is what makes a post citable
+   with a date and a publisher attached. */
+function articleJsonLd(article: Article, lang: Locale) {
+  const url = `${siteUrl}${localePath(lang, `/blog/${article.slug}`)}`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: article.title,
+    description: article.excerpt,
+    inLanguage: LOCALE_TAGS[lang],
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    url,
+    datePublished: article.date || undefined,
+    image: article.image ? [new URL(article.image, siteUrl).toString()] : undefined,
+    articleSection: article.category || undefined,
+    author: { "@type": "Organization", name: "iStudentPlus", url: siteUrl },
+    publisher: { "@type": "Organization", name: "iStudentPlus", url: siteUrl },
+  };
 }
 
 export async function generateStaticParams() {
@@ -38,13 +60,19 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
   const { lang, slug } = await params;
   if (!hasLocale(lang)) notFound();
   const d = await getDictionary(lang);
-  const article = await getArticle(slug, lang);
+  const articles = await readContent<Article[]>("blog", lang);
+  const article = articles.find((a) => a.slug === slug);
   if (!article) notFound();
   const WHATSAPP_URL = await getWhatsAppUrl();
   const date = formatDate(article.date, lang);
+  const related = relatedArticles(articles, article);
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd(article, lang)) }}
+      />
       <Header lang={lang} />
       <main>
         <article className="py-12 sm:py-16">
@@ -91,6 +119,37 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
                   )
                 )}
               </div>
+            )}
+
+            {/* Every post used to end in a WhatsApp button and nothing else — a reader who
+                finished one had no way back into the other 276 except the browser's back button. */}
+            {related.length > 0 && (
+              <section className="mx-auto mt-12 max-w-3xl">
+                <h2 className="mb-4 text-[13px] font-bold uppercase tracking-wide text-muted">
+                  {d.blog.relatedTitle}
+                </h2>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  {related.map((r) => (
+                    <Link
+                      key={r.slug}
+                      href={localePath(lang, `/blog/${r.slug}`)}
+                      className="group flex flex-col rounded-xl border border-line bg-card p-4 transition-colors hover:border-accent"
+                    >
+                      <span className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-accent">
+                        {categoryLabel(r.category, d.blog.categories)}
+                      </span>
+                      <span className="line-clamp-3 text-[14.5px] font-semibold leading-snug text-ink transition-colors group-hover:text-accent">
+                        {r.title}
+                      </span>
+                      {formatDate(r.date, lang) && (
+                        <span className="mt-auto pt-2 text-[12px] text-muted">
+                          {formatDate(r.date, lang)}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </section>
             )}
 
             <div className="mt-12 flex flex-col items-center gap-4 rounded-2xl bg-ink px-8 py-10 text-center text-white">

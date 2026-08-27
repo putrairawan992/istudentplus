@@ -49,3 +49,26 @@ export function formatDate(iso: string | undefined, locale: Locale) {
     year: "numeric",
   });
 }
+
+/** Case-insensitive substring match over what a reader can actually see on a card. The blog
+    is 277 posts behind a 12-per-page list; category filters alone leave 81 posts in
+    "Destinations" and no way to find one of them. Substring, not tokenised — a search index
+    for 277 rows filtered on the server is a dependency with nothing to buy. */
+export function matchesQuery(article: Article, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const haystack = `${article.title} ${article.excerpt ?? ""} ${article.category ?? ""}`;
+  return haystack.toLowerCase().includes(q);
+}
+
+/** Up to `limit` other posts to read next: same category first, newest first, the rest of the
+    blog filling in behind. Recent News has 19 posts and one of them is the article you're on,
+    so category-only would sometimes render a single lonely card under "Keep reading". */
+export function relatedArticles(all: Article[], current: Article, limit = 3): Article[] {
+  const byDate = (a: Article, b: Article) => (b.date ?? "").localeCompare(a.date ?? "");
+  const others = all.filter((a) => a.slug && a.slug !== current.slug);
+  const same = others.filter((a) => a.category === current.category).sort(byDate);
+  if (same.length >= limit) return same.slice(0, limit);
+  const rest = others.filter((a) => a.category !== current.category).sort(byDate);
+  return [...same, ...rest].slice(0, limit);
+}

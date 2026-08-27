@@ -9,7 +9,14 @@ import YouTubeEmbed from "@/app/components/YouTubeEmbed";
 import { readContent } from "@/lib/content";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { getVisibleCountries } from "@/lib/countries";
-import { CATEGORY_SLUGS, PAGE_SIZE, categoryLabel, formatDate, type Article } from "@/lib/blog";
+import {
+  CATEGORY_SLUGS,
+  PAGE_SIZE,
+  categoryLabel,
+  formatDate,
+  matchesQuery,
+  type Article,
+} from "@/lib/blog";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, fmt, hasLocale, localePath } from "@/lib/i18n";
 
@@ -32,16 +39,17 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
   const d = await getDictionary(lang);
   const p = (path: string) => localePath(lang, path);
 
-  const { category, page } = await searchParams;
+  const { category, page, q } = await searchParams;
   const activeCategory = typeof category === "string" ? category : undefined;
   const pageParam = typeof page === "string" ? page : undefined;
+  const query = typeof q === "string" ? q.trim() : "";
 
   const WHATSAPP_URL = await getWhatsAppUrl();
   const ARTICLES = await readContent<Article[]>("blog", lang);
   const VIDEO_SERIES = await readContent<Video[]>("videoSeries", lang);
-  const filtered = activeCategory
-    ? ARTICLES.filter((a) => a.category === activeCategory)
-    : ARTICLES;
+  const filtered = ARTICLES.filter(
+    (a) => (!activeCategory || a.category === activeCategory) && matchesQuery(a, query)
+  );
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const current = Math.min(Math.max(1, Number(pageParam) || 1), pageCount);
   const paged = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
@@ -49,6 +57,7 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
     p(
       `/blog?${new URLSearchParams({
         ...(activeCategory ? { category: activeCategory } : {}),
+        ...(query ? { q: query } : {}),
         ...(n > 1 ? { page: String(n) } : {}),
       })}`
     );
@@ -77,6 +86,41 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
           <div className="mx-auto max-w-[1400px] px-7">
             <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
               <div>
+                {/* A plain GET form: the results are rendered on the server, so search works
+                    with JavaScript off and every result set has a shareable URL. The category
+                    rides along in a hidden field so searching inside a category stays inside it. */}
+                <form action={p("/blog")} method="get" className="mb-5 flex gap-2">
+                  {activeCategory && <input type="hidden" name="category" value={activeCategory} />}
+                  <input
+                    type="search"
+                    name="q"
+                    defaultValue={query}
+                    placeholder={d.blog.searchPlaceholder}
+                    aria-label={d.blog.searchSubmit}
+                    className="min-w-0 flex-1 rounded-full border border-line bg-card px-4.5 py-2.5 text-[14px] text-ink outline-none placeholder:text-muted focus:border-accent"
+                  />
+                  <button
+                    type="submit"
+                    className="shrink-0 rounded-full bg-ink px-5 py-2.5 text-[13.5px] font-semibold text-white"
+                  >
+                    {d.blog.searchSubmit}
+                  </button>
+                </form>
+
+                {query && (
+                  <div className="mb-5 flex flex-wrap items-center gap-3 text-[13.5px]">
+                    <span className="font-semibold text-ink">
+                      {fmt(d.blog.resultsFor, { count: filtered.length, query })}
+                    </span>
+                    <Link
+                      href={p(activeCategory ? `/blog?category=${activeCategory}` : "/blog")}
+                      className="font-semibold text-accent hover:underline"
+                    >
+                      {d.blog.clearSearch}
+                    </Link>
+                  </div>
+                )}
+
                 <div className="mb-7 flex flex-wrap gap-2">
                   <Link
                     href={p("/blog")}
@@ -111,11 +155,18 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
                           href={article.slug ? p(`/blog/${article.slug}`) : "#"}
                           className="group flex gap-5 border-b border-line py-6 first:pt-0 last:border-b-0"
                         >
-                          {article.image && (
-                            <div className="relative h-[110px] w-[150px] shrink-0 overflow-hidden rounded bg-paper-raise sm:h-[130px] sm:w-[176px]">
+                          {/* 223 of the 277 migrated posts have no image and the old site has
+                              none to give. The box stays either way — a list that alternates
+                              between indented and full-width rows reads as broken, not sparse. */}
+                          <div className="relative h-[110px] w-[150px] shrink-0 overflow-hidden rounded bg-paper-raise sm:h-[130px] sm:w-[176px]">
+                            {article.image ? (
                               <Image src={article.image} alt={article.title} fill sizes="176px" className="object-cover" />
-                            </div>
-                          )}
+                            ) : (
+                              <span className="flex h-full items-center justify-center px-3 text-center text-[11px] font-bold uppercase leading-tight tracking-wide text-muted">
+                                {categoryLabel(article.category, d.blog.categories)}
+                              </span>
+                            )}
+                          </div>
                           <div className="flex min-w-0 flex-1 flex-col justify-center">
                             <div className="mb-1.5 text-[13px]">
                               <span className="font-semibold text-accent">
@@ -134,7 +185,7 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
                   </div>
                 ) : (
                   <p className="rounded-2xl border border-dashed border-line p-6.5 text-sm text-muted">
-                    {d.blog.empty}
+                    {query ? fmt(d.blog.noResults, { query }) : d.blog.empty}
                   </p>
                 )}
 

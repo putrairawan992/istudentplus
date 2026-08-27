@@ -48,7 +48,6 @@
       "titleTemplate": "Study in {name}"
     }
   },
-
   "common": {
     "chatOnWhatsApp": "Chat on WhatsApp",
     "bookFreeConsultation": "Book Free Consultation",
@@ -61,7 +60,6 @@
     "cancel": "Cancel",
     "somethingWentWrong": "Something went wrong."
   },
-
   "language": {
     "label": "Language",
     "switchTo": "Switch to {language}",
@@ -70,7 +68,6 @@
       "id": "Bahasa Indonesia"
     }
   },
-
   "nav": {
     "aboutUs": "About Us",
     "ourServices": "Our Services",
@@ -90,7 +87,6 @@
     "logout": "Log out",
     "toggleMenu": "Toggle menu"
   },
-
   "footer": {
     "tagline": "Your Global Student Network and Media Agency — offices in Pangkalpinang and Makassar, Indonesia (Jakarta coming soon).",
     "studyAbroad": "Study Abroad",
@@ -106,7 +102,6 @@
     "social": "Social",
     "copyright": "© 2026 iStudentPlus"
   },
-
   "home": {
     "heroImageAlt": "Student preparing to study abroad",
     "findCourse": "Find Course →",
@@ -157,11 +152,36 @@
     "statusOpen": "Open",
     "statusSeats": "3 Seats",
     "departures": [
-      { "city": "Melbourne", "program": "VET + Bachelor", "intake": "Feb", "status": "open" },
-      { "city": "Toronto", "program": "Undergraduate", "intake": "Sep", "status": "seats" },
-      { "city": "Osaka", "program": "Language School", "intake": "Apr", "status": "open" },
-      { "city": "London", "program": "Postgraduate", "intake": "Sep", "status": "open" },
-      { "city": "Beijing", "program": "Language + University", "intake": "Mar", "status": "open" }
+      {
+        "city": "Melbourne",
+        "program": "VET + Bachelor",
+        "intake": "Feb",
+        "status": "open"
+      },
+      {
+        "city": "Toronto",
+        "program": "Undergraduate",
+        "intake": "Sep",
+        "status": "seats"
+      },
+      {
+        "city": "Osaka",
+        "program": "Language School",
+        "intake": "Apr",
+        "status": "open"
+      },
+      {
+        "city": "London",
+        "program": "Postgraduate",
+        "intake": "Sep",
+        "status": "open"
+      },
+      {
+        "city": "Beijing",
+        "program": "Language + University",
+        "intake": "Mar",
+        "status": "open"
+      }
     ],
     "destinationsKicker": "Where students go",
     "destinationsTitle": "Four countries, most requested this intake.",
@@ -176,7 +196,6 @@
     "consultationTitle": "Tell us your study plans, we'll do the rest.",
     "consultationSubtitle": "No obligation, no fees to talk. A counselor reviews your details and replies with a personalized recommendation."
   },
-
   "about": {
     "kicker": "Who We Are",
     "title": "A global student network and **media agency**.",
@@ -200,10 +219,14 @@
     "bioComingSoon": "Photo and bio coming soon.",
     "countriesTitle": "Students we've worked with, by country",
     "countriesSubtitle": "Our counselors speak {languages} — and have supported students from:",
-    "spokenLanguages": ["English", "Bahasa Indonesia", "Chinese", "Spanish"],
+    "spokenLanguages": [
+      "English",
+      "Bahasa Indonesia",
+      "Chinese",
+      "Spanish"
+    ],
     "ctaTitle": "Talk to a counselor who's helped students like you."
   },
-
   "services": {
     "kicker": "Services",
     "title": "Our services in **a minute**.",
@@ -220,7 +243,6 @@
     "faqTitle": "Frequently Asked Questions (FAQ)",
     "bookToday": "Book a Free Consultation Today"
   },
-
   "contact": {
     "kicker": "Get In Touch",
     "title": "Book a free **consultation** session.",
@@ -229,7 +251,6 @@
     "weReplyIn": "We reply in",
     "socialMedia": "Social Media"
   },
-
   "courses": {
     "kicker": "Courses & Universities",
     "title": "Choose your program to suit your **long term goals**.",
@@ -247,7 +268,6 @@
     "highSchoolSubtitle": "Known for quality and diverse options — choosing the right school depends on your goals, location, and budget.",
     "ctaTitle": "Still deciding between qualifications?"
   },
-
   "languagePrograms": {
     "kicker": "Our Online Courses",
     "title": "Study abroad, **experience differently!**",
@@ -258,7 +278,6 @@
     "instructorRole": "English Teacher",
     "ctaTitle": "Not sure which language program fits?"
   },
-
   "studyAbroad": {
     "kicker": "Study Abroad",
     "title": "Pick a destination, then let a **counselor** handle the paperwork.",
@@ -273,7 +292,6 @@
     "qualificationBody": "Compare VET/Diploma, Bachelor, Master, PhD, and language-study pathways on the Courses & Universities page.",
     "ctaTitle": "Not sure which country fits? Ask a counselor."
   },
-
   "country": {
     "kicker": "Study Abroad",
     "heroTitle": "Study in {name}",
@@ -293,7 +311,6 @@
     "browseCourses": "Browse Courses & Universities →",
     "ctaTitle": "Ready to talk about studying in {name}?"
   },
-
   "blog": {
     "kicker": "Blog",
     "title": "Visa updates and stories from **the road**.",
@@ -319,9 +336,14 @@
     "ctaTitle": "Have a question a blog post didn't answer?",
     "backToBlog": "← Back to Blog",
     "author": "iStudentPlus Team",
-    "articleCtaTitle": "Have a question this article didn't answer?"
+    "articleCtaTitle": "Have a question this article didn't answer?",
+    "searchPlaceholder": "Search articles…",
+    "searchSubmit": "Search",
+    "clearSearch": "Clear search",
+    "resultsFor": "{count} results for “{query}”",
+    "noResults": "No articles match “{query}”. Try a different word, or browse a category.",
+    "relatedTitle": "Keep reading"
   },
-
   "webinars": {
     "title": "Webinar",
     "intro": "Free online sessions on studying abroad, scholarships, and language preparation. Register with your email — we send the joining link before the day.",
@@ -339,7 +361,6 @@
     "minutes": "{count} min",
     "timezone": "WIB"
   },
-
   "threads": {
     "title": "Q&A Forum",
     "intro": "Ask anything about studying abroad, scholarships, or visas — no account needed. Anyone can answer. Abusive or spam posts are rejected automatically.",
@@ -378,7 +399,6 @@
       "cancel": "Cancel"
     }
   },
-
   "forms": {
     "consultation": {
       "successTitle": "Thanks — we got it!",
@@ -391,18 +411,48 @@
       "whatsappPlaceholder": "+62 8xx xxxx xxxx",
       "destination": "Preferred Study Destination",
       "destinationPlaceholder": "Select a destination",
-      "destinations": ["Australia", "Japan", "China", "UK", "USA", "Canada", "Others"],
+      "destinations": [
+        "Australia",
+        "Japan",
+        "China",
+        "UK",
+        "USA",
+        "Canada",
+        "Others"
+      ],
       "showOptional": "+ Add study details & CV (optional)",
       "hideOptional": "− Hide optional details",
       "fieldOfStudy": "Preferred Field of Study",
       "fieldOfStudyPlaceholder": "Select a field",
-      "fieldsOfStudy": ["Business", "IT", "Hospitality", "Health", "Language and Linguistic", "Others"],
+      "fieldsOfStudy": [
+        "Business",
+        "IT",
+        "Hospitality",
+        "Health",
+        "Language and Linguistic",
+        "Others"
+      ],
       "qualificationLevel": "Preferred Level of Qualification",
       "qualificationLevelPlaceholder": "Select a level",
-      "qualificationLevels": ["VET or Diploma", "Bachelor Degree", "Master Degree", "PhD", "Language Study", "Others"],
+      "qualificationLevels": [
+        "VET or Diploma",
+        "Bachelor Degree",
+        "Master Degree",
+        "PhD",
+        "Language Study",
+        "Others"
+      ],
       "latestQualification": "Latest Qualification",
       "latestQualificationPlaceholder": "Select your latest qualification",
-      "latestQualifications": ["High School", "VET or Diploma", "Bachelor Degree", "Master Degree", "PhD", "Language Study", "Others"],
+      "latestQualifications": [
+        "High School",
+        "VET or Diploma",
+        "Bachelor Degree",
+        "Master Degree",
+        "PhD",
+        "Language Study",
+        "Others"
+      ],
       "cv": "Attach Your Most Updated CV",
       "cvHint": "For assessment purposes prior to your consultation.",
       "submit": "Book My Free Consultation",
@@ -455,15 +505,28 @@
     "courseFilter": {
       "title": "Browse by qualification & country",
       "qualification": "Qualification",
-      "qualifications": ["VET or Diploma", "Bachelor Degree", "Master Degree", "PhD", "Language Study", "Exchange Program"],
+      "qualifications": [
+        "VET or Diploma",
+        "Bachelor Degree",
+        "Master Degree",
+        "PhD",
+        "Language Study",
+        "Exchange Program"
+      ],
       "country": "Country",
-      "countries": ["Australia", "UK", "USA", "Canada", "China", "Japan"],
+      "countries": [
+        "Australia",
+        "UK",
+        "USA",
+        "Canada",
+        "China",
+        "Japan"
+      ],
       "result": "We don't publish a live university database yet — tell a counselor you're looking at {qualification} in {country} and they'll send you the current partner list and requirements.",
       "resultCta": "Book a free consultation →",
       "hint": "Pick both to see how a counselor can help."
     }
   },
-
   "api": {
     "nameEmailRequired": "Name and email are required.",
     "sendFailed": "Could not send.",
