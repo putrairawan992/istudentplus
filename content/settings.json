@@ -32,12 +32,24 @@
   ],
   "socials": [
     {
-      "href": "#",
+      "href": "https://www.instagram.com/istudentplus/",
       "label": "Instagram"
     },
     {
-      "href": "#",
+      "href": "https://www.facebook.com/istudentplusaustralia",
       "label": "Facebook"
+    },
+    {
+      "href": "https://www.linkedin.com/company/istudentplus",
+      "label": "LinkedIn"
+    },
+    {
+      "href": "https://wa.me/6285255286800",
+      "label": "WhatsApp Indonesia"
+    },
+    {
+      "href": "https://wa.me/61456911112",
+      "label": "WhatsApp Australia"
     }
   ],
   "whatWeDo": [
@@ -50,7 +62,7 @@
     "Mental health support",
     "Academic guidance"
   ],
-  "whatsapp": "https://wa.me/6281234567890",
+  "whatsapp": "https://wa.me/6285255286800",
   "heroTitle": "Get into your **dream study abroad**",
   "languages": [
     "Indonesian",
