@@ -155,6 +155,40 @@ body {
   border-top: 1px solid var(--line);
   margin: 2em 0;
 }
+/* Embeds (YouTube, Instagram) pasted into a post's `html`. Iframes render fine through
+   dangerouslySetInnerHTML; <script> tags in it never execute, which is why Instagram's
+   blockquote needs <ArticleEmbeds> to load embed.js for it. */
+.article-body iframe {
+  display: block;
+  max-width: 100%;
+  margin: 1.6em auto;
+  border: 0;
+  border-radius: 12px;
+}
+/* YouTube's copy-paste code is a fixed 560x315 — fill the column and stay 16:9 on phones. */
+.article-body iframe[src*="youtube.com"],
+.article-body iframe[src*="youtube-nocookie.com"],
+.article-body iframe[src*="youtu.be"] {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+/* embed.js sizes the blockquote form itself. The plain .../embed iframe has no script to
+   do that, so give it Instagram's own width and a portrait default. */
+.article-body iframe[src*="instagram.com"] {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 4 / 5;
+}
+/* Until embed.js swaps it out, Instagram's placeholder is a <blockquote> — keep the
+   pull-quote styling above off it. */
+.article-body blockquote.instagram-media {
+  margin: 1.6em auto;
+  border-left: 0;
+  padding-left: 0;
+  color: inherit;
+  font-style: normal;
+}
 /* Old posts include wide tables; let them scroll instead of blowing out the page. */
 .article-body table {
   display: block;
