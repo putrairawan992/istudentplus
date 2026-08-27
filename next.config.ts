@@ -69,6 +69,12 @@ function migratedPostRedirects() {
 
 const nextConfig: NextConfig = {
   images: { remotePatterns },
+  experimental: {
+    // Next.js caps Server Action request bodies at 1MB by default. The admin editor saves
+    // list collections (e.g. blog, with 277+ full HTML posts) as one action call, which
+    // already exceeds that — every save failed with an opaque digest error in production.
+    serverActions: { bodySizeLimit: "10mb" },
+  },
   async redirects() {
     return [
       ...migratedPostRedirects(),
