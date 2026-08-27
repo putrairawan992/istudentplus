@@ -11,6 +11,7 @@ import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, hasLocale, localePath, LOCALE_TAGS, type Locale } from "@/lib/i18n";
 import { SITE_URL as siteUrl } from "@/lib/site";
 import Media from "@/app/components/Media";
+import ArticleEmbeds from "@/app/components/ArticleEmbeds";
 import { anyMedia } from "@/lib/media";
 
 async function getArticle(slug: string, locale: Locale) {
@@ -108,10 +109,15 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
             {article.html ? (
               /* Migrated WordPress bodies are HTML (headings, lists, tables, links). Sanitized
                  at migration time — tags and attributes are whitelisted there, not here. */
-              <div
-                className="article-body mx-auto max-w-3xl"
-                dangerouslySetInnerHTML={{ __html: article.html }}
-              />
+              <>
+                <div
+                  className="article-body mx-auto max-w-3xl"
+                  dangerouslySetInnerHTML={{ __html: article.html }}
+                />
+                {/* Pasted YouTube iframes render on their own; an Instagram embed needs its
+                    script run for it, which innerHTML won't do. */}
+                <ArticleEmbeds html={article.html} />
+              </>
             ) : (
               <div className="mx-auto flex max-w-3xl flex-col gap-4.5">
                 {(article.content && article.content.length > 0 ? article.content : [article.excerpt]).map(
