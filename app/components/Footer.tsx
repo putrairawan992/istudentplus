@@ -9,11 +9,12 @@ type Social = { label: string; href: string };
 
 export default async function Footer({ lang }: { lang: Locale }) {
   const [SETTINGS, COUNTRIES, d] = await Promise.all([
-    readContent<{ socials: Social[]; whatsapp: string }>("settings", lang),
+    readContent<{ socials: Social[] }>("settings", lang),
     getVisibleCountries(lang),
     getDictionary(lang),
   ]);
-  const SOCIALS = [...SETTINGS.socials, { label: "WhatsApp", href: SETTINGS.whatsapp }];
+  // Both WhatsApp numbers (ID + AU) are stored in `socials` now, so don't append a third.
+  const SOCIALS = SETTINGS.socials;
   const p = (path: string) => localePath(lang, path);
 
   return (
