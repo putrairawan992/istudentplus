@@ -277,6 +277,79 @@ function extractYouTubeId(input: string): string {
   return match ? match[1] : trimmed;
 }
 
+// Turns a pasted YouTube or Instagram link into a ready-to-render <iframe>, so an editor never
+// has to go copy a platform's own embed snippet (Instagram's includes a <script> that silently
+// does nothing once it's inside dangerouslySetInnerHTML — see ArticleEmbeds' removal). Instagram
+// serves the same card at a plain iframe URL with no script required, same as YouTube.
+const YOUTUBE_URL = /(?:youtube\.com\/(?:watch\?(?:\S*&)?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/;
+const INSTAGRAM_URL = /instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/;
+
+function embedIframeFor(url: string): string | null {
+  const yt = url.match(YOUTUBE_URL);
+  if (yt) {
+    return `<iframe width="560" height="315" src="https://www.youtube.com/embed/${yt[1]}" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+  }
+  const ig = url.match(INSTAGRAM_URL);
+  if (ig) {
+    return `<iframe src="https://www.instagram.com/p/${ig[1]}/embed" width="400" height="480" scrolling="no" allowtransparency="true"></iframe>`;
+  }
+  return null;
+}
+
+// The blog post body: a plain HTML textarea plus a small helper that appends a YouTube/Instagram
+// embed from just a link, so editors never touch raw <iframe>/<script> markup by hand.
+function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
+  const [embedUrl, setEmbedUrl] = useState("");
+  const [err, setErr] = useState("");
+
+  function insertEmbed() {
+    const iframe = embedIframeFor(embedUrl.trim());
+    if (!iframe) {
+      setErr("Link tidak dikenali — tempel link video YouTube atau post/reel Instagram.");
+      return;
+    }
+    setErr("");
+    const current = value ?? "";
+    onChange(current ? `${current}\n${iframe}` : iframe);
+    setEmbedUrl("");
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <textarea
+        value={value ?? ""}
+        rows={10}
+        onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
+        className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+      />
+      <div className="rounded-lg border border-line bg-paper-raise/60 p-3">
+        <p className="mb-2 text-[12px] font-bold text-muted">Sisipkan embed YouTube / Instagram</p>
+        <div className="flex flex-wrap gap-2">
+          <input
+            type="text"
+            value={embedUrl}
+            onChange={(e) => { setEmbedUrl(e.target.value); setErr(""); }}
+            placeholder="Tempel link video YouTube atau post/reel Instagram di sini"
+            className="min-w-0 flex-1 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+          />
+          <button
+            type="button"
+            onClick={insertEmbed}
+            className="shrink-0 rounded-lg border border-line px-3 py-2 text-[13px] font-semibold text-accent hover:bg-paper"
+          >
+            + Sisipkan
+          </button>
+        </div>
+        {err && <p className="mt-1.5 text-[12px] text-red-600">{err}</p>}
+        <p className="mt-1.5 text-[12px] text-muted">
+          Klik &quot;Sisipkan&quot; untuk menambahkan embed ke akhir konten di atas. Tidak perlu
+          menyalin kode embed dari YouTube/Instagram — cukup link-nya saja.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function VideoField({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
   const id = value ?? "";
   const [broken, setBroken] = useState(false);
@@ -489,6 +562,7 @@ function FieldEditor({
   const placeholder = label ? `Enter ${humanize(label).toLowerCase()}` : undefined;
 
   if (value === null || typeof value === "string") {
+    if (label === "html") return <HtmlBodyField value={value} onChange={update} />;
     if (isMediaKey(label)) return <ImageField value={value} onChange={update} field={label} />;
     if (label && YOUTUBE_KEY.test(label)) return <VideoField value={value} onChange={update} />;
     if (isBgColorField(label, value)) return <BgColorField value={value ?? ""} onChange={update} />;

@@ -155,9 +155,8 @@ body {
   border-top: 1px solid var(--line);
   margin: 2em 0;
 }
-/* Embeds (YouTube, Instagram) pasted into a post's `html`. Iframes render fine through
-   dangerouslySetInnerHTML; <script> tags in it never execute, which is why Instagram's
-   blockquote needs <ArticleEmbeds> to load embed.js for it. */
+/* Embeds (YouTube, Instagram) inserted via the admin's embed field — always a plain <iframe>,
+   which renders fine through dangerouslySetInnerHTML with no script required. */
 .article-body iframe {
   display: block;
   max-width: 100%;
@@ -173,21 +172,12 @@ body {
   height: auto;
   aspect-ratio: 16 / 9;
 }
-/* embed.js sizes the blockquote form itself. The plain .../embed iframe has no script to
-   do that, so give it Instagram's own width and a portrait default. */
+/* The plain .../embed iframe has no script to size itself, so give it Instagram's own
+   width and a portrait default. */
 .article-body iframe[src*="instagram.com"] {
   width: 100%;
   max-width: 400px;
   aspect-ratio: 4 / 5;
-}
-/* Until embed.js swaps it out, Instagram's placeholder is a <blockquote> — keep the
-   pull-quote styling above off it. */
-.article-body blockquote.instagram-media {
-  margin: 1.6em auto;
-  border-left: 0;
-  padding-left: 0;
-  color: inherit;
-  font-style: normal;
 }
 /* Old posts include wide tables; let them scroll instead of blowing out the page. */
 .article-body table {
