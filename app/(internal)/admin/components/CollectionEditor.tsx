@@ -299,49 +299,23 @@ function extractYouTubeId(input: string): string {
   return match ? match[1] : trimmed;
 }
 
-// Turns a pasted link into a ready-to-render <iframe>, so an editor never has to go copy a
-// platform's own embed snippet (several of them include a <script> that silently does nothing
-// once it's inside dangerouslySetInnerHTML). Which platforms and which URL shapes live in
-// lib/embeds.ts, so this, the article renderer's aspect ratio, and the on-screen guidance
-// can't drift apart. Only src is written — the page sizes the frame itself.
-function embedIframeFor(url: string): string | null {
-  const found = resolveEmbed(url);
-  if (!found) return null;
-  return `<iframe src="${found.embedUrl}" title="${found.platform.label} embed" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-}
+// Turns a pasted YouTube or Instagram link into a ready-to-render <iframe>, so an editor never
+// has to go copy a platform's own embed snippet (Instagram's includes a <script> that silently
+// does nothing once it's inside dangerouslySetInnerHTML — see ArticleEmbeds' removal). Instagram
+// serves the same card at a plain iframe URL with no script required, same as YouTube.
+const YOUTUBE_URL = /(?:youtube\.com\/(?:watch\?(?:\S*&)?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/;
+const INSTAGRAM_URL = /instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/;
 
-/** The platform table as advice: what to paste, and whether a thumbnail comes for free. */
-function EmbedGuidance() {
-  return (
-    <div className="mt-2 rounded-lg border border-line bg-paper px-3 py-2.5 text-[12px] leading-relaxed">
-      <p className="mb-1.5 font-bold text-ink">Link yang bisa dipakai &amp; soal thumbnail</p>
-      <dl className="flex flex-col gap-1.5">
-        {PLATFORMS.map((pl) => (
-          <div key={pl.id} className="grid grid-cols-[86px_1fr] gap-x-2.5">
-            <dt className="font-semibold text-ink">
-              {pl.label}
-              {pl.thumbnail && <span className="ml-1 text-emerald-600" title="thumbnail otomatis">&#10003;</span>}
-            </dt>
-            <dd className="text-muted">
-              <span className="text-ink">{pl.accepts}</span> &mdash; {pl.note}
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <p className="mt-2 text-muted">
-        Tanda <span className="font-semibold text-emerald-600">&#10003;</span> berarti gambar
-        kecil di daftar Blog terisi sendiri. Untuk platform lainnya, isi kolom{" "}
-        <span className="font-semibold text-ink">Image</span> bila ingin artikelnya punya gambar
-        di daftar &mdash; kalau tidak, yang tampil hanya nama kategorinya.
-      </p>
-      <p className="mt-1.5 text-muted">
-        Salin link dari tombol <span className="font-semibold text-ink">Share &rarr; Copy link</span>{" "}
-        di aplikasinya, atau dari alamat di browser. Link yang sudah dipendekkan (vm.tiktok.com,
-        bit.ly, dan sejenisnya) tidak dikenali &mdash; buka dulu di browser, lalu salin alamat
-        panjangnya.
-      </p>
-    </div>
-  );
+function embedIframeFor(url: string): string | null {
+  const yt = url.match(YOUTUBE_URL);
+  if (yt) {
+    return `<iframe width="560" height="315" src="https://www.youtube.com/embed/${yt[1]}" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+  }
+  const ig = url.match(INSTAGRAM_URL);
+  if (ig) {
+    return `<iframe src="https://www.instagram.com/p/${ig[1]}/embed" width="400" height="480" scrolling="no" allowtransparency="true"></iframe>`;
+  }
+  return null;
 }
 
 // The blog post body: a plain HTML textarea plus a small helper that appends a YouTube/Instagram
@@ -353,7 +327,7 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
   function insertEmbed() {
     const iframe = embedIframeFor(embedUrl.trim());
     if (!iframe) {
-      setErr(`Link tidak dikenali. Yang didukung: ${PLATFORM_NAMES}. Lihat daftar di bawah.`);
+      setErr("Link tidak dikenali — tempel link video YouTube atau post/reel Instagram.");
       return;
     }
     setErr("");
@@ -371,13 +345,13 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
         className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
       />
       <div className="rounded-lg border border-line bg-paper-raise/60 p-3">
-        <p className="mb-2 text-[12px] font-bold text-muted">Sisipkan video / postingan</p>
+        <p className="mb-2 text-[12px] font-bold text-muted">Sisipkan embed YouTube / Instagram</p>
         <div className="flex flex-wrap gap-2">
           <input
             type="text"
             value={embedUrl}
             onChange={(e) => { setEmbedUrl(e.target.value); setErr(""); }}
-            placeholder="Tempel link YouTube, Instagram, TikTok, X, Facebook, atau Vimeo di sini"
+            placeholder="Tempel link video YouTube atau post/reel Instagram di sini"
             className="min-w-0 flex-1 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
           />
           <button
@@ -390,12 +364,9 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
         </div>
         {err && <p className="mt-1.5 text-[12px] text-red-600">{err}</p>}
         <p className="mt-1.5 text-[12px] text-muted">
-          Klik &quot;Sisipkan&quot; untuk menambahkan video ke artikel ini. Tidak perlu menyalin
-          kode embed dari platform-nya — cukup link-nya saja. Di website, semua video yang
-          disisipkan tampil dalam satu blok di bagian paling atas artikel (dua kolom bila lebih
-          dari satu, satu kolom di ponsel), bukan di bawah tulisan.
+          Klik &quot;Sisipkan&quot; untuk menambahkan embed ke akhir konten di atas. Tidak perlu
+          menyalin kode embed dari YouTube/Instagram — cukup link-nya saja.
         </p>
-        <EmbedGuidance />
       </div>
     </div>
   );

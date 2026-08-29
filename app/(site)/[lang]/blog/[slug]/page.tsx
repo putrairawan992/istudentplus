@@ -158,9 +158,9 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
 
             {article.html ? (
               /* Migrated WordPress bodies are HTML (headings, lists, tables, links). Sanitized
-                 at migration time — tags and attributes are whitelisted there, not here. The
-                 embeds have been lifted out into ArticleEmbeds above, so what's left here is
-                 the prose. */
+                 at migration time — tags and attributes are whitelisted there, not here.
+                 YouTube/Instagram embeds pasted in via the admin's embed field are plain
+                 <iframe>s, so they render straight out of innerHTML like everything else. */
               <div
                 className="article-body mx-auto max-w-3xl"
                 dangerouslySetInnerHTML={{ __html: body }}
