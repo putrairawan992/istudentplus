@@ -5,7 +5,7 @@ import { getCollectionMeta } from "@/lib/collections";
 import type { JsonValue } from "@/lib/json-tree";
 import { DEFAULT_LOCALE, hasLocale, LOCALES, type Locale } from "@/lib/i18n";
 import CollectionEditor from "../../components/CollectionEditor";
-import { saveCollectionAction } from "./actions";
+import { saveCollectionAction, saveEntryAction } from "./actions";
 
 const LOCALE_NAMES: Record<Locale, string> = { en: "English", id: "Bahasa Indonesia" };
 
@@ -81,6 +81,7 @@ export default async function CollectionPage({
         locale={lang}
         initialData={data as JsonValue}
         saveAction={saveCollectionAction}
+        entryAction={saveEntryAction}
       />
     </div>
   );
