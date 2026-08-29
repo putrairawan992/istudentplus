@@ -6,7 +6,15 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import { readContent } from "@/lib/content";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
-import { categoryLabel, formatDate, relatedArticles, type Article } from "@/lib/blog";
+import {
+  articleImage,
+  categoryLabel,
+  formatDate,
+  relatedArticles,
+  splitEmbeds,
+  type Article,
+  type Embed,
+} from "@/lib/blog";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, hasLocale, localePath, LOCALE_TAGS, type Locale } from "@/lib/i18n";
 import { SITE_URL as siteUrl } from "@/lib/site";
@@ -32,11 +40,50 @@ function articleJsonLd(article: Article, lang: Locale) {
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     url,
     datePublished: article.date || undefined,
-    image: article.image ? [new URL(article.image, siteUrl).toString()] : undefined,
+    image: articleImage(article) ? [new URL(articleImage(article) as string, siteUrl).toString()] : undefined,
     articleSection: article.category || undefined,
     author: { "@type": "Organization", name: "iStudentPlus", url: siteUrl },
     publisher: { "@type": "Organization", name: "iStudentPlus", url: siteUrl },
   };
+}
+
+/**
+ * The embeds an article carries, in one block at the top.
+ *
+ * The CMS appends each inserted embed to the end of the body, which buried them under the
+ * closing paragraph. They're lifted out and rendered here instead: one full-width video reads
+ * as the article's header, and several sit two-up on a tablet and wider, one-up on a phone —
+ * so a post with four videos is two rows rather than four full-width players to scroll past.
+ *
+ * The iframe is rebuilt from its `src` rather than passed through, so a hand-pasted embed
+ * can't bring its own width/height (or anything else) and break out of the grid cell.
+ */
+function ArticleEmbeds({ embeds, title }: { embeds: Embed[]; title: string }) {
+  if (embeds.length === 0) return null;
+  return (
+    <div
+      className={`mx-auto mb-8 grid max-w-3xl gap-4 ${embeds.length > 1 ? "sm:grid-cols-2" : ""}`}
+    >
+      {embeds.map((embed, i) => (
+        <div
+          key={embed.src}
+          // The ratio comes from the platform table (lib/embeds.ts) — a TikTok or a Reel in a
+          // 16:9 box is a letterboxed stripe. It lives on the wrapper so the iframe stays a
+          // plain 100%-of-the-box element at every width.
+          className={`w-full overflow-hidden rounded-xl bg-ink ${embed.ratioClass}`}
+        >
+          <iframe
+            src={embed.src}
+            title={`${title} — embed ${i + 1}`}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="h-full w-full border-0"
+          />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 export async function generateStaticParams() {
@@ -68,6 +115,8 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
   const WHATSAPP_URL = await getWhatsAppUrl();
   const date = formatDate(article.date, lang);
   const related = relatedArticles(articles, article);
+  const hero = articleImage(article);
+  const { embeds, body } = splitEmbeds(article.html);
   const relatedHaveMedia = anyMedia(related);
 
   return (
@@ -99,20 +148,22 @@ export default async function ArticlePage({ params }: PageProps<"/[lang]/blog/[s
             </h1>
             <p className="mb-7 text-[13px] text-muted">{d.blog.author}</p>
 
-            {article.image && (
+            <ArticleEmbeds embeds={embeds} title={article.title} />
+
+            {hero && (
               <div className="relative mx-auto mb-8 aspect-[3/2] w-full max-w-3xl overflow-hidden rounded-xl bg-paper-raise">
-                <Image src={article.image} alt={article.title} fill sizes="768px" className="object-cover" priority />
+                <Image src={hero} alt={article.title} fill sizes="768px" className="object-cover" priority />
               </div>
             )}
 
             {article.html ? (
               /* Migrated WordPress bodies are HTML (headings, lists, tables, links). Sanitized
-                 at migration time — tags and attributes are whitelisted there, not here.
-                 YouTube/Instagram embeds pasted in via the admin's embed field are plain
-                 <iframe>s, so they render straight out of innerHTML like everything else. */
+                 at migration time — tags and attributes are whitelisted there, not here. The
+                 embeds have been lifted out into ArticleEmbeds above, so what's left here is
+                 the prose. */
               <div
                 className="article-body mx-auto max-w-3xl"
-                dangerouslySetInnerHTML={{ __html: article.html }}
+                dangerouslySetInnerHTML={{ __html: body }}
               />
             ) : (
               <div className="mx-auto flex max-w-3xl flex-col gap-4.5">

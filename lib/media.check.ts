@@ -61,3 +61,50 @@ const missing = collections.filter((c) => !specced.has(`${c}.image`) && !specced
 assert.deepEqual(missing, [], "collections whose image slot has no size standard: " + missing.join(", "));
 
 console.log("media.check.ts ok — " + collections.length + " collections, every image slot specced");
+
+// --- isEmbedPageUrl: a platform page is never a picture ----------------------
+// The live blog had `https://www.youtube.com/watch?v=...` saved in a post's Image slot, and
+// the admin's own isImagePath counted it as an image, so it rendered broken.
+import { isEmbedPageUrl } from "./media.ts";
+for (const bad of [
+  "https://www.youtube.com/watch?v=RSnU_ILuEqU",
+  "https://youtu.be/RSnU_ILuEqU",
+  "http://youtube.com/shorts/abc123",
+  "https://www.instagram.com/p/Cxyz/",
+  "https://www.instagram.com/reel/Cxyz/",
+  "https://vimeo.com/12345",
+  "https://www.tiktok.com/@user/video/123",
+  "  https://www.youtube.com/watch?v=x  ",
+]) assert.equal(isEmbedPageUrl(bad), true, bad);
+
+for (const ok of [
+  "/blog/2023-08-image.png",
+  "/uploads/1724750000-poster.jpg",
+  // Uploads come back from the Go API with no extension — the whole reason this is a blocklist
+  // and not an is-it-an-image test.
+  "https://api.istudentplus.com/media/9f2c1ab3",
+  "https://api.istudentplus.com/media/9f2c1ab3.webp",
+  "https://i.ytimg.com/vi/abc/hqdefault.jpg",   // a YouTube *thumbnail* is a real image
+  "",
+]) assert.equal(isEmbedPageUrl(ok), false, ok);
+assert.equal(isEmbedPageUrl(null), false);
+assert.equal(isEmbedPageUrl(undefined), false);
+
+// Not fooled by a host that merely contains the name.
+assert.equal(isEmbedPageUrl("https://youtube.com.evil.test/a.jpg"), false, "suffix match only");
+assert.equal(isEmbedPageUrl("https://m.youtube.com/watch?v=x"), true, "subdomains still count");
+
+// pickMedia must drop it rather than hand a broken src to <Media>
+assert.equal(pickMedia({ image: "https://www.youtube.com/watch?v=x" }), null);
+// ...but the youtubeId field is exactly where that link belongs, so it still wins there.
+assert.deepEqual(pickMedia({ image: "https://www.youtube.com/watch?v=x", youtubeId: "abc" }),
+  { kind: "youtubeId", src: "abc" });
+
+// The real blog content must not carry a page link in an image slot without being caught.
+const posts = JSON.parse(readFileSync(new URL("../content/blog.json", import.meta.url), "utf8"));
+const leaked = (posts as { image?: string; slug?: string }[])
+  .filter((x) => isEmbedPageUrl(x.image))
+  .map((x) => x.slug);
+console.log("embed-URLs found in blog image slots: " + (leaked.length ? leaked.join(", ") : "none"));
+
+console.log("media.check.ts embed-guard ok");

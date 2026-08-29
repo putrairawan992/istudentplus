@@ -11,6 +11,7 @@ import { getVisibleCountries } from "@/lib/countries";
 import {
   CATEGORY_SLUGS,
   PAGE_SIZE,
+  articleThumbnail,
   categoryLabel,
   formatDate,
   matchesQuery,
@@ -158,10 +159,12 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
                         >
                           {/* 223 of the 277 migrated posts have no image and the old site has
                               none to give. The box stays either way — a list that alternates
-                              between indented and full-width rows reads as broken, not sparse. */}
+                              between indented and full-width rows reads as broken, not sparse.
+                              A post whose only visual is an embedded video shows that video's
+                              poster frame here rather than the bare category name. */}
                           <div className="relative h-[110px] w-[150px] shrink-0 overflow-hidden rounded bg-paper-raise sm:h-[130px] sm:w-[176px]">
-                            {article.image ? (
-                              <Image src={article.image} alt={article.title} fill sizes="176px" className="object-cover" />
+                            {articleThumbnail(article) ? (
+                              <Image src={articleThumbnail(article) as string} alt={article.title} fill sizes="176px" className="object-cover" />
                             ) : (
                               <span className="flex h-full items-center justify-center px-3 text-center text-[11px] font-bold uppercase leading-tight tracking-wide text-muted">
                                 {categoryLabel(article.category, d.blog.categories)}

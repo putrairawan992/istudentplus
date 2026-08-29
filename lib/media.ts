@@ -48,7 +48,9 @@ export function pickMedia(m: Media | null | undefined):
   const yt = val("youtubeId");
   if (yt) return { kind: "youtubeId", src: yt };
   const img = val("image");
-  if (img) return { kind: "image", src: img };
+  // A platform page URL saved into the image slot is not a picture — rendering it would put a
+  // broken image on the public site. Falls through to null so the caller shows nothing.
+  if (img && !isEmbedPageUrl(img)) return { kind: "image", src: img };
   return null;
 }
 
@@ -63,4 +65,21 @@ export function pickMedia(m: Media | null | undefined):
  */
 export function anyMedia(items: readonly (Media | null | undefined)[]): boolean {
   return items.some(hasMedia);
+}
+
+/**
+ * A link to a *page* on a video or social platform — something to embed, never a picture.
+ *
+ * The Image slot used to be a free-text box labelled "paste an image/video URL", so a YouTube
+ * watch link went in and rendered as a broken `<img>` on the live blog: the admin's own
+ * `isImagePath` counted any http URL without a video extension as an image. A blocklist rather
+ * than an is-it-an-image list on purpose — uploads come back from the Go API at
+ * `/media/<id>` with no file extension, so anything trying to prove a value *is* a picture
+ * rejects every real upload.
+ */
+const EMBED_PAGE_URL =
+  /^https?:\/\/(?:[\w-]+\.)*(?:youtube\.com|youtu\.be|instagram\.com|tiktok\.com|facebook\.com|fb\.watch|vimeo\.com|twitter\.com|x\.com|threads\.net)\//i;
+
+export function isEmbedPageUrl(value: string | null | undefined): boolean {
+  return typeof value === "string" && EMBED_PAGE_URL.test(value.trim());
 }
