@@ -10,6 +10,8 @@ import {
   unionShapeOf,
   mergeWithModel,
 } from "@/lib/json-tree";
+import { MEDIA_FIELDS, isEmbedPageUrl } from "@/lib/media";
+import { PLATFORMS, PLATFORM_NAMES, resolveEmbed } from "@/lib/embeds";
 import {
   IMAGE_EXT,
   MAX_UPLOAD_BYTES,
@@ -21,6 +23,7 @@ import {
   formatList,
   getImageSpec,
   isVideoField,
+  VIDEO_GUIDANCE,
   rejectionMessage,
 } from "@/lib/image-specs";
 import { sectionsOf } from "@/lib/form-sections";
@@ -51,6 +54,19 @@ const CollectionContext = createContext<string | undefined>(undefined);
 // one instance and nothing to reconcile against.
 const ModelContext = createContext<JsonObject>({});
 
+/**
+ * Two collections are left out of the media trio (lib/media.ts):
+ *  - `leads` is an inbox of visitor submissions, not content. An upload box on a lead record
+ *    invites someone to attach a file to a stranger's enquiry, which is not a thing.
+ *  - `webinars` already carries all three concepts under its own names (`image`,
+ *    `recordingYoutubeId`, `recordingVideoFile`); adding the trio would give it five media
+ *    fields and no way to guess which pair wins.
+ */
+const NO_MEDIA_TRIO = new Set(["leads", "webinars"]);
+function hasMediaTrio(collection?: string) {
+  return !!collection && !NO_MEDIA_TRIO.has(collection);
+}
+
 // Field keys that hold an uploadable asset — these render an image/video upload widget.
 const MEDIA_KEY = /(image|photo|thumbnail|thumb|logo|icon|avatar|cover|poster|banner|picture|img|video)/i;
 // Keys the regex above catches but that hold text, not a file: "imageLabel" is the caption drawn
@@ -61,6 +77,9 @@ function isMediaKey(key?: string) {
   return !!key && MEDIA_KEY.test(key) && !NOT_MEDIA_KEY.test(key);
 }
 function isImagePath(v: string) {
+  // A YouTube/Instagram link is a page, not a picture — without this it fell through to the
+  // "any https URL is an image" arm and rendered a permanently broken <img> in the preview.
+  if (isEmbedPageUrl(v)) return false;
   return /\.(jpe?g|png|webp|gif|svg)(\?|#|$)/i.test(v) || (/^https?:\/\//i.test(v) && !/\.(mp4|webm|pdf)(\?|#|$)/i.test(v));
 }
 function isVideoPath(v: string) {
@@ -97,7 +116,17 @@ function readDimensions(file: File): Promise<{ width: number; height: number } |
   });
 }
 
-// A media string field: live preview + upload (click or drag-drop) + editable path/URL.
+/**
+ * A media string field: live preview + upload (click or drop), and the stored path shown but
+ * NOT editable.
+ *
+ * It used to be a free-text box captioned "Upload, or paste an image/video URL", which is an
+ * invitation — and what turned up in a blog post's Image slot on production was
+ * `https://www.youtube.com/watch?v=...`, rendering broken on the article header and in the
+ * list. A video belongs in the article body's embed field or in a YouTube field; this slot
+ * takes a file. Removing the box removes the mistake rather than warning about it, and Remove
+ * + Upload still covers every reason someone had to retype the value.
+ */
 function ImageField({
   value,
   onChange,
@@ -173,14 +202,21 @@ function ImageField({
           <span className="text-muted">+ Upload</span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-1.5">
-        <input
-          type="text"
-          value={str}
-          placeholder="Upload, or paste an image/video URL"
-          onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
-          className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
-        />
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <div className="w-full truncate rounded-lg border border-line bg-paper-raise/60 px-3 py-2 text-sm text-muted" title={str}>
+          {str || <span className="text-muted/70">Belum ada file — klik kotak di kiri untuk mengunggah.</span>}
+        </div>
+        {/* Values saved before this field became upload-only. Says where the link actually goes
+            instead of only saying it's wrong. */}
+        {isEmbedPageUrl(str) && (
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] leading-relaxed text-red-700">
+            Ini link video/postingan, bukan gambar — di website akan tampil sebagai gambar rusak.
+            Klik <span className="font-semibold">Remove</span>, lalu unggah gambar di sini. Untuk
+            menampilkan videonya, tempel link itu di kolom{" "}
+            <span className="font-semibold">Sisipkan embed YouTube / Instagram</span> pada isi
+            artikel, atau di kolom <span className="font-semibold">YouTube</span>.
+          </p>
+        )}
         {/* The rules for this exact slot, spelled out before anyone picks a file — the whole
             point is that nobody has to guess and every upload comes out the same shape.
             Shown for every media field: slots without a size spec still get the limit and
@@ -346,7 +382,7 @@ function VideoField({ value, onChange }: { value: string | null; onChange: (v: s
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
       <div className="grid h-16 w-28 shrink-0 place-items-center overflow-hidden rounded-lg border border-line bg-paper text-center text-[10px] text-muted">
         {id && !broken ? (
           // eslint-disable-next-line @next/next/no-img-element -- external YouTube thumbnail
@@ -360,13 +396,40 @@ function VideoField({ value, onChange }: { value: string | null; onChange: (v: s
           <span>No preview</span>
         )}
       </div>
-      <input
-        type="text"
-        value={id}
-        placeholder="Paste a YouTube URL or video ID"
-        onChange={(e) => handleChange(e.target.value)}
-        className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
-      />
+      <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+        <input
+          type="text"
+          value={id}
+          placeholder="Paste a YouTube URL or video ID"
+          onChange={(e) => handleChange(e.target.value)}
+          className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+        />
+        {/* The video half of the house standard. The upload field next to it already prints its
+            own rules; this one had none, which is why people were pasting 4:3 uploads. */}
+        <div className="rounded-lg border border-line bg-paper-raise/60 px-3 py-2 text-[12px] leading-relaxed">
+          <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5">
+            <dt className="text-muted">Isi dengan</dt>
+            <dd className="font-semibold text-ink">
+              Link YouTube (watch, youtu.be, atau Shorts) — ID-nya diambil otomatis
+            </dd>
+            <dt className="text-muted">Bentuk</dt>
+            <dd className="font-semibold text-ink">{VIDEO_GUIDANCE.ratio} (landscape)</dd>
+            <dt className="text-muted">Thumbnail</dt>
+            <dd className="font-semibold text-emerald-700">
+              Otomatis dari YouTube — tidak perlu unggah gambar
+            </dd>
+          </dl>
+          <p className="mt-1.5 text-muted">{VIDEO_GUIDANCE.note}</p>
+          <p className="mt-1.5 text-muted">
+            Kolom ini <span className="font-semibold text-ink">hanya menerima YouTube</span>,
+            karena hanya YouTube yang menyediakan thumbnail otomatis. Untuk TikTok, Instagram, X,
+            Facebook, atau Vimeo: tempel link-nya di kolom{" "}
+            <span className="font-semibold text-ink">Sisipkan video / postingan</span> pada isi
+            artikel Blog — dan isi kolom <span className="font-semibold text-ink">Image</span>{" "}
+            bila ingin ada gambarnya di daftar.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -802,9 +865,16 @@ export default function CollectionEditor({
   });
 
   const isList = Array.isArray(data);
-  // Every field any entry in this list has, so every entry's tabs match (see unionShapeOf).
-  // {} for a single-object collection — nothing to reconcile against with only one instance.
-  const model = useMemo(() => (isList ? unionShapeOf(data as JsonValue[]) : {}), [isList, data]);
+  // Every field any entry in this list has, so every entry's tabs match (see unionShapeOf),
+  // widened with the media trio so anything in the CMS can be given a picture or a video
+  // without a code change (lib/media.ts). The union goes on top: a collection that already
+  // stores an image keeps its own value as the field's example, not the blank one.
+  // For a single-object collection there is nothing to reconcile, but the trio still applies —
+  // it is what puts an image slot on Site Settings, Services Page and Courses Page at all.
+  const model = useMemo(() => {
+    if (!hasMediaTrio(collection)) return isList ? unionShapeOf(data as JsonValue[]) : {};
+    return { ...MEDIA_FIELDS, ...(isList ? unionShapeOf(data as JsonValue[]) : {}) };
+  }, [isList, data, collection]);
 
   function edit(v: JsonValue) {
     setData(v);

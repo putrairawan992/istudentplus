@@ -5,10 +5,12 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Marked from "@/app/components/Marked";
 import LeadForm from "@/app/components/LeadForm";
+import Media from "@/app/components/Media";
 import { readContent } from "@/lib/content";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, fmt, hasLocale } from "@/lib/i18n";
+import { anyMedia, hasMedia, type Media as MediaValue } from "@/lib/media";
 
 export async function generateMetadata({
   params,
@@ -23,7 +25,7 @@ export async function generateMetadata({
   };
 }
 
-type LanguageProgram = {
+type LanguageProgram = MediaValue & {
   id: string;
   name: string;
   overview: string;
@@ -34,7 +36,7 @@ type LanguageProgram = {
   bg?: string;
 };
 type Instructor = { name: string; photo: string };
-type EnglishSkill = { name: string; description: string };
+type EnglishSkill = MediaValue & { name: string; description: string };
 
 export default async function LanguageProgramsPage({
   params,
@@ -46,6 +48,7 @@ export default async function LanguageProgramsPage({
   const PROGRAMS = await readContent<LanguageProgram[]>("languagePrograms", lang);
   const INSTRUCTORS = await readContent<Instructor[]>("instructors", lang);
   const ENGLISH_SKILLS = await readContent<EnglishSkill[]>("englishSkills", lang);
+  const skillsHaveMedia = anyMedia(ENGLISH_SKILLS);
   const WHATSAPP_URL = await getWhatsAppUrl();
 
   return (
@@ -74,25 +77,64 @@ export default async function LanguageProgramsPage({
                 id={program.id}
                 className={`scroll-mt-20 rounded-2xl border border-line p-7 ${program.bg ?? "bg-card"}`}
               >
-                <h2 className="mb-2 text-xl font-extrabold">{program.name}</h2>
-                <p className="mb-5 max-w-2xl text-[15px] leading-relaxed text-ink/70">{program.overview}</p>
-                <div className="mb-5 flex flex-wrap gap-2">
-                  {program.features.map((feature) => (
-                    <span key={feature} className="rounded-full bg-white/70 px-3.5 py-1.5 text-[12.5px] font-medium">
-                      ✓ {feature}
-                    </span>
-                  ))}
-                </div>
-                <div className="rounded-xl bg-white/70 px-4.5 py-3 text-[13.5px] font-semibold text-ink">
-                  <span className="mr-2 text-xs font-bold uppercase tracking-wide text-sky">
-                    {d.languagePrograms.duration}
-                  </span>
-                  {program.duration}
+                {/* These panels are stacked full-width with the text capped at max-w-2xl, so
+                    there is real space to the right of it on a laptop and up. A picture goes
+                    there rather than above the heading; below lg it moves to the top, where a
+                    single-column layout wants it. No reserve needed — nothing sits beside a
+                    panel to fall out of line with. */}
+                <div
+                  className={
+                    hasMedia(program)
+                      ? "grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,380px)] lg:gap-8"
+                      : ""
+                  }
+                >
+                  <div className="min-w-0">
+                    <h2 className="mb-2 text-xl font-extrabold">{program.name}</h2>
+                    <p className="mb-5 max-w-2xl text-[15px] leading-relaxed text-ink/70">{program.overview}</p>
+                    <div className="mb-5 flex flex-wrap gap-2">
+                      {program.features.map((feature) => (
+                        <span key={feature} className="rounded-full bg-white/70 px-3.5 py-1.5 text-[12.5px] font-medium">
+                          ✓ {feature}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="rounded-xl bg-white/70 px-4.5 py-3 text-[13.5px] font-semibold text-ink">
+                      <span className="mr-2 text-xs font-bold uppercase tracking-wide text-sky">
+                        {d.languagePrograms.duration}
+                      </span>
+                      {program.duration}
+                    </div>
+                  </div>
+                  {hasMedia(program) && (
+                    <Media
+                      media={program}
+                      alt={program.name}
+                      ratio="wide"
+                      rounded="rounded-xl"
+                      className="order-first lg:order-none"
+                      sizes="(min-width: 1024px) 380px, 92vw"
+                    />
+                  )}
                 </div>
                 {program.id === "general-english" && (
                   <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     {ENGLISH_SKILLS.map((skill) => (
-                      <div key={skill.name} className="rounded-xl bg-white/70 p-4">
+                      <div key={skill.name} className="overflow-hidden rounded-xl bg-white/70 p-4">
+                        {/* Four small cards in one row — reserved, or one picture drags the row. */}
+                        {skillsHaveMedia && (
+                          <div className="-mx-4 -mt-4 mb-3">
+                            <Media
+                              media={skill}
+                              alt={skill.name}
+                              ratio="photo"
+                              reserve
+                              placeholder={skill.name}
+                              rounded="rounded-none"
+                              sizes="(min-width: 1024px) 20vw, (min-width: 640px) 42vw, 88vw"
+                            />
+                          </div>
+                        )}
                         <div className="mb-1 font-bold">{skill.name}</div>
                         <p className="text-[12px] leading-relaxed text-ink/70">{skill.description}</p>
                       </div>

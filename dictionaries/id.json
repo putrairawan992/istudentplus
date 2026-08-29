@@ -48,7 +48,6 @@
       "titleTemplate": "Kuliah di {name}"
     }
   },
-
   "common": {
     "chatOnWhatsApp": "Chat via WhatsApp",
     "bookFreeConsultation": "Konsultasi Gratis",
@@ -61,7 +60,6 @@
     "cancel": "Batal",
     "somethingWentWrong": "Terjadi kesalahan."
   },
-
   "language": {
     "label": "Bahasa",
     "switchTo": "Ganti ke {language}",
@@ -70,7 +68,6 @@
       "id": "Bahasa Indonesia"
     }
   },
-
   "nav": {
     "aboutUs": "Tentang Kami",
     "ourServices": "Layanan Kami",
@@ -90,7 +87,6 @@
     "logout": "Keluar",
     "toggleMenu": "Buka menu"
   },
-
   "footer": {
     "tagline": "Jaringan Pelajar Global dan Media Agency — berkantor di Pangkalpinang dan Makassar, Indonesia (Jakarta segera menyusul).",
     "studyAbroad": "Kuliah di Luar Negeri",
@@ -106,7 +102,6 @@
     "social": "Sosial Media",
     "copyright": "© 2026 iStudentPlus"
   },
-
   "home": {
     "heroImageAlt": "Siswa yang bersiap kuliah di luar negeri",
     "findCourse": "Cari Program →",
@@ -157,11 +152,36 @@
     "statusOpen": "Terbuka",
     "statusSeats": "3 Kursi",
     "departures": [
-      { "city": "Melbourne", "program": "VET + Sarjana", "intake": "Feb", "status": "open" },
-      { "city": "Toronto", "program": "Sarjana", "intake": "Sep", "status": "seats" },
-      { "city": "Osaka", "program": "Sekolah Bahasa", "intake": "Apr", "status": "open" },
-      { "city": "London", "program": "Pascasarjana", "intake": "Sep", "status": "open" },
-      { "city": "Beijing", "program": "Bahasa + Universitas", "intake": "Mar", "status": "open" }
+      {
+        "city": "Melbourne",
+        "program": "VET + Sarjana",
+        "intake": "Feb",
+        "status": "open"
+      },
+      {
+        "city": "Toronto",
+        "program": "Sarjana",
+        "intake": "Sep",
+        "status": "seats"
+      },
+      {
+        "city": "Osaka",
+        "program": "Sekolah Bahasa",
+        "intake": "Apr",
+        "status": "open"
+      },
+      {
+        "city": "London",
+        "program": "Pascasarjana",
+        "intake": "Sep",
+        "status": "open"
+      },
+      {
+        "city": "Beijing",
+        "program": "Bahasa + Universitas",
+        "intake": "Mar",
+        "status": "open"
+      }
     ],
     "destinationsKicker": "Negara tujuan siswa kami",
     "destinationsTitle": "Empat negara paling banyak dicari intake ini.",
@@ -176,7 +196,6 @@
     "consultationTitle": "Ceritakan rencana studimu, sisanya kami bantu.",
     "consultationSubtitle": "Tanpa kewajiban, tanpa biaya untuk berkonsultasi. Konselor kami akan meninjau datamu dan membalas dengan rekomendasi yang sesuai."
   },
-
   "about": {
     "kicker": "Siapa Kami",
     "title": "Jaringan pelajar global dan **media agency**.",
@@ -200,10 +219,14 @@
     "bioComingSoon": "Foto dan profil segera menyusul.",
     "countriesTitle": "Siswa yang pernah kami dampingi, per negara",
     "countriesSubtitle": "Konselor kami berbahasa {languages} — dan telah mendampingi siswa dari:",
-    "spokenLanguages": ["Inggris", "Indonesia", "Mandarin", "Spanyol"],
+    "spokenLanguages": [
+      "Inggris",
+      "Indonesia",
+      "Mandarin",
+      "Spanyol"
+    ],
     "ctaTitle": "Bicara dengan konselor yang sudah membantu siswa sepertimu."
   },
-
   "services": {
     "kicker": "Layanan",
     "title": "Layanan kami dalam **satu menit**.",
@@ -220,7 +243,6 @@
     "faqTitle": "Pertanyaan yang Sering Diajukan (FAQ)",
     "bookToday": "Jadwalkan Konsultasi Gratis Sekarang"
   },
-
   "contact": {
     "kicker": "Hubungi Kami",
     "title": "Jadwalkan sesi **konsultasi** gratis.",
@@ -229,7 +251,6 @@
     "weReplyIn": "Kami membalas dalam",
     "socialMedia": "Sosial Media"
   },
-
   "courses": {
     "kicker": "Program & Universitas",
     "title": "Pilih program yang sejalan dengan **tujuan jangka panjangmu**.",
@@ -247,7 +268,6 @@
     "highSchoolSubtitle": "Dikenal berkualitas dengan pilihan yang beragam — memilih sekolah yang tepat bergantung pada tujuan, lokasi, dan anggaranmu.",
     "ctaTitle": "Masih menimbang antar kualifikasi?"
   },
-
   "languagePrograms": {
     "kicker": "Kursus Online Kami",
     "title": "Kuliah di luar negeri, **rasakan bedanya!**",
@@ -258,7 +278,6 @@
     "instructorRole": "Pengajar Bahasa Inggris",
     "ctaTitle": "Belum yakin program bahasa mana yang cocok?"
   },
-
   "studyAbroad": {
     "kicker": "Kuliah di Luar Negeri",
     "title": "Pilih negara tujuan, urusan dokumen serahkan ke **konselor**.",
@@ -273,7 +292,6 @@
     "qualificationBody": "Bandingkan jalur VET/Diploma, Sarjana, Magister, Doktor, dan kursus bahasa di halaman Program & Universitas.",
     "ctaTitle": "Belum yakin negara mana yang cocok? Tanya konselor."
   },
-
   "country": {
     "kicker": "Kuliah di Luar Negeri",
     "heroTitle": "Kuliah di {name}",
@@ -293,7 +311,6 @@
     "browseCourses": "Lihat Program & Universitas →",
     "ctaTitle": "Siap membahas rencana kuliah di {name}?"
   },
-
   "blog": {
     "kicker": "Blog",
     "title": "Update visa dan cerita **dari perjalanan**.",
@@ -319,9 +336,14 @@
     "ctaTitle": "Ada pertanyaan yang belum terjawab di blog?",
     "backToBlog": "← Kembali ke Blog",
     "author": "Tim iStudentPlus",
-    "articleCtaTitle": "Ada pertanyaan yang belum terjawab di artikel ini?"
+    "articleCtaTitle": "Ada pertanyaan yang belum terjawab di artikel ini?",
+    "searchPlaceholder": "Cari artikel…",
+    "searchSubmit": "Cari",
+    "clearSearch": "Hapus pencarian",
+    "resultsFor": "{count} hasil untuk “{query}”",
+    "noResults": "Tidak ada artikel yang cocok dengan “{query}”. Coba kata lain, atau jelajahi per kategori.",
+    "relatedTitle": "Baca juga"
   },
-
   "webinars": {
     "title": "Webinar",
     "intro": "Sesi online gratis seputar kuliah di luar negeri, beasiswa, dan persiapan bahasa. Daftar dengan email — link acaranya kami kirim sebelum hari-H.",
@@ -339,7 +361,6 @@
     "minutes": "{count} menit",
     "timezone": "WIB"
   },
-
   "threads": {
     "title": "Forum Tanya Jawab",
     "intro": "Tanya apa saja soal kuliah di luar negeri, beasiswa, atau visa — tanpa perlu akun. Siapa pun boleh menjawab. Tulisan yang kasar atau spam otomatis ditolak.",
@@ -378,7 +399,6 @@
       "cancel": "Batal"
     }
   },
-
   "forms": {
     "consultation": {
       "successTitle": "Terima kasih — sudah kami terima!",
@@ -391,18 +411,48 @@
       "whatsappPlaceholder": "+62 8xx xxxx xxxx",
       "destination": "Negara Tujuan Studi",
       "destinationPlaceholder": "Pilih negara tujuan",
-      "destinations": ["Australia", "Jepang", "China", "Inggris", "Amerika Serikat", "Kanada", "Lainnya"],
+      "destinations": [
+        "Australia",
+        "Jepang",
+        "China",
+        "Inggris",
+        "Amerika Serikat",
+        "Kanada",
+        "Lainnya"
+      ],
       "showOptional": "+ Tambah detail studi & CV (opsional)",
       "hideOptional": "− Sembunyikan detail opsional",
       "fieldOfStudy": "Bidang Studi yang Diminati",
       "fieldOfStudyPlaceholder": "Pilih bidang studi",
-      "fieldsOfStudy": ["Bisnis", "IT", "Perhotelan", "Kesehatan", "Bahasa dan Linguistik", "Lainnya"],
+      "fieldsOfStudy": [
+        "Bisnis",
+        "IT",
+        "Perhotelan",
+        "Kesehatan",
+        "Bahasa dan Linguistik",
+        "Lainnya"
+      ],
       "qualificationLevel": "Jenjang Kualifikasi yang Diminati",
       "qualificationLevelPlaceholder": "Pilih jenjang",
-      "qualificationLevels": ["VET atau Diploma", "Sarjana", "Magister", "Doktor", "Kursus Bahasa", "Lainnya"],
+      "qualificationLevels": [
+        "VET atau Diploma",
+        "Sarjana",
+        "Magister",
+        "Doktor",
+        "Kursus Bahasa",
+        "Lainnya"
+      ],
       "latestQualification": "Pendidikan Terakhir",
       "latestQualificationPlaceholder": "Pilih pendidikan terakhirmu",
-      "latestQualifications": ["SMA/SMK", "VET atau Diploma", "Sarjana", "Magister", "Doktor", "Kursus Bahasa", "Lainnya"],
+      "latestQualifications": [
+        "SMA/SMK",
+        "VET atau Diploma",
+        "Sarjana",
+        "Magister",
+        "Doktor",
+        "Kursus Bahasa",
+        "Lainnya"
+      ],
       "cv": "Lampirkan CV Terbarumu",
       "cvHint": "Untuk keperluan asesmen sebelum konsultasi.",
       "submit": "Jadwalkan Konsultasi Gratis",
@@ -455,15 +505,28 @@
     "courseFilter": {
       "title": "Cari berdasarkan kualifikasi & negara",
       "qualification": "Kualifikasi",
-      "qualifications": ["VET atau Diploma", "Sarjana", "Magister", "Doktor", "Kursus Bahasa", "Program Pertukaran"],
+      "qualifications": [
+        "VET atau Diploma",
+        "Sarjana",
+        "Magister",
+        "Doktor",
+        "Kursus Bahasa",
+        "Program Pertukaran"
+      ],
       "country": "Negara",
-      "countries": ["Australia", "Inggris", "Amerika Serikat", "Kanada", "China", "Jepang"],
+      "countries": [
+        "Australia",
+        "Inggris",
+        "Amerika Serikat",
+        "Kanada",
+        "China",
+        "Jepang"
+      ],
       "result": "Kami belum menyediakan database universitas secara langsung — sampaikan ke konselor bahwa kamu sedang mencari {qualification} di {country}, dan mereka akan mengirimkan daftar partner serta persyaratan terkini.",
       "resultCta": "Jadwalkan konsultasi gratis →",
       "hint": "Pilih keduanya untuk melihat bagaimana konselor bisa membantu."
     }
   },
-
   "api": {
     "nameEmailRequired": "Nama dan email wajib diisi.",
     "sendFailed": "Gagal mengirim.",
