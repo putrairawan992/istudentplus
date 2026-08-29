@@ -32,6 +32,19 @@ export const COLLECTIONS: CollectionMeta[] = [
 
 export const COLLECTION_GROUPS: CollectionGroup[] = ["General", "Content", "Inbox"];
 
+/**
+ * Fields the editor should always offer for a collection, even when no entry has one yet.
+ *
+ * The form is otherwise derived from the data (unionShapeOf), which is what keeps the CMS free
+ * of per-collection schemas — but it also means a newly introduced optional field stays
+ * invisible until somebody hand-edits the stored JSON. `featured` is exactly that: the blog's
+ * hero and Featured column fall back to newest-with-a-picture, and the checkbox is how an
+ * editor overrides that.
+ */
+export const ALWAYS_FIELDS: Partial<Record<CollectionKey, Record<string, boolean | string>>> = {
+  blog: { featured: false },
+};
+
 export function getCollectionMeta(key: string): CollectionMeta | undefined {
   return COLLECTIONS.find((c) => c.key === key);
 }

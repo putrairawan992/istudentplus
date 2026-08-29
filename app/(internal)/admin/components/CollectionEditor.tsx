@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useRef, useState, useTransition } from "react";
+import { createContext, Fragment, useContext, useMemo, useRef, useState, useTransition } from "react";
 import type { JsonValue, JsonObject } from "@/lib/json-tree";
 import {
   setAtPath,
@@ -27,6 +27,8 @@ import {
   rejectionMessage,
 } from "@/lib/image-specs";
 import { sectionsOf } from "@/lib/form-sections";
+import { ALWAYS_FIELDS } from "@/lib/collections";
+import type { CollectionKey } from "@/lib/content";
 import {
   fromInputValue,
   granularityOf,
@@ -299,23 +301,27 @@ function extractYouTubeId(input: string): string {
   return match ? match[1] : trimmed;
 }
 
-// Turns a pasted YouTube or Instagram link into a ready-to-render <iframe>, so an editor never
-// has to go copy a platform's own embed snippet (Instagram's includes a <script> that silently
-// does nothing once it's inside dangerouslySetInnerHTML — see ArticleEmbeds' removal). Instagram
-// serves the same card at a plain iframe URL with no script required, same as YouTube.
-const YOUTUBE_URL = /(?:youtube\.com\/(?:watch\?(?:\S*&)?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/;
-const INSTAGRAM_URL = /instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/;
-
+// Turns a pasted link into a ready-to-render <iframe>, so an editor never has to go copy a
+// platform's own embed snippet (Instagram's includes a <script> that silently does nothing once
+// it's inside dangerouslySetInnerHTML — see ArticleEmbeds' removal).
+//
+// Reads lib/embeds.ts rather than keeping its own regexes: that table already knew about TikTok,
+// X, Facebook and Vimeo while this button only accepted YouTube and Instagram — so the guidance
+// panel next to the YouTube field was telling the client to paste a TikTok link into a field
+// that would answer "Link tidak dikenali".
 function embedIframeFor(url: string): string | null {
-  const yt = url.match(YOUTUBE_URL);
-  if (yt) {
-    return `<iframe width="560" height="315" src="https://www.youtube.com/embed/${yt[1]}" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
-  }
-  const ig = url.match(INSTAGRAM_URL);
-  if (ig) {
-    return `<iframe src="https://www.instagram.com/p/${ig[1]}/embed" width="400" height="480" scrolling="no" allowtransparency="true"></iframe>`;
-  }
-  return null;
+  const resolved = resolveEmbed(url);
+  if (!resolved) return null;
+  const { platform, embedUrl } = resolved;
+  // Portrait players in a 16:9 box render as a letterboxed stripe; the article renderer picks
+  // the box from the same table (RATIO_CLASS), these numbers only set the iframe's own aspect.
+  const size =
+    platform.ratio === "portrait"
+      ? 'width="400" height="700"'
+      : platform.ratio === "square"
+        ? 'width="480" height="480"'
+        : 'width="560" height="315"';
+  return `<iframe ${size} src="${embedUrl}" title="${platform.label}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
 }
 
 // The blog post body: a plain HTML textarea plus a small helper that appends a YouTube/Instagram
@@ -327,7 +333,7 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
   function insertEmbed() {
     const iframe = embedIframeFor(embedUrl.trim());
     if (!iframe) {
-      setErr("Link tidak dikenali — tempel link video YouTube atau post/reel Instagram.");
+      setErr(`Link tidak dikenali. Yang bisa dipakai: ${PLATFORM_NAMES}.`);
       return;
     }
     setErr("");
@@ -345,13 +351,13 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
         className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
       />
       <div className="rounded-lg border border-line bg-paper-raise/60 p-3">
-        <p className="mb-2 text-[12px] font-bold text-muted">Sisipkan embed YouTube / Instagram</p>
+        <p className="mb-2 text-[12px] font-bold text-muted">Sisipkan video / postingan</p>
         <div className="flex flex-wrap gap-2">
           <input
             type="text"
             value={embedUrl}
             onChange={(e) => { setEmbedUrl(e.target.value); setErr(""); }}
-            placeholder="Tempel link video YouTube atau post/reel Instagram di sini"
+            placeholder="Tempel link video atau postingan di sini"
             className="min-w-0 flex-1 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
           />
           <button
@@ -364,9 +370,23 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
         </div>
         {err && <p className="mt-1.5 text-[12px] text-red-600">{err}</p>}
         <p className="mt-1.5 text-[12px] text-muted">
-          Klik &quot;Sisipkan&quot; untuk menambahkan embed ke akhir konten di atas. Tidak perlu
-          menyalin kode embed dari YouTube/Instagram — cukup link-nya saja.
+          Cukup tempel link-nya, lalu klik &quot;Sisipkan&quot; — embed-nya ditambahkan ke akhir
+          konten di atas. Tidak perlu menyalin kode embed dari platform-nya.
         </p>
+        {/* One row per platform, straight from lib/embeds.ts — the same table the insert button
+            matches against, so what this promises and what the button accepts cannot drift. */}
+        <dl className="mt-2.5 grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1.5 border-t border-line pt-2.5 text-[12px] leading-relaxed">
+          {PLATFORMS.map((platform) => (
+            <Fragment key={platform.id}>
+              <dt className="font-semibold text-ink">{platform.label}</dt>
+              <dd className="text-muted">
+                <span className="text-ink">{platform.accepts}</span>
+                <br />
+                {platform.note}
+              </dd>
+            </Fragment>
+          ))}
+        </dl>
       </div>
     </div>
   );
@@ -410,7 +430,7 @@ function VideoField({ value, onChange }: { value: string | null; onChange: (v: s
           <dl className="grid grid-cols-[auto_1fr] gap-x-2.5 gap-y-0.5">
             <dt className="text-muted">Isi dengan</dt>
             <dd className="font-semibold text-ink">
-              Link YouTube (watch, youtu.be, atau Shorts) — ID-nya diambil otomatis
+              Tempel link YouTube apa adanya — ID-nya diambil otomatis
             </dd>
             <dt className="text-muted">Bentuk</dt>
             <dd className="font-semibold text-ink">{VIDEO_GUIDANCE.ratio} (landscape)</dd>
@@ -419,14 +439,37 @@ function VideoField({ value, onChange }: { value: string | null; onChange: (v: s
               Otomatis dari YouTube — tidak perlu unggah gambar
             </dd>
           </dl>
-          <p className="mt-1.5 text-muted">{VIDEO_GUIDANCE.note}</p>
+          {/* The field stores the bare id, so the panel shows which part of each link that is —
+              "paste the whole link" plus a picture of what gets kept beats a rule to memorise. */}
+          <p className="mt-2 text-muted">
+            Yang disimpan hanya <span className="font-semibold text-ink">ID video</span>: 11
+            karakter yang ditandai di bawah. Kamu boleh menempel link penuhnya — bagian lainnya
+            dibuang sendiri.
+          </p>
+          <ul className="mt-1.5 flex flex-col gap-1 break-all font-mono text-[11.5px] text-muted">
+            {[
+              "https://www.youtube.com/watch?v=",
+              "https://youtu.be/",
+              "https://www.youtube.com/shorts/",
+            ].map((prefix) => (
+              <li key={prefix}>
+                <span>{prefix}</span>
+                <span className="rounded bg-emerald-100 px-1 font-bold text-emerald-800">
+                  dQw4w9WgXcQ
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-muted">{VIDEO_GUIDANCE.note}</p>
           <p className="mt-1.5 text-muted">
             Kolom ini <span className="font-semibold text-ink">hanya menerima YouTube</span>,
-            karena hanya YouTube yang menyediakan thumbnail otomatis. Untuk TikTok, Instagram, X,
-            Facebook, atau Vimeo: tempel link-nya di kolom{" "}
+            karena hanya YouTube yang menyediakan thumbnail otomatis. Untuk{" "}
+            {PLATFORMS.filter((x) => x.id !== "youtube").map((x) => x.label).join(", ")}: tempel
+            link-nya di kolom{" "}
             <span className="font-semibold text-ink">Sisipkan video / postingan</span> pada isi
-            artikel Blog — dan isi kolom <span className="font-semibold text-ink">Image</span>{" "}
-            bila ingin ada gambarnya di daftar.
+            artikel Blog — di sana ada panduan per platform-nya — dan isi kolom{" "}
+            <span className="font-semibold text-ink">Image</span> bila ingin ada gambarnya di
+            daftar Blog.
           </p>
         </div>
       </div>
@@ -470,7 +513,15 @@ function isObject(v: JsonValue): v is JsonObject {
 
 // "Description" is unambiguously prose everywhere it appears — always a textarea, no matter
 // how short today's value happens to be, so it doesn't clip as someone types a longer one.
-const PROSE_KEY = /^(desc|description)$/i;
+// Fields that hold a paragraph, so they get a textarea and a full-width row even while empty.
+//
+// Length alone can't decide this in the "Add new entry" modal: every value there starts blank,
+// so the blog's `html` body was being filed as a short string and rendered in a half-width
+// column next to an empty gutter. The list is the set of keys that hold prose anywhere in
+// content/*.json — `image`, `slug` and `source` are long too but are URLs with their own
+// widgets, and `title`/`value`/`q` stay single-line on purpose.
+const PROSE_KEY =
+  /^(a|aboutStory|accommodation|admission|benefit|bio|body|career|content|culture|desc|description|excerpt|heroSubtitle|html|intro|livingCost|note|overview|quote|whyStudy)$/i;
 // "Value" is ambiguous: a Key Facts row ("AUD 20,000 – AUD 45,000 / year") and a homepage stat
 // ("9.3K") are the same {label, value} shape with very different content. They don't overlap
 // in length in the data on this site (stats top out at 4 chars, Key Facts values start at 7),
@@ -743,8 +794,11 @@ function ObjectFields({
 }) {
   return (
     <div className="grid grid-cols-1 gap-x-5 gap-y-3.5 sm:grid-cols-2">
+      {/* isMediaish, not isMediaKey: "youtubeId" doesn't match the media-key regex, so it was
+          the one tall field still sharing a row. Half of the 672px Add-entry modal left its
+          guidance panel 170px wide, wrapping the text three words to a line. */}
       {(keys ?? Object.keys(value)).map((key) => (
-        <div key={key} className={isWideField(value[key], key) || isMediaKey(key) ? "sm:col-span-2" : ""}>
+        <div key={key} className={isWideField(value[key], key) || isMediaish(key) ? "sm:col-span-2" : ""}>
           <label className="mb-1 block text-[12.5px] font-bold text-muted">{humanize(key)}</label>
           <FieldEditor value={value[key]} path={[...path, key]} root={root} setRoot={setRoot} label={key} />
         </div>
@@ -872,8 +926,10 @@ export default function CollectionEditor({
   // For a single-object collection there is nothing to reconcile, but the trio still applies —
   // it is what puts an image slot on Site Settings, Services Page and Courses Page at all.
   const model = useMemo(() => {
-    if (!hasMediaTrio(collection)) return isList ? unionShapeOf(data as JsonValue[]) : {};
-    return { ...MEDIA_FIELDS, ...(isList ? unionShapeOf(data as JsonValue[]) : {}) };
+    const always = ALWAYS_FIELDS[collection as CollectionKey] ?? {};
+    const union = isList ? unionShapeOf(data as JsonValue[]) : {};
+    if (!hasMediaTrio(collection)) return { ...always, ...union };
+    return { ...MEDIA_FIELDS, ...always, ...union };
   }, [isList, data, collection]);
 
   function edit(v: JsonValue) {
@@ -1056,7 +1112,7 @@ export default function CollectionEditor({
                 ✕
               </button>
             </div>
-            <div className="flex-1 overflow-y-auto bg-paper-raise p-6">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden bg-paper-raise p-6">
               {isObject(draft) && Object.keys(draft).length > 0 ? (
                 <TabbedFields value={draft} path={[]} root={draft} setRoot={setDraft} />
               ) : (
