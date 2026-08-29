@@ -33,6 +33,7 @@ import {
   isPickable,
   toInputValue,
 } from "@/lib/date-fields";
+import type { ListOp } from "@/lib/list-ops";
 import ConfirmModal from "./ConfirmModal";
 import { useToast } from "./Toast";
 
@@ -787,14 +788,23 @@ export default function CollectionEditor({
   initialData,
   locale,
   saveAction,
+  entryAction,
 }: {
   collection: string;
   initialData: JsonValue;
   /** Which language's document is being edited — passed straight through to the save action. */
   locale?: string;
+  /** Whole-document save. Used by single-object collections, which are only a few KB. */
   saveAction: (
     collection: string,
     json: string,
+    locale?: string
+  ) => Promise<{ ok: boolean; error?: string }>;
+  /** One-entry save for list collections. `blog` is ~1.5MB, far past the Server Action body
+      limit, so a list never sends the whole document back — just the op that changed it. */
+  entryAction: (
+    collection: string,
+    op: ListOp,
     locale?: string
   ) => Promise<{ ok: boolean; error?: string }>;
 }) {
@@ -851,7 +861,7 @@ export default function CollectionEditor({
     const newData = removeAtIndex(data, [], index);
     setRemoveBusy(true);
     try {
-      const res = await saveAction(collection, JSON.stringify(newData), locale);
+      const res = await entryAction(collection, { type: "remove", index }, locale);
       if (res.ok) {
         setData(newData);
         setDirty(false);
@@ -883,7 +893,7 @@ export default function CollectionEditor({
 
     setReorderBusy(true);
     try {
-      const res = await saveAction(collection, JSON.stringify(next), locale);
+      const res = await entryAction(collection, { type: "move", from: index, to: target }, locale);
       if (res.ok) {
         setData(next);
         setDirty(false);
@@ -900,9 +910,15 @@ export default function CollectionEditor({
     }
   }
 
-  function handleSave() {
+  // A list sends only the entry that was edited; a single-object collection is small enough
+  // to send whole. Saving a list wholesale is what made every blog edit fail — 277 posts is
+  // ~1.5MB, well past the Server Action body limit.
+  function handleSave(index?: number) {
     startTransition(async () => {
-      const res = await saveAction(collection, JSON.stringify(data), locale);
+      const res =
+        Array.isArray(data) && index !== undefined
+          ? await entryAction(collection, { type: "replace", index, entry: data[index] }, locale)
+          : await saveAction(collection, JSON.stringify(data), locale);
       setStatus(res.ok ? "saved" : "error");
       if (res.ok) {
         setDirty(false);
@@ -923,11 +939,24 @@ export default function CollectionEditor({
     setShowAddModal(true);
   }
 
+  // Saved on the spot rather than left pending, the way Remove and reorder already are. It also
+  // keeps the editor's indexes honest: every row on screen is a row that exists on the server,
+  // so a later "save entry #0" can't land on top of what used to be the first entry.
   function confirmAddEntry() {
     if (!Array.isArray(data)) return;
-    edit([draft, ...data]);
-    setOpenIdx(0); // the new entry lands at the top and is the one open
-    setShowAddModal(false);
+    startTransition(async () => {
+      const res = await entryAction(collection, { type: "insert", entry: draft }, locale);
+      if (!res.ok) {
+        toast("error", res.error || "Failed to add entry.");
+        return;
+      }
+      setData([draft, ...data]);
+      setDirty(false);
+      setStatus("saved");
+      setOpenIdx(0); // the new entry lands at the top and is the one open
+      setShowAddModal(false);
+      toast("success", "Entry added.");
+    });
   }
 
   function cancelAddEntry() {
@@ -1012,9 +1041,10 @@ export default function CollectionEditor({
               <button
                 type="button"
                 onClick={confirmAddEntry}
-                className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25"
+                disabled={pending}
+                className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
               >
-                Add entry
+                {pending ? "Adding…" : "Add entry"}
               </button>
             </div>
           </div>
@@ -1084,7 +1114,7 @@ export default function CollectionEditor({
                       {status === "error" && <span className="text-[13px] font-semibold text-red-600">Failed to save</span>}
                       <button
                         type="button"
-                        onClick={handleSave}
+                        onClick={() => handleSave(i)}
                         disabled={pending || !dirty}
                         className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
                       >
@@ -1110,7 +1140,7 @@ export default function CollectionEditor({
               {status === "error" && <span className="text-sm font-semibold text-red-600">Failed to save</span>}
               {dirty && status === "idle" && <span className="text-sm font-medium text-amber-600">Unsaved changes</span>}
               <button
-                onClick={handleSave}
+                onClick={() => handleSave()}
                 disabled={pending || !dirty}
                 className="rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
               >
