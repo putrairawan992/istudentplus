@@ -5,6 +5,7 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import YouTubeEmbed from "@/app/components/YouTubeEmbed";
 import LeadForm from "@/app/components/LeadForm";
+import WebinarHero from "@/app/components/WebinarHero";
 import { readContent } from "@/lib/content";
 import { SITE_URL as siteUrl } from "@/lib/site";
 import {
@@ -213,6 +214,11 @@ export default async function WebinarsPage({ params }: PageProps<"/[lang]/webina
   const { upcoming, past } = await splitByDate(webinars);
   const events = [...upcoming, ...past].map((w) => eventJsonLd(w, lang)).filter(Boolean);
 
+  // splitByDate puts a session that is on right now first, then the soonest — so the head of
+  // the list is exactly what the hero should promote. It's then dropped from the grid below
+  // rather than shown twice.
+  const [featured, ...restUpcoming] = upcoming;
+
   return (
     <>
       {events.length > 0 && (
@@ -222,41 +228,52 @@ export default async function WebinarsPage({ params }: PageProps<"/[lang]/webina
         />
       )}
       <Header lang={lang} />
-      <main className="mx-auto max-w-[1200px] px-5 py-10 sm:px-7 sm:py-14">
-        <h1 className="text-3xl font-extrabold sm:text-4xl">{d.webinars.title}</h1>
-        <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-muted">{d.webinars.intro}</p>
+      <main>
+        <WebinarHero
+          featured={featured ?? null}
+          lang={lang}
+          copy={d.webinars}
+          leadLabels={d.forms.webinarLead}
+          hasPast={past.length > 0}
+        />
 
-        <section className="mt-8">
-          <h2 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted">
-            {d.webinars.upcomingHeading}
-          </h2>
-          {upcoming.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-line px-5 py-10 text-center text-sm text-muted">
-              {d.webinars.emptyUpcoming}
-            </p>
-          ) : (
-            <ThemedGroups
-              webinars={upcoming}
-              lang={lang}
-              copy={d.webinars}
-              leadLabels={d.forms.webinarLead}
-            />
+        <div className="mx-auto max-w-[1200px] px-5 pb-14 sm:px-7">
+          {/* With the next session in the hero, this heading covers what's left — and when
+              nothing at all is scheduled it's the empty state that has to say so. */}
+          {(restUpcoming.length > 0 || upcoming.length === 0) && (
+            <section className="mt-12">
+              <h2 className="mb-4 text-xl font-extrabold tracking-tight sm:text-2xl">
+                {featured ? d.webinars.moreUpcoming : d.webinars.upcomingHeading}
+              </h2>
+              {upcoming.length === 0 ? (
+                <p className="rounded-2xl border border-dashed border-line px-5 py-10 text-center text-sm text-muted">
+                  {d.webinars.emptyUpcoming}
+                </p>
+              ) : (
+                <ThemedGroups
+                  webinars={restUpcoming}
+                  lang={lang}
+                  copy={d.webinars}
+                  leadLabels={d.forms.webinarLead}
+                />
+              )}
+            </section>
           )}
-        </section>
 
-        {past.length > 0 && (
-          <section className="mt-10">
-            <h2 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted">
-              {d.webinars.pastHeading}
-            </h2>
-            <ThemedGroups
-              webinars={past}
-              lang={lang}
-              copy={d.webinars}
-              leadLabels={d.forms.webinarLead}
-            />
-          </section>
-        )}
+          {past.length > 0 && (
+            <section id="past" className="mt-14 scroll-mt-24 border-t border-line pt-10">
+              <h2 className="mb-4 text-xl font-extrabold tracking-tight sm:text-2xl">
+                {d.webinars.pastHeading}
+              </h2>
+              <ThemedGroups
+                webinars={past}
+                lang={lang}
+                copy={d.webinars}
+                leadLabels={d.forms.webinarLead}
+              />
+            </section>
+          )}
+        </div>
       </main>
       <Footer lang={lang} />
     </>

@@ -29,42 +29,56 @@ export type WebinarWithStatus = Webinar & { status: WebinarStatus };
 const DEFAULT_MINUTES = 90;
 
 // The sessions run in Jakarta whichever language you read the page in, so the timezone is
-// fixed and only the language of the date changes.
-const DATE_FMT: Record<Locale, Intl.DateTimeFormat> = {
-  en: new Intl.DateTimeFormat("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Jakarta",
-  }),
-  id: new Intl.DateTimeFormat("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Jakarta",
-  }),
+// fixed and only the language of the date changes. Date and time are formatted separately
+// because the page shows them as two labelled rows, not one sentence.
+const DATE_LOCALE: Record<Locale, string> = { en: "en-GB", id: "id-ID" };
+const DATE_OPTS: Intl.DateTimeFormatOptions = {
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "Asia/Jakarta",
+};
+const TIME_OPTS: Intl.DateTimeFormatOptions = {
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Asia/Jakarta",
 };
 
-/** `copy` is the dictionary's `webinars` slice — it carries the "{count} min" and timezone
-    wording, which is all the difference between the two locales here. */
+export type ScheduleParts = { date: string; time: string; duration: string | null };
+
+/**
+ * When a session runs, in the pieces the page labels separately: "Saturday, 15 August 2026",
+ * "12:00 WIB", "90 min". Null when there is no usable date — an undated entry is still listed,
+ * it just has nothing to say about when.
+ *
+ * `copy` is the dictionary's `webinars` slice; the timezone suffix and the "{count} min"
+ * wording are the only parts that differ between locales.
+ */
+export function scheduleParts(
+  w: Webinar,
+  locale: Locale,
+  copy: { minutes: string; timezone: string }
+): ScheduleParts | null {
+  if (!w.date) return null;
+  const d = new Date(w.date);
+  if (Number.isNaN(d.getTime())) return null;
+  return {
+    date: new Intl.DateTimeFormat(DATE_LOCALE[locale], DATE_OPTS).format(d),
+    time: `${new Intl.DateTimeFormat(DATE_LOCALE[locale], TIME_OPTS).format(d)} ${copy.timezone}`,
+    duration: w.durationMinutes ? fmt(copy.minutes, { count: w.durationMinutes }) : null,
+  };
+}
+
+/** The same thing on one line, for cards and the home page banner. */
 export function schedule(
   w: Webinar,
   locale: Locale,
   copy: { minutes: string; timezone: string }
 ) {
-  if (!w.date) return null;
-  const d = new Date(w.date);
-  if (Number.isNaN(d.getTime())) return null;
-  const duration = w.durationMinutes
-    ? ` · ${fmt(copy.minutes, { count: w.durationMinutes })}`
-    : "";
-  return `${DATE_FMT[locale].format(d)} ${copy.timezone}${duration}`;
+  const parts = scheduleParts(w, locale, copy);
+  if (!parts) return null;
+  return [parts.date, parts.time, parts.duration].filter(Boolean).join(" · ");
 }
 
 // The replay: an explicit recording if one was uploaded, otherwise the live stream's own ID.
