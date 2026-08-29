@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Header from "@/app/components/Header";
@@ -11,12 +10,14 @@ import { getVisibleCountries } from "@/lib/countries";
 import {
   CATEGORY_SLUGS,
   PAGE_SIZE,
-  articleThumbnail,
   categoryLabel,
-  formatDate,
+  categoryRows,
+  featuredArticles,
   matchesQuery,
   type Article,
 } from "@/lib/blog";
+import ArticleCard from "@/app/components/ArticleCard";
+import BlogHero from "@/app/components/BlogHero";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, fmt, hasLocale, localePath } from "@/lib/i18n";
 import Media from "@/app/components/Media";
@@ -69,6 +70,19 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
     label: categoryLabel(slug, d.blog.categories),
   }));
 
+  // The magazine furniture — hero, Featured column, per-category rows — belongs to the blog's
+  // front page. Once someone has filtered or searched, they asked a question and the answer is
+  // the result list; a hero above it is just something else to scroll past.
+  const isFrontPage = !activeCategory && !query && current === 1;
+  const HERO_SLIDES = 3;
+  const FEATURED_ASIDE = 3;
+  const headline = isFrontPage ? featuredArticles(ARTICLES, HERO_SLIDES + FEATURED_ASIDE) : [];
+  const heroSlides = headline.slice(0, HERO_SLIDES);
+  const featuredAside = headline.slice(HERO_SLIDES);
+  const ROWS = isFrontPage
+    ? categoryRows(ARTICLES, 3, new Set(headline.map((a) => a.slug as string)))
+    : [];
+
   return (
     <>
       <Header lang={lang} />
@@ -84,10 +98,28 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
           </div>
         </section>
 
+        <BlogHero
+          slides={heroSlides}
+          featured={featuredAside}
+          lang={lang}
+          d={d.blog}
+          categoryOrder={CATEGORY_SLUGS}
+        />
+
         <section className="pb-16">
           <div className="mx-auto max-w-[1400px] px-7">
             <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
               <div>
+                {isFrontPage && (
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
+                      {d.blog.latestTitle}
+                    </h2>
+                    <p className="mt-1.5 text-[14.5px] leading-relaxed text-muted">
+                      {d.blog.latestSubtitle}
+                    </p>
+                  </div>
+                )}
                 {/* A plain GET form: the results are rendered on the server, so search works
                     with JavaScript off and every result set has a shareable URL. The category
                     rides along in a hidden field so searching inside a category stays inside it. */}
@@ -148,44 +180,18 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
                 </div>
 
                 {paged.length > 0 ? (
-                  <div className="flex flex-col">
-                    {paged.map((article) => {
-                      const date = formatDate(article.date, lang);
-                      return (
-                        <a
-                          key={article.slug ?? article.title}
-                          href={article.slug ? p(`/blog/${article.slug}`) : "#"}
-                          className="group flex gap-5 border-b border-line py-6 first:pt-0 last:border-b-0"
-                        >
-                          {/* 223 of the 277 migrated posts have no image and the old site has
-                              none to give. The box stays either way — a list that alternates
-                              between indented and full-width rows reads as broken, not sparse.
-                              A post whose only visual is an embedded video shows that video's
-                              poster frame here rather than the bare category name. */}
-                          <div className="relative h-[110px] w-[150px] shrink-0 overflow-hidden rounded bg-paper-raise sm:h-[130px] sm:w-[176px]">
-                            {articleThumbnail(article) ? (
-                              <Image src={articleThumbnail(article) as string} alt={article.title} fill sizes="176px" className="object-cover" />
-                            ) : (
-                              <span className="flex h-full items-center justify-center px-3 text-center text-[11px] font-bold uppercase leading-tight tracking-wide text-muted">
-                                {categoryLabel(article.category, d.blog.categories)}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex min-w-0 flex-1 flex-col justify-center">
-                            <div className="mb-1.5 text-[13px]">
-                              <span className="font-semibold text-accent">
-                                {categoryLabel(article.category, d.blog.categories)}
-                              </span>
-                              {date && <span className="text-muted"> · {date}</span>}
-                            </div>
-                            <h2 className="mb-1.5 text-lg font-bold leading-snug text-ink transition-colors group-hover:text-accent sm:text-xl">
-                              {article.title}
-                            </h2>
-                            <p className="line-clamp-2 text-[13.5px] leading-relaxed text-muted">{article.excerpt}</p>
-                          </div>
-                        </a>
-                      );
-                    })}
+                  <div className="grid gap-4.5 sm:grid-cols-2 xl:grid-cols-3">
+                    {paged.map((article) => (
+                      <ArticleCard
+                        key={article.slug ?? article.title}
+                        article={article}
+                        href={article.slug ? p(`/blog/${article.slug}`) : "#"}
+                        lang={lang}
+                        d={d.blog}
+                        categoryOrder={CATEGORY_SLUGS}
+                        sizes="(min-width: 1280px) 22vw, (min-width: 640px) 42vw, 92vw"
+                      />
+                    ))}
                   </div>
                 ) : (
                   <p className="rounded-2xl border border-dashed border-line p-6.5 text-sm text-muted">
@@ -276,6 +282,41 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
             </div>
           </div>
         </section>
+
+        {/* One row per category, the way the reference site stacks its report and radar
+            strips. Only categories with a full row appear, so a thin category never renders
+            as a lonely card, and the hero's picks are excluded so the same story isn't the
+            first thing twice. */}
+        {ROWS.map((row) => (
+          <section key={row.slug} className="border-t border-line py-12">
+            <div className="mx-auto max-w-[1400px] px-7">
+              <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+                <h2 className="text-xl font-extrabold tracking-tight sm:text-2xl">
+                  {categoryLabel(row.slug, d.blog.categories)}
+                </h2>
+                <Link
+                  href={p(`/blog?category=${row.slug}`)}
+                  className="text-[13.5px] font-semibold text-accent hover:underline"
+                >
+                  {d.blog.seeAll}
+                </Link>
+              </div>
+              <div className="grid gap-4.5 sm:grid-cols-2 lg:grid-cols-3">
+                {row.articles.map((article) => (
+                  <ArticleCard
+                    key={article.slug}
+                    article={article}
+                    href={p(`/blog/${article.slug}`)}
+                    lang={lang}
+                    d={d.blog}
+                    categoryOrder={CATEGORY_SLUGS}
+                    sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        ))}
 
         <section className="bg-paper-raise py-16">
           <div className="mx-auto max-w-[1400px] px-7">

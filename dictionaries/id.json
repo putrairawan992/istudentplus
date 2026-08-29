@@ -315,6 +315,11 @@
     "kicker": "Blog",
     "title": "Update visa dan cerita **dari perjalanan**.",
     "all": "Semua",
+    "featuredKicker": "⭐ Pilihan",
+    "latestTitle": "Artikel terbaru",
+    "latestSubtitle": "Aturan visa, persiapan tes, dan kehidupan mahasiswa — seluruh arsip, terbaru di atas.",
+    "readTime": "{count} menit baca",
+    "seeAll": "Lihat semua →",
     "categories": {
       "recent-news": "Berita Terbaru",
       "immigration": "Imigrasi",

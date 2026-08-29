@@ -17,6 +17,10 @@ export type Article = {
   html?: string;
   /** Original URL on the old site, for tracing a migrated post back to its source. */
   source?: string;
+  /** Tick this in the CMS to put a post in the hero carousel and the Featured column. When
+      nothing is ticked the blog falls back to the newest posts, so the header is never empty
+      and nobody has to maintain a flag to keep the page working. */
+  featured?: boolean;
 };
 
 /** Category order as shown in the filter strip. The display labels are translated, so they
@@ -50,6 +54,61 @@ export function formatDate(iso: string | undefined, locale: Locale) {
     month: "short",
     year: "numeric",
   });
+}
+
+/** Newest first. Undated posts sort last rather than jumping to the top on an empty string. */
+export function byNewest(a: Article, b: Article) {
+  return (b.date ?? "").localeCompare(a.date ?? "");
+}
+
+/**
+ * Reading time in whole minutes, from the stored body. 200 wpm is the usual desk figure and
+ * this is a "5 min read" chip, not a promise — the point is telling a long explainer apart
+ * from a two-paragraph notice at a glance. Never returns 0: "0 min read" reads as broken.
+ */
+export function readingMinutes(article: Article): number {
+  const text = article.html
+    ? article.html.replace(/<[^>]+>/g, " ")
+    : (article.content ?? [article.excerpt ?? ""]).join(" ");
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200));
+}
+
+/**
+ * What the hero and the Featured column show, newest first: posts ticked `featured` in the
+ * CMS, then — because most migrated posts have no picture and a hero slide without one is a
+ * grey rectangle — whatever else has a real uploaded picture, and only then the plain newest.
+ *
+ * Ranks on `articleImage`, not `articleThumbnail`: a video's poster frame is fine on a small
+ * card, but it is whatever the video happens to open on, and the hero is the largest thing on
+ * the page. One live post proves the point — its embedded video's poster is an album cover,
+ * which is not what should sit under a headline about visa refusals.
+ */
+export function featuredArticles(all: Article[], limit: number): Article[] {
+  const live = all.filter((a) => a.slug);
+  const picked = live.filter((a) => a.featured).sort(byNewest);
+  const illustrated = live.filter((a) => !a.featured && articleImage(a)).sort(byNewest);
+  const rest = live.filter((a) => !a.featured && !articleImage(a)).sort(byNewest);
+  return [...picked, ...illustrated, ...rest].slice(0, limit);
+}
+
+/**
+ * One row per category for the sections down the page, skipping categories too thin to fill a
+ * row. `exclude` keeps the posts already shown in the hero from being repeated immediately
+ * underneath.
+ */
+export function categoryRows(
+  all: Article[],
+  perRow: number,
+  exclude: ReadonlySet<string> = new Set()
+): { slug: string; articles: Article[] }[] {
+  return CATEGORY_SLUGS.map((slug) => ({
+    slug,
+    articles: all
+      .filter((a) => a.slug && a.category === slug && !exclude.has(a.slug))
+      .sort(byNewest)
+      .slice(0, perRow),
+  })).filter((row) => row.articles.length >= perRow);
 }
 
 /** Case-insensitive substring match over what a reader can actually see on a card. The blog

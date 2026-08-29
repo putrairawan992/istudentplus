@@ -315,6 +315,11 @@
     "kicker": "Blog",
     "title": "Visa updates and stories from **the road**.",
     "all": "All",
+    "featuredKicker": "⭐ Featured",
+    "latestTitle": "Latest articles",
+    "latestSubtitle": "Visa rules, test prep, and student life — the whole archive, newest first.",
+    "readTime": "{count} min read",
+    "seeAll": "See all →",
     "categories": {
       "recent-news": "Recent News",
       "immigration": "Immigration",
