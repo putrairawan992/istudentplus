@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { loginAction } from "./actions";
 
 export default function AdminLoginPage() {
@@ -10,7 +11,11 @@ export default function AdminLoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-paper-raise to-sky-ink px-4">
       <div className="w-full max-w-sm rounded-3xl border border-line bg-card p-8 shadow-lg shadow-ink/5">
-        <Image src="/icon-istudentplus.png" alt="iStudentPlus" width={986} height={338} className="mb-6 h-8 w-auto" />
+        {/* The way back out: someone who lands here by accident, or gets here from the public
+            site's Login link, has no other route to the website itself. */}
+        <Link href="/" className="mb-6 inline-block">
+          <Image src="/icon-istudentplus.png" alt="iStudentPlus" width={986} height={338} className="h-8 w-auto" />
+        </Link>
         <h1 className="mb-1 text-xl font-extrabold">Admin Login</h1>
         <p className="mb-6 text-sm text-muted">Manage iStudentPlus website content.</p>
         <form action={formAction} className="flex flex-col gap-4">

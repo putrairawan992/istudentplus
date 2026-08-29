@@ -30,7 +30,10 @@ export const COLLECTIONS: CollectionMeta[] = [
   { key: "leads", label: "Consultation & Contact Leads", description: "Submissions from the Free Consultation, Contact, and webinar registration forms", kind: "list", usedOn: "Home, Contact, Webinars", icon: "📥", group: "Inbox" },
 ];
 
-export const COLLECTION_GROUPS: CollectionGroup[] = ["General", "Content", "Inbox"];
+// Inbox first: it's the only group that changes on its own. Everything else sits where the
+// team left it, so a sidebar ordered "content first" buried the one thing worth checking on
+// arrival at the bottom of a scrolling list. Both the sidebar and the dashboard read this.
+export const COLLECTION_GROUPS: CollectionGroup[] = ["Inbox", "General", "Content"];
 
 /**
  * Fields the editor should always offer for a collection, even when no entry has one yet.
