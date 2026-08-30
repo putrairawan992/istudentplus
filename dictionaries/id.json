@@ -246,10 +246,15 @@
   "contact": {
     "kicker": "Hubungi Kami",
     "title": "Jadwalkan sesi **konsultasi** gratis.",
-    "subtitle": "Cara tercepat menghubungi konselor adalah WhatsApp — sebagian besar pertanyaan dijawab di hari yang sama.",
-    "fastest": "Tercepat",
+    "subtitle": "Satu konselor mendampingimu dari pendaftaran sampai tiba di kampus — pilihan jurusan, penerimaan, visa, dan keberangkatan. Didukung 100+ universitas partner.",
     "weReplyIn": "Kami membalas dalam",
-    "socialMedia": "Sosial Media"
+    "socialMedia": "Sosial Media",
+    "badge": "Konsultasi gratis · Intake 2026 dibuka",
+    "benefits": [
+      "Konsultasi gratis soal kampus yang realistis kamu tembus",
+      "Angka biaya kuliah dan hidup yang sebenarnya, sebelum kamu putuskan",
+      "Dokumen visa disiapkan bersama migration agent terdaftar"
+    ]
   },
   "courses": {
     "kicker": "Program & Universitas",
@@ -476,18 +481,36 @@
       "submitting": "Mengirim…"
     },
     "contact": {
-      "successTitle": "Pesan terkirim!",
-      "successBody": "Konselor kami akan segera menghubungimu.",
+      "successTitle": "Permintaanmu masuk",
+      "successBody": "Konselor kami sedang meninjau profilmu. Mau jawaban dalam beberapa menit? Chat saja lewat WhatsApp.",
       "name": "Nama lengkap",
-      "namePlaceholder": "Namamu",
+      "namePlaceholder": "mis. Andira Putri",
       "email": "Email",
       "emailPlaceholder": "kamu@contoh.com",
-      "destination": "Negara tujuan yang diminati",
-      "destinationPlaceholder": "mis. Australia, Korea, Jepang",
+      "destination": "Negara tujuan",
+      "destinationPlaceholder": "Pilih negara tujuan",
       "message": "Pesan",
       "messagePlaceholder": "Ceritakan rencana studimu",
-      "submit": "Kirim pesan",
-      "submitting": "Mengirim…"
+      "submit": "Minta konsultasi gratis",
+      "submitting": "Mengirim…",
+      "heading": "Dapatkan konsultasi gratismu",
+      "headingBadge": "Gratis",
+      "intro": "Konselor kami meninjau profilmu dan membalas dengan pilihan jurusan, biaya, dan jalur visa — biasanya di hari yang sama.",
+      "whatsapp": "Nomor WhatsApp",
+      "whatsappPlaceholder": "+62 812 3456 7890",
+      "destinations": [
+        "Australia",
+        "Jepang",
+        "China",
+        "Inggris",
+        "Kanada",
+        "Belum yakin — tolong sarankan"
+      ],
+      "note": "Cukup 40 detik · Datamu kami jaga · Tanpa kewajiban mendaftar",
+      "continueWhatsApp": "Lanjut di WhatsApp →",
+      "submitAnother": "Kirim pertanyaan lagi",
+      "orReachDirectly": "atau hubungi kami langsung",
+      "whatsappInstead": "Chat lewat WhatsApp saja"
     },
     "checklist": {
       "success": "✓ Sudah kami terima — tim kami akan mengirim checklist ke emailmu.",

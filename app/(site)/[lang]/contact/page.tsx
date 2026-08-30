@@ -20,7 +20,8 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/contact">)
 }
 
 type Social = { label: string; href: string };
-type Settings = { languages: string[]; socials: Social[]; whatsapp: string };
+type Stat = { label: string; value: string };
+type Settings = { languages: string[]; socials: Social[]; whatsapp: string; stats: Stat[] };
 
 export default async function ContactPage({ params }: PageProps<"/[lang]/contact">) {
   const { lang } = await params;
@@ -36,67 +37,80 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
     <>
       <Header lang={lang} />
       <main>
-        <section className="pt-16 pb-14">
-          <div className="mx-auto max-w-3xl px-7 text-center">
-            <div className="mb-4.5 inline-flex items-center gap-2 rounded-full bg-sky-ink px-3 py-1 text-xs font-bold uppercase tracking-widest text-sky">
-              {d.contact.kicker}
-            </div>
-            <h1 className="mb-5 text-4xl font-extrabold tracking-tight text-balance sm:text-5xl">
-              <Marked text={d.contact.title} />
-            </h1>
-            <p className="mx-auto max-w-lg text-[17px] leading-relaxed text-muted">{d.contact.subtitle}</p>
-          </div>
-        </section>
+        {/* Two columns, the pitch beside the form — the shape of the ads landing-page mockup.
+            The old layout put a centred hero above a WhatsApp card, a language list and a
+            social list, and left the form last: three things to scroll past before the one
+            thing the page is for. */}
+        <section className="bg-[radial-gradient(760px_420px_at_92%_0%,var(--color-accent)/8,transparent_62%)] pt-12 pb-16 sm:pt-16">
+          <div className="mx-auto grid max-w-[1180px] items-start gap-12 px-6 lg:grid-cols-[1.05fr_.95fr] lg:gap-14">
+            <div>
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-line bg-card px-3.5 py-1.5 text-[12.5px] font-bold text-accent-ink shadow-sm">
+                <span className="block h-1.5 w-1.5 rounded-full bg-[#25D366]" />
+                {d.contact.badge}
+              </div>
 
-        <section className="pb-16">
-          <div className="mx-auto grid max-w-[1400px] gap-8 px-7 lg:grid-cols-[1fr_1.1fr]">
-            <div className="flex flex-col gap-4.5">
-              <a
-                href={WHATSAPP_URL}
-                className="flex items-center justify-between rounded-2xl bg-accent px-6 py-5 text-white shadow-lg shadow-accent/25"
-              >
-                <div>
-                  <div className="text-xs font-bold uppercase tracking-wide opacity-80">{d.contact.fastest}</div>
-                  <div className="text-lg font-extrabold">{d.common.chatOnWhatsApp}</div>
-                </div>
-                <span className="text-2xl">→</span>
-              </a>
+              <h1 className="mt-5 text-4xl font-extrabold leading-[1.03] tracking-tight text-balance sm:text-5xl lg:text-[60px]">
+                <Marked text={d.contact.title} />
+              </h1>
 
-              <div className="rounded-2xl border border-line bg-card p-5">
-                <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
-                  {d.contact.weReplyIn}
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {LANGUAGES.map((language) => (
-                    <span key={language} className="rounded-full bg-paper-raise px-3 py-1 text-[12.5px] font-medium">
-                      {language}
+              <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-muted">
+                {d.contact.subtitle}
+              </p>
+
+              <div className="mt-7 flex max-w-lg flex-col gap-3">
+                {d.contact.benefits.map((benefit) => (
+                  <div key={benefit} className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-50 text-[12px] font-extrabold text-emerald-700">
+                      ✓
                     </span>
-                  ))}
-                </div>
+                    <span className="text-[15.5px] leading-snug text-ink/80">{benefit}</span>
+                  </div>
+                ))}
               </div>
 
-              <div className="rounded-2xl border border-line bg-card p-5">
-                <div className="mb-2 text-xs font-bold uppercase tracking-widest text-accent">
-                  {d.contact.socialMedia}
-                </div>
-                <div className="flex flex-wrap gap-2.5">
-                  {SOCIALS.map((s) => (
-                    <a key={s.label} href={s.href} className="rounded-full border border-line px-4 py-1.5 text-[13px] font-semibold hover:bg-paper-raise">
-                      {s.label}
-                    </a>
-                  ))}
-                  <a href={WHATSAPP_URL} className="rounded-full bg-accent px-4 py-1.5 text-[13px] font-semibold text-white">
-                    WhatsApp
-                  </a>
-                </div>
+              {/* Straight from Site Settings, like the home page's row — one place to edit. */}
+              <div className="mt-8 flex flex-wrap gap-x-9 gap-y-5 border-t border-line pt-6">
+                {SETTINGS.stats.map((stat) => (
+                  <div key={stat.label}>
+                    <div className="text-[34px] font-extrabold leading-none">{stat.value}</div>
+                    <div className="mt-1.5 font-mono text-[11.5px] uppercase tracking-wide text-muted">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <ContactForm
-              lang={lang}
-              copy={d.forms.contact}
-              fallbackError={d.common.somethingWentWrong}
-            />
+            <div>
+              <ContactForm
+                lang={lang}
+                copy={d.forms.contact}
+                fallbackError={d.common.somethingWentWrong}
+                whatsappUrl={WHATSAPP_URL}
+              />
+
+              <div className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 px-1 text-[12px] text-muted">
+                <span className="font-mono text-[10.5px] font-bold uppercase tracking-wider">
+                  {d.contact.weReplyIn}
+                </span>
+                <span>{LANGUAGES.join(" · ")}</span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 px-1">
+                <span className="font-mono text-[10.5px] font-bold uppercase tracking-wider text-muted">
+                  {d.contact.socialMedia}
+                </span>
+                {SOCIALS.map((social) => (
+                  <a
+                    key={social.label}
+                    href={social.href}
+                    className="text-[13px] font-semibold text-ink hover:text-accent"
+                  >
+                    {social.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </main>
