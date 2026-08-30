@@ -3,13 +3,15 @@ import { articleThumbnail, type Article } from "@/lib/blog";
 import { localePath, type Locale } from "@/lib/i18n";
 import type { Dictionary } from "@/lib/dictionary";
 import { ArticleMeta, ArticleThumb, categoryTint } from "./ArticleCard";
+import BlogHeroCarousel from "./BlogHeroCarousel";
 
 /**
  * The news-portal header: one big rotating story on the left, a Featured column on the right.
  *
- * The carousel is CSS scroll-snap plus anchor links for the dots — no client component, no
- * hydration, and it stays swipeable on a phone and scrollable with a trackpad. A JS carousel
- * here would ship a bundle to do what `overflow-x-auto` already does.
+ * Scrolling stays the browser's — CSS scroll-snap on a horizontally scrollable strip, so a
+ * swipe and a trackpad work with no JavaScript at all. BlogHeroCarousel wraps it to add the
+ * arrows, the live dots and the 5-second advance; the slides themselves stay server-rendered
+ * because they're passed to it as children.
  */
 export default function BlogHero({
   slides,
@@ -31,7 +33,14 @@ export default function BlogHero({
     <section className="pt-8 pb-12">
       <div className="mx-auto grid max-w-[1400px] gap-6 px-7 lg:grid-cols-[1.9fr_1fr]">
         <div>
-          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <BlogHeroCarousel
+            count={slides.length}
+            labels={{
+              prevStory: d.prevStory,
+              nextStory: d.nextStory,
+              goToStory: d.goToStory,
+            }}
+          >
             {slides.map((article, i) => {
               // Once per slide: articleThumbnail scans the article body for embeds.
               const hasPhoto = articleThumbnail(article) !== null;
@@ -40,7 +49,7 @@ export default function BlogHero({
                 key={article.slug}
                 id={`story-${i + 1}`}
                 href={p(`/blog/${article.slug}`)}
-                // scroll-mt keeps the sticky header off the slide when a dot link targets it
+                // Keeps its own anchor id: /blog#story-2 still links straight to a slide.
                 className="group relative flex aspect-video w-full shrink-0 snap-center scroll-mt-24 flex-col justify-end overflow-hidden rounded-3xl bg-ink"
               >
                 <div className="absolute inset-0">
@@ -82,20 +91,7 @@ export default function BlogHero({
               </Link>
               );
             })}
-          </div>
-
-          {slides.length > 1 && (
-            <div className="mt-3 flex justify-center gap-2">
-              {slides.map((article, i) => (
-                <a
-                  key={article.slug}
-                  href={`#story-${i + 1}`}
-                  aria-label={article.title}
-                  className="h-1.5 w-6 rounded-full bg-line transition-colors hover:bg-accent"
-                />
-              ))}
-            </div>
-          )}
+          </BlogHeroCarousel>
         </div>
 
         <aside className="flex flex-col gap-3">
