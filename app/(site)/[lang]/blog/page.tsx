@@ -70,16 +70,20 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
     label: categoryLabel(slug, d.blog.categories),
   }));
 
-  // The magazine furniture — hero, Featured column, per-category rows — belongs to the blog's
-  // front page. Once someone has filtered or searched, they asked a question and the answer is
-  // the result list; a hero above it is just something else to scroll past.
-  const isFrontPage = !activeCategory && !query && current === 1;
+  // The hero and the Featured column are the blog's front-of-book, not a view of the result
+  // list: they stay put on every tab, page and search so switching a filter changes the
+  // articles below and nothing else. Which posts they hold is editorial — see featuredArticles
+  // and the Featured checkbox in the CMS — so they don't follow the filter either.
   const HERO_SLIDES = 3;
   const FEATURED_ASIDE = 3;
-  const headline = isFrontPage ? featuredArticles(ARTICLES, HERO_SLIDES + FEATURED_ASIDE) : [];
+  const headline = featuredArticles(ARTICLES, HERO_SLIDES + FEATURED_ASIDE);
   const heroSlides = headline.slice(0, HERO_SLIDES);
   const featuredAside = headline.slice(HERO_SLIDES);
-  const ROWS = isFrontPage
+
+  // The per-category rows are the exception: they're a way to browse everything, which is only
+  // an offer worth making to someone who hasn't already narrowed down.
+  const isUnfiltered = !activeCategory && !query && current === 1;
+  const ROWS = isUnfiltered
     ? categoryRows(ARTICLES, 3, new Set(headline.map((a) => a.slug as string)))
     : [];
 
@@ -110,7 +114,7 @@ export default async function BlogPage({ params, searchParams }: PageProps<"/[la
           <div className="mx-auto max-w-[1400px] px-7">
             <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
               <div>
-                {isFrontPage && (
+                {isUnfiltered && (
                   <div className="mb-6">
                     <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">
                       {d.blog.latestTitle}
