@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, Fragment, useContext, useMemo, useRef, useState, useTransition } from "react";
+import { createContext, Fragment, useContext, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { JsonValue, JsonObject } from "@/lib/json-tree";
 import {
   setAtPath,
@@ -324,11 +324,132 @@ function embedIframeFor(url: string): string | null {
   return `<iframe ${size} src="${embedUrl}" title="${platform.label}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
 }
 
-// The blog post body: a plain HTML textarea plus a small helper that appends a YouTube/Instagram
-// embed from just a link, so editors never touch raw <iframe>/<script> markup by hand.
+// A full Rich Text / WYSIWYG Editor for HTML fields (e.g. blog posts)
+// Gives non-technical users standard formatting (headings, bold, lists, quotes, links, images),
+// while offering a Code view for power users and a Live Preview matching .article-body typography.
 function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v: string | null) => void }) {
+  const [mode, setMode] = useState<"visual" | "html" | "preview">("visual");
+  const editorRef = useRef<HTMLDivElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const [embedUrl, setEmbedUrl] = useState("");
   const [err, setErr] = useState("");
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageAlt, setImageAlt] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const savedSelection = useRef<Range | null>(null);
+
+  // Sync value into contentEditable when switching back to visual mode or when initial value arrives
+  useEffect(() => {
+    if (editorRef.current && mode === "visual") {
+      const currentHtml = editorRef.current.innerHTML;
+      const targetHtml = value ?? "";
+      if (currentHtml !== targetHtml) {
+        editorRef.current.innerHTML = targetHtml;
+      }
+    }
+  }, [value, mode]);
+
+  function handleInput() {
+    if (editorRef.current) {
+      const html = editorRef.current.innerHTML;
+      if (html === "" || html === "<br>" || html === "<p><br></p>" || html === "<div><br></div>") {
+        onChange(null);
+      } else {
+        onChange(html);
+      }
+    }
+  }
+
+  function exec(command: string, val: string | undefined = undefined) {
+    if (mode !== "visual") return;
+    editorRef.current?.focus();
+    document.execCommand(command, false, val);
+    handleInput();
+  }
+
+  function saveCurrentSelection() {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      savedSelection.current = sel.getRangeAt(0).cloneRange();
+    }
+  }
+
+  function restoreSelection() {
+    if (savedSelection.current) {
+      const sel = window.getSelection();
+      if (sel) {
+        sel.removeAllRanges();
+        sel.addRange(savedSelection.current);
+      }
+    }
+  }
+
+  function openLinkModal() {
+    saveCurrentSelection();
+    const sel = window.getSelection();
+    const selected = sel ? sel.toString() : "";
+    setLinkText(selected);
+    setLinkUrl("");
+    setShowLinkModal(true);
+  }
+
+  function applyLink() {
+    setShowLinkModal(false);
+    if (!linkUrl.trim()) return;
+    editorRef.current?.focus();
+    restoreSelection();
+    const url = linkUrl.trim().startsWith("http://") || linkUrl.trim().startsWith("https://") || linkUrl.trim().startsWith("mailto:")
+      ? linkUrl.trim()
+      : `https://${linkUrl.trim()}`;
+    if (linkText.trim() && savedSelection.current?.collapsed) {
+      const linkHtml = `<a href="${url}" target="_blank" rel="noopener noreferrer">${linkText.trim()}</a>`;
+      document.execCommand("insertHTML", false, linkHtml);
+    } else {
+      document.execCommand("createLink", false, url);
+    }
+    handleInput();
+  }
+
+  function openImageModal() {
+    saveCurrentSelection();
+    setImageUrl("");
+    setImageAlt("");
+    setShowImageModal(true);
+  }
+
+  function applyImage() {
+    setShowImageModal(false);
+    if (!imageUrl.trim()) return;
+    editorRef.current?.focus();
+    restoreSelection();
+    const imgHtml = `<figure><img src="${imageUrl.trim()}" alt="${imageAlt.trim() || 'Blog image'}" class="rounded-xl my-4 max-w-full h-auto" />${imageAlt.trim() ? `<figcaption class="text-xs text-muted mt-1 text-center">${imageAlt.trim()}</figcaption>` : ''}</figure><p></p>`;
+    document.execCommand("insertHTML", false, imgHtml);
+    handleInput();
+  }
+
+  async function handleImageUpload(file: File) {
+    setUploadingImage(true);
+    setErr("");
+    try {
+      if (file.size > MAX_UPLOAD_BYTES) {
+        throw new Error(`File terlalu besar — maksimal ${MAX_UPLOAD_LABEL}.`);
+      }
+      const fd = new FormData();
+      fd.set("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
+      const data = await readUploadResponse(res);
+      if (!res.ok || !data.ok || !data.url) throw new Error(data.error || "Gagal mengunggah gambar.");
+      setImageUrl(data.url);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Gagal mengunggah gambar.");
+    } finally {
+      setUploadingImage(false);
+    }
+  }
 
   function insertEmbed() {
     const iframe = embedIframeFor(embedUrl.trim());
@@ -338,51 +459,424 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
     }
     setErr("");
     const current = value ?? "";
-    onChange(current ? `${current}\n${iframe}` : iframe);
+    const updated = current ? `${current}\n<div class="my-6">${iframe}</div>\n<p></p>` : `<div class="my-6">${iframe}</div>\n<p></p>`;
+    onChange(updated);
+    if (editorRef.current && mode === "visual") {
+      editorRef.current.innerHTML = updated;
+    }
     setEmbedUrl("");
   }
 
+  // Count words and characters
+  const rawText = (value ?? "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const wordCount = rawText ? rawText.split(" ").length : 0;
+  const charCount = rawText.length;
+
   return (
-    <div className="flex flex-col gap-2">
-      <textarea
-        value={value ?? ""}
-        rows={10}
-        onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
-        className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
-      />
-      <div className="rounded-lg border border-line bg-paper-raise/60 p-3">
-        <p className="mb-2 text-[12px] font-bold text-muted">Sisipkan video / postingan</p>
+    <div className="flex flex-col gap-3 rounded-2xl border border-line bg-card p-4 shadow-xs">
+      {/* Editor Header: Mode Switcher Tabs */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+        <div className="flex items-center gap-1 rounded-xl bg-paper-raise p-1 text-xs font-bold">
+          <button
+            type="button"
+            onClick={() => setMode("visual")}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${
+              mode === "visual" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
+            }`}
+          >
+            <span>🎨</span>
+            <span>Editor Visual</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("html")}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${
+              mode === "html" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
+            }`}
+          >
+            <span>💻</span>
+            <span>Kode HTML</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("preview")}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${
+              mode === "preview" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
+            }`}
+          >
+            <span>👁️</span>
+            <span>Pratinjau</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3 text-xs text-muted">
+          <span>{wordCount} kata</span>
+          <span>•</span>
+          <span>{charCount} karakter</span>
+        </div>
+      </div>
+
+      {/* Visual Editor Toolbar */}
+      {mode === "visual" && (
+        <div className="flex flex-wrap items-center gap-1 rounded-xl border border-line/80 bg-paper p-1.5">
+          {/* Headings */}
+          <select
+            onChange={(e) => {
+              if (e.target.value) {
+                exec("formatBlock", e.target.value);
+                e.target.value = "";
+              }
+            }}
+            defaultValue=""
+            className="rounded-lg border border-line bg-card px-2.5 py-1 text-xs font-bold text-ink outline-none"
+            title="Pilih Format Judul / Paragraf"
+          >
+            <option value="" disabled>Format Text</option>
+            <option value="<p>">Paragraf Biasa</option>
+            <option value="<h2>">Judul Utama (H2)</option>
+            <option value="<h3>">Sub Judul (H3)</option>
+            <option value="<h4>">Sub-sub Judul (H4)</option>
+          </select>
+
+          <span className="mx-1 h-5 w-px bg-line" />
+
+          {/* Formatting buttons */}
+          <button
+            type="button"
+            onClick={() => exec("bold")}
+            title="Tebal (Bold) - Ctrl+B"
+            className="grid h-7 w-7 place-items-center rounded-lg font-bold text-ink hover:bg-paper-raise"
+          >
+            <b>B</b>
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("italic")}
+            title="Miring (Italic) - Ctrl+I"
+            className="grid h-7 w-7 place-items-center rounded-lg italic text-ink hover:bg-paper-raise"
+          >
+            <i>I</i>
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("underline")}
+            title="Garis Bawah (Underline) - Ctrl+U"
+            className="grid h-7 w-7 place-items-center rounded-lg underline text-ink hover:bg-paper-raise"
+          >
+            <u>U</u>
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("strikeThrough")}
+            title="Coret (Strikethrough)"
+            className="grid h-7 w-7 place-items-center rounded-lg line-through text-ink hover:bg-paper-raise text-xs"
+          >
+            S
+          </button>
+
+          <span className="mx-1 h-5 w-px bg-line" />
+
+          {/* Lists */}
+          <button
+            type="button"
+            onClick={() => exec("insertUnorderedList")}
+            title="Daftar Poin (Bullet List)"
+            className="grid h-7 w-7 place-items-center rounded-lg text-ink hover:bg-paper-raise text-sm"
+          >
+            •≡
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("insertOrderedList")}
+            title="Daftar Angka (Numbered List)"
+            className="grid h-7 w-7 place-items-center rounded-lg text-ink hover:bg-paper-raise text-xs font-bold"
+          >
+            1.
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("formatBlock", "<blockquote>")}
+            title="Kutipan (Blockquote)"
+            className="grid h-7 w-7 place-items-center rounded-lg text-ink hover:bg-paper-raise text-xs font-bold"
+          >
+            “ ”
+          </button>
+
+          <span className="mx-1 h-5 w-px bg-line" />
+
+          {/* Links & Media */}
+          <button
+            type="button"
+            onClick={openLinkModal}
+            title="Sisipkan Tautan / Link"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-accent hover:bg-accent/10"
+          >
+            <span>🔗</span>
+            <span>Link</span>
+          </button>
+          <button
+            type="button"
+            onClick={openImageModal}
+            title="Sisipkan Gambar"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-semibold text-ink hover:bg-paper-raise"
+          >
+            <span>🖼️</span>
+            <span>Gambar</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("insertHorizontalRule")}
+            title="Garis Pembatas (Divider)"
+            className="rounded-lg px-2 py-1 text-xs font-semibold text-muted hover:bg-paper-raise"
+          >
+            ― Garis
+          </button>
+
+          <span className="mx-1 h-5 w-px bg-line" />
+
+          {/* Utility */}
+          <button
+            type="button"
+            onClick={() => exec("removeFormat")}
+            title="Hapus Pemformatan (Clear Formatting)"
+            className="rounded-lg px-2 py-1 text-xs text-muted hover:bg-paper-raise hover:text-ink"
+          >
+            🧹 Hapus Format
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("undo")}
+            title="Undo (Urungkan)"
+            className="grid h-7 w-7 place-items-center rounded-lg text-muted hover:bg-paper-raise hover:text-ink text-xs"
+          >
+            ↶
+          </button>
+          <button
+            type="button"
+            onClick={() => exec("redo")}
+            title="Redo (Ulangi)"
+            className="grid h-7 w-7 place-items-center rounded-lg text-muted hover:bg-paper-raise hover:text-ink text-xs"
+          >
+            ↷
+          </button>
+        </div>
+      )}
+
+      {/* Editor Body */}
+      {mode === "visual" && (
+        <div className="relative rounded-xl border border-line bg-paper focus-within:border-accent focus-within:bg-card focus-within:ring-2 focus-within:ring-accent/15">
+          <div
+            ref={editorRef}
+            contentEditable
+            onInput={handleInput}
+            onBlur={handleInput}
+            className="article-body min-h-[320px] max-h-[600px] overflow-y-auto p-5 outline-none focus:outline-none"
+            data-placeholder="Tulis konten artikel di sini..."
+          />
+          {(!value || value.trim() === "") && (
+            <p className="pointer-events-none absolute left-5 top-5 text-sm text-muted/60">
+              Mulai mengetik artikel Anda di sini... Gunakan toolbar di atas untuk judul, tebal, gambar, atau link.
+            </p>
+          )}
+        </div>
+      )}
+
+      {mode === "html" && (
+        <div className="flex flex-col gap-2">
+          <textarea
+            value={value ?? ""}
+            rows={14}
+            onChange={(e) => onChange(e.target.value === "" ? null : e.target.value)}
+            placeholder="<p>Tulis kode HTML di sini...</p>"
+            className="w-full font-mono text-xs leading-relaxed rounded-xl border border-line bg-paper p-4 text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/15"
+          />
+          <p className="text-[11.5px] text-muted">
+            💡 Mode Kode HTML berguna jika Anda ingin menyalin atau memeriksa struktur tag HTML secara langsung.
+          </p>
+        </div>
+      )}
+
+      {mode === "preview" && (
+        <div className="rounded-xl border border-line bg-card p-6 shadow-xs">
+          <div className="mb-4 flex items-center justify-between border-b border-line pb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-muted">Pratinjau Halaman Artikel</span>
+            <span className="text-xs font-semibold text-emerald-600">✓ Tampilan Langsung</span>
+          </div>
+          {value ? (
+            <div
+              className="article-body max-w-none"
+              dangerouslySetInnerHTML={{ __html: value }}
+            />
+          ) : (
+            <p className="py-12 text-center text-sm text-muted italic">Belum ada konten untuk ditampilkan.</p>
+          )}
+        </div>
+      )}
+
+      {/* Insert Link Modal */}
+      {showLinkModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={() => setShowLinkModal(false)}>
+          <div className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="mb-3 text-base font-extrabold">Sisipkan Tautan / Link</h3>
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted">Teks Tautan (Opsional)</label>
+                <input
+                  type="text"
+                  value={linkText}
+                  onChange={(e) => setLinkText(e.target.value)}
+                  placeholder="Contoh: Klik di sini untuk mendaftar"
+                  className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-xs text-ink outline-none focus:border-accent"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted">URL / Alamat Web</label>
+                <input
+                  type="text"
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  placeholder="https://example.com atau /study-abroad"
+                  className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-xs text-ink outline-none focus:border-accent"
+                />
+              </div>
+              <div className="mt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowLinkModal(false)}
+                  className="rounded-xl border border-line px-4 py-1.5 text-xs font-semibold hover:bg-paper-raise"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={applyLink}
+                  className="rounded-xl bg-accent px-4 py-1.5 text-xs font-bold text-white shadow-xs"
+                >
+                  Sisipkan Link
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Insert Image Modal */}
+      {showImageModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={() => setShowImageModal(false)}>
+          <div className="w-full max-w-md rounded-2xl bg-card p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="mb-3 text-base font-extrabold">Sisipkan Gambar ke Artikel</h3>
+            <div className="flex flex-col gap-3">
+              {/* Upload option */}
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted">Unggah dari Komputer</label>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleImageUpload(f);
+                  }}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={uploadingImage}
+                  className="w-full rounded-xl border border-dashed border-line bg-paper p-3 text-center text-xs font-semibold text-ink hover:border-accent hover:bg-card"
+                >
+                  {uploadingImage ? "Sedang mengunggah..." : "📁 Klik untuk memilih & mengunggah gambar"}
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="h-px flex-1 bg-line" />
+                <span className="text-[11px] text-muted">atau masukkan URL</span>
+                <span className="h-px flex-1 bg-line" />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted">URL Gambar</label>
+                <input
+                  type="text"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="https://.../gambar.jpg"
+                  className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-xs text-ink outline-none focus:border-accent"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-semibold text-muted">Keterangan Gambar / Caption (Opsional)</label>
+                <input
+                  type="text"
+                  value={imageAlt}
+                  onChange={(e) => setImageAlt(e.target.value)}
+                  placeholder="Contoh: Suasana perkuliahan di Melbourne University"
+                  className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-xs text-ink outline-none focus:border-accent"
+                />
+              </div>
+
+              {imageUrl && (
+                <div className="rounded-xl border border-line p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={imageUrl} alt="Pratinjau" className="max-h-36 mx-auto object-contain rounded-lg" />
+                </div>
+              )}
+
+              {err && <p className="text-xs text-red-600">{err}</p>}
+
+              <div className="mt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowImageModal(false)}
+                  className="rounded-xl border border-line px-4 py-1.5 text-xs font-semibold hover:bg-paper-raise"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={applyImage}
+                  disabled={!imageUrl.trim()}
+                  className="rounded-xl bg-accent px-4 py-1.5 text-xs font-bold text-white shadow-xs disabled:opacity-50"
+                >
+                  Sisipkan Gambar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Embed helper (YouTube / Instagram / TikTok / etc.) */}
+      <div className="rounded-xl border border-line bg-paper-raise/60 p-4">
+        <p className="mb-2 text-xs font-bold text-ink">📹 Sisipkan Video / Postingan Media Sosial</p>
         <div className="flex flex-wrap gap-2">
           <input
             type="text"
             value={embedUrl}
             onChange={(e) => { setEmbedUrl(e.target.value); setErr(""); }}
-            placeholder="Tempel link video atau postingan di sini"
-            className="min-w-0 flex-1 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+            placeholder="Tempel link YouTube, Instagram, TikTok, atau Twitter di sini..."
+            className="min-w-0 flex-1 rounded-xl border border-line bg-paper px-3.5 py-2 text-xs text-ink outline-none focus:border-accent"
           />
           <button
             type="button"
             onClick={insertEmbed}
-            className="shrink-0 rounded-lg border border-line px-3 py-2 text-[13px] font-semibold text-accent hover:bg-paper"
+            className="shrink-0 rounded-xl bg-ink px-4 py-2 text-xs font-bold text-white transition-transform hover:scale-[1.02]"
           >
-            + Sisipkan
+            + Sisipkan Video
           </button>
         </div>
-        {err && <p className="mt-1.5 text-[12px] text-red-600">{err}</p>}
-        <p className="mt-1.5 text-[12px] text-muted">
-          Cukup tempel link-nya, lalu klik &quot;Sisipkan&quot; — embed-nya ditambahkan ke akhir
-          konten di atas. Tidak perlu menyalin kode embed dari platform-nya.
+        {err && <p className="mt-1.5 text-xs text-red-600">{err}</p>}
+        <p className="mt-2 text-[11.5px] leading-relaxed text-muted">
+          Cukup tempel link video/postingan dan klik <b>Sisipkan Video</b>. Embed responsif akan otomatis ditambahkan ke dalam artikel.
         </p>
-        {/* One row per platform, straight from lib/embeds.ts — the same table the insert button
-            matches against, so what this promises and what the button accepts cannot drift. */}
-        <dl className="mt-2.5 grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1.5 border-t border-line pt-2.5 text-[12px] leading-relaxed">
+
+        <dl className="mt-2.5 grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1.5 border-t border-line pt-2.5 text-[11.5px] leading-relaxed">
           {PLATFORMS.map((platform) => (
             <Fragment key={platform.id}>
-              <dt className="font-semibold text-ink">{platform.label}</dt>
+              <dt className="font-bold text-ink">{platform.label}</dt>
               <dd className="text-muted">
-                <span className="text-ink">{platform.accepts}</span>
-                <br />
-                {platform.note}
+                <span className="text-ink">{platform.accepts}</span> — {platform.note}
               </dd>
             </Fragment>
           ))}
