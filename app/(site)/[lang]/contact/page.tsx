@@ -4,9 +4,11 @@ import Header from "@/app/components/Header";
 import Footer from "@/app/components/Footer";
 import Marked from "@/app/components/Marked";
 import ContactForm from "@/app/components/ContactForm";
+import Media from "@/app/components/Media";
 import { readContent } from "@/lib/content";
 import { getDictionary } from "@/lib/dictionary";
 import { alternatesFor, hasLocale } from "@/lib/i18n";
+import { hasMedia, type Media as MediaValue } from "@/lib/media";
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/contact">): Promise<Metadata> {
   const { lang } = await params;
@@ -23,12 +25,24 @@ type Social = { label: string; href: string };
 type Stat = { label: string; value: string };
 type Settings = { languages: string[]; socials: Social[]; whatsapp: string; stats: Stat[] };
 
+// The hero's headline, proof points and optional photo/video live in their own CMS record
+// (like the home page's heroTitle/heroSubtitle in Site Settings) rather than in the interface
+// dictionary — this is marketing copy the client changes on her own, not fixed page chrome.
+// `weReplyIn` / `socialMedia` below stay in the dictionary: those are UI labels, not content.
+type ContactPageContent = MediaValue & {
+  badge: string;
+  title: string;
+  subtitle: string;
+  benefits: string[];
+};
+
 export default async function ContactPage({ params }: PageProps<"/[lang]/contact">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
   const d = await getDictionary(lang);
 
   const SETTINGS = await readContent<Settings>("settings", lang);
+  const PAGE = await readContent<ContactPageContent>("contactPage", lang);
   const LANGUAGES = SETTINGS.languages;
   const SOCIALS = SETTINGS.socials;
   const WHATSAPP_URL = SETTINGS.whatsapp;
@@ -46,19 +60,19 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
             <div>
               <div className="inline-flex items-center gap-2.5 rounded-full border border-line bg-card px-3.5 py-1.5 text-[12.5px] font-bold text-accent-ink shadow-sm">
                 <span className="block h-1.5 w-1.5 rounded-full bg-[#25D366]" />
-                {d.contact.badge}
+                {PAGE.badge}
               </div>
 
               <h1 className="mt-5 text-4xl font-extrabold leading-[1.03] tracking-tight text-balance sm:text-5xl lg:text-[60px]">
-                <Marked text={d.contact.title} />
+                <Marked text={PAGE.title} />
               </h1>
 
               <p className="mt-5 max-w-lg text-[17px] leading-relaxed text-muted">
-                {d.contact.subtitle}
+                {PAGE.subtitle}
               </p>
 
               <div className="mt-7 flex max-w-lg flex-col gap-3">
-                {d.contact.benefits.map((benefit) => (
+                {PAGE.benefits.map((benefit) => (
                   <div key={benefit} className="flex items-start gap-3">
                     <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-50 text-[12px] font-extrabold text-emerald-700">
                       ✓
@@ -79,6 +93,21 @@ export default async function ContactPage({ params }: PageProps<"/[lang]/contact
                   </div>
                 ))}
               </div>
+
+              {/* Optional photo or video, set on the Contact Page record itself — a counselor
+                  at their desk, a short intro clip, whatever the client wants to put a face to
+                  the form. Renders nothing at all when unset, so the pitch column above is the
+                  whole page until someone fills it in. */}
+              {hasMedia(PAGE) && (
+                <Media
+                  media={PAGE}
+                  alt={PAGE.title}
+                  ratio="wide"
+                  rounded="rounded-3xl"
+                  className="mt-8 max-w-lg"
+                  sizes="(min-width: 1024px) 560px, (min-width: 640px) 90vw, 100vw"
+                />
+              )}
             </div>
 
             <div>

@@ -143,6 +143,13 @@ const SPECS: Record<string, ImageSpec> = {
     minWidth: 900,
     usedOn: "bagian atas halaman Services",
   },
+  "contactPage.image": {
+    width: 1200,
+    height: 675,
+    minWidth: 640,
+    usedOn: "bawah form konsultasi di halaman Contact",
+    note: "Kolom ini lebih sempit dari halaman lain (berbagi baris dengan form) — foto konselor atau kantor lebih cocok daripada foto lebar berisi banyak teks.",
+  },
   "settings.image": {
     width: 1600,
     height: 900,

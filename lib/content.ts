@@ -25,7 +25,8 @@ export type CollectionKey =
   | "coursesPage"
   | "englishSkills"
   | "videoSeries"
-  | "webinars";
+  | "webinars"
+  | "contactPage";
 
 function filePath(key: string) {
   return path.join(CONTENT_DIR, `${key}.json`);

@@ -33,6 +33,14 @@ export function localeKey(collection: string, locale: Locale): string {
   return locale === DEFAULT_LOCALE ? collection : `${collection}.${locale}`;
 }
 
+/** The inverse of `localeKey`: `"settings.id"` -> `"settings"`, `"settings"` -> `"settings"`.
+    Mirrors the Go backend's own `baseCollection` — what a size spec or an allow-list check is
+    keyed on, since a translated document is still the same collection. */
+export function baseCollectionKey(key: string): string {
+  const dot = key.indexOf(".");
+  return dot === -1 ? key : key.slice(0, dot);
+}
+
 export function hasLocale(value: string): value is Locale {
   return (LOCALES as readonly string[]).includes(value);
 }

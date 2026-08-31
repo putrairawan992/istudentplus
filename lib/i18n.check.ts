@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import {
   alternatesFor,
+  baseCollectionKey,
   fmt,
   hasLocale,
   localeKey,
@@ -53,6 +54,13 @@ assert.equal(fmt("no {missing} here", {}), "no {missing} here", "unknown key lef
 // --- storage keys ---
 assert.equal(localeKey("settings", "en"), "settings");
 assert.equal(localeKey("settings", "id"), "settings.id");
+
+// baseCollectionKey is localeKey's inverse — round-tripping either direction must land on the
+// same collection, which is what lets a scan over content/*.json (base docs and .id siblings
+// mixed together) treat them as one thing rather than two.
+assert.equal(baseCollectionKey("settings"), "settings");
+assert.equal(baseCollectionKey("settings.id"), "settings");
+assert.equal(baseCollectionKey(localeKey("contactPage", "id")), "contactPage");
 
 // --- the overlay: what the site actually renders per language -----------------------------
 // No translation started at all -> English, untouched.

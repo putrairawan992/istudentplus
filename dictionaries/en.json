@@ -244,17 +244,8 @@
     "bookToday": "Book a Free Consultation Today"
   },
   "contact": {
-    "kicker": "Get In Touch",
-    "title": "Book a free **consultation** session.",
-    "subtitle": "One counselor guides you from application to arrival — course choice, admission, visa and departure. Backed by 100+ partner universities.",
     "weReplyIn": "We reply in",
-    "socialMedia": "Social Media",
-    "badge": "Free counseling · 2026 intakes open",
-    "benefits": [
-      "Free consultation on what you can realistically get into",
-      "Real tuition and living cost numbers before you commit",
-      "Visa documents prepared with a registered migration agent"
-    ]
+    "socialMedia": "Social Media"
   },
   "courses": {
     "kicker": "Courses & Universities",

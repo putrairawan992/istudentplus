@@ -244,17 +244,8 @@
     "bookToday": "Jadwalkan Konsultasi Gratis Sekarang"
   },
   "contact": {
-    "kicker": "Hubungi Kami",
-    "title": "Jadwalkan sesi **konsultasi** gratis.",
-    "subtitle": "Satu konselor mendampingimu dari pendaftaran sampai tiba di kampus — pilihan jurusan, penerimaan, visa, dan keberangkatan. Didukung 100+ universitas partner.",
     "weReplyIn": "Kami membalas dalam",
-    "socialMedia": "Sosial Media",
-    "badge": "Konsultasi gratis · Intake 2026 dibuka",
-    "benefits": [
-      "Konsultasi gratis soal kampus yang realistis kamu tembus",
-      "Angka biaya kuliah dan hidup yang sebenarnya, sebelum kamu putuskan",
-      "Dokumen visa disiapkan bersama migration agent terdaftar"
-    ]
+    "socialMedia": "Sosial Media"
   },
   "courses": {
     "kicker": "Program & Universitas",

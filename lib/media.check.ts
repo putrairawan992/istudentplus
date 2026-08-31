@@ -3,6 +3,7 @@
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { anyMedia, hasMedia, pickMedia, MEDIA_FIELDS, MEDIA_KEYS, type Media } from "./media.ts";
+import { baseCollectionKey } from "./i18n.ts";
 
 // --- hasMedia ---------------------------------------------------------------
 assert.equal(hasMedia(null), false);
@@ -53,10 +54,16 @@ assert.ok(YOUTUBE_KEY.test("youtubeId"), "YouTube widget");
 const specSrc = readFileSync(new URL("./image-specs.ts", import.meta.url), "utf8");
 const specced = new Set([...specSrc.matchAll(/"([a-zA-Z]+)\.(image|photo)":/g)].map((m) => `${m[1]}.${m[2]}`));
 const NO_TRIO = new Set(["leads", "webinars"]); // see CollectionEditor's NO_MEDIA_TRIO
-const collections = readdirSync(new URL("../content/", import.meta.url))
-  .filter((f) => f.endsWith(".json"))
-  .map((f) => f.replace(/\.json$/, ""))
-  .filter((c) => !NO_TRIO.has(c));
+// A local translation sibling (e.g. contactPage.id.json) is the same collection as its base —
+// baseCollectionKey collapses it back so the scan doesn't go looking for a "contactPage.id.image"
+// spec that was never meant to exist; the size standard applies per collection, not per locale.
+const collections = [
+  ...new Set(
+    readdirSync(new URL("../content/", import.meta.url))
+      .filter((f) => f.endsWith(".json"))
+      .map((f) => baseCollectionKey(f.replace(/\.json$/, "")))
+  ),
+].filter((c) => !NO_TRIO.has(c));
 const missing = collections.filter((c) => !specced.has(`${c}.image`) && !specced.has(`${c}.photo`));
 assert.deepEqual(missing, [], "collections whose image slot has no size standard: " + missing.join(", "));
 

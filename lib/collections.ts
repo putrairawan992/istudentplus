@@ -20,6 +20,7 @@ export const COLLECTIONS: CollectionMeta[] = [
   { key: "homeServices", label: "Home Service Cards", description: "The 4 pastel service cards", kind: "list", usedOn: "Home", icon: "🃏", group: "Content" },
   { key: "visaServices", label: "Visa Services", description: "Visa & partner services list", kind: "list", usedOn: "Services", icon: "🛂", group: "Content" },
   { key: "servicesPage", label: "Services Page Extras", description: "Pitfalls to avoid, admission steps, and FAQ", kind: "single", usedOn: "Services", icon: "📄", group: "Content" },
+  { key: "contactPage", label: "Contact Page", description: "Hero badge, headline, proof points, and an optional photo or video", kind: "single", usedOn: "Contact", icon: "📞", group: "Content" },
   { key: "languagePrograms", label: "Language Programs", description: "General English, IELTS, Conversation, JLPT", kind: "list", usedOn: "Language Programs, Home", icon: "🗣️", group: "Content" },
   { key: "instructors", label: "Instructors", description: "Teacher profiles", kind: "list", usedOn: "Language Programs", icon: "🎓", group: "Content" },
   { key: "blog", label: "Blog Articles", description: "Blog post titles, excerpts, categories", kind: "list", usedOn: "Blog", icon: "✍️", group: "Content" },
