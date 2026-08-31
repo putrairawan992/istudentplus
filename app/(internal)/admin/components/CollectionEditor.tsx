@@ -909,28 +909,47 @@ export default function CollectionEditor({
   } | null>(null);
   const [removeBusy, setRemoveBusy] = useState(false);
   const [reorderBusy, setReorderBusy] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [pageSize, setPageSize] = useState<"20" | "50" | "all">("20");
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
-  // Accordion, not a checklist: only one entry open at a time, everywhere in the admin. A
-  // short list (≤3) starts with its single entry open; anything longer starts fully closed so
-  // opening #2 doesn't leave #1's fields sitting expanded above it.
+  // Accordion: track open index
   const [openIdx, setOpenIdx] = useState<number | null>(() => {
     if (Array.isArray(initialData) && initialData.length === 1) return 0;
     return null;
   });
 
   const isList = Array.isArray(data);
-  // Every field any entry in this list has, so every entry's tabs match (see unionShapeOf),
-  // widened with the media trio so anything in the CMS can be given a picture or a video
-  // without a code change (lib/media.ts). The union goes on top: a collection that already
-  // stores an image keeps its own value as the field's example, not the blank one.
-  // For a single-object collection there is nothing to reconcile, but the trio still applies —
-  // it is what puts an image slot on Site Settings, Services Page and Courses Page at all.
   const model = useMemo(() => {
     const always = ALWAYS_FIELDS[collection as CollectionKey] ?? {};
     const union = isList ? unionShapeOf(data as JsonValue[]) : {};
     if (!hasMediaTrio(collection)) return { ...always, ...union };
     return { ...MEDIA_FIELDS, ...always, ...union };
   }, [isList, data, collection]);
+
+  const itemsWithOriginalIndex = useMemo(() => {
+    if (!Array.isArray(data)) return [];
+    return data.map((item, originalIndex) => ({ item, originalIndex }));
+  }, [data]);
+
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) return itemsWithOriginalIndex;
+    const q = searchQuery.toLowerCase();
+    return itemsWithOriginalIndex.filter(({ item }) => {
+      if (!item || typeof item !== "object") return false;
+      const str = JSON.stringify(item).toLowerCase();
+      return str.includes(q);
+    });
+  }, [itemsWithOriginalIndex, searchQuery]);
+
+  const totalPages = pageSize === "all" ? 1 : Math.ceil(filteredItems.length / Number(pageSize)) || 1;
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const displayedItems = useMemo(() => {
+    if (pageSize === "all") return filteredItems;
+    const size = Number(pageSize);
+    const start = (safeCurrentPage - 1) * size;
+    return filteredItems.slice(start, start + size);
+  }, [filteredItems, pageSize, safeCurrentPage]);
 
   function edit(v: JsonValue) {
     setData(v);
@@ -969,11 +988,6 @@ export default function CollectionEditor({
     }
   }
 
-  // Display order on every public page is just array order (confirmed: no seed data has a
-  // separate "order" field, pages render collections via plain .map()) — so reordering here
-  // is reordering the array, saved the same way Remove already does: immediately, not gated
-  // behind each entry's own "Save changes" button, since this acts on the list itself rather
-  // than one entry's fields.
   async function moveEntry(index: number, direction: -1 | 1) {
     if (!Array.isArray(data) || reorderBusy) return;
     const target = index + direction;
@@ -989,7 +1003,6 @@ export default function CollectionEditor({
         setData(next);
         setDirty(false);
         setStatus("saved");
-        // The open entry follows its content, not its old position.
         setOpenIdx((prev) => (prev === index ? target : prev === target ? index : prev));
       } else {
         toast("error", res.error || "Failed to reorder.");
@@ -1001,9 +1014,6 @@ export default function CollectionEditor({
     }
   }
 
-  // A list sends only the entry that was edited; a single-object collection is small enough
-  // to send whole. Saving a list wholesale is what made every blog edit fail — 277 posts is
-  // ~1.5MB, well past the Server Action body limit.
   function handleSave(index?: number) {
     startTransition(async () => {
       const res =
@@ -1020,19 +1030,29 @@ export default function CollectionEditor({
     });
   }
 
-  // "Add new entry" opens a modal to fill in the new item, instead of appending a blank
-  // row at the bottom of a possibly-long list and forcing a scroll to find it.
   function openAddModal() {
     if (!Array.isArray(data)) return;
-    // The union model, not just the first entry — so a new entry starts with every tab the rest
-    // of the collection has, even if entry #1 happens to be one of the thinner ones.
     setDraft(blankShapeOf(model));
     setShowAddModal(true);
   }
 
-  // Saved on the spot rather than left pending, the way Remove and reorder already are. It also
-  // keeps the editor's indexes honest: every row on screen is a row that exists on the server,
-  // so a later "save entry #0" can't land on top of what used to be the first entry.
+  function handleDuplicate(originalIndex: number) {
+    if (!Array.isArray(data)) return;
+    const source = data[originalIndex];
+    if (typeof source !== "object" || source === null) return;
+    const cloned = JSON.parse(JSON.stringify(source));
+    if (cloned.title && typeof cloned.title === "string") {
+      cloned.title = `${cloned.title} (Copy)`;
+    } else if (cloned.name && typeof cloned.name === "string") {
+      cloned.name = `${cloned.name} (Copy)`;
+    }
+    if (cloned.slug && typeof cloned.slug === "string") {
+      cloned.slug = `${cloned.slug}-copy`;
+    }
+    setDraft(cloned);
+    setShowAddModal(true);
+  }
+
   function confirmAddEntry() {
     if (!Array.isArray(data)) return;
     startTransition(async () => {
@@ -1044,7 +1064,8 @@ export default function CollectionEditor({
       setData([draft, ...data]);
       setDirty(false);
       setStatus("saved");
-      setOpenIdx(0); // the new entry lands at the top and is the one open
+      setOpenIdx(0);
+      setCurrentPage(1);
       setShowAddModal(false);
       toast("success", "Entry added.");
     });
@@ -1058,24 +1079,90 @@ export default function CollectionEditor({
     <CollectionContext.Provider value={collection}>
     <ModelContext.Provider value={model}>
     <div>
-      {/* Top bar — only for lists: add entries + status. Saving lives on each entry (lists)
-          or in the sticky bottom bar (single objects), never both. */}
+      {/* Top bar — only for lists: search, filter, add entries + status */}
       {isList && (
-        <div className="sticky top-0 z-20 -mx-1 mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-card/85 px-4 py-3 backdrop-blur">
-          <div className="flex items-center gap-3">
-            {status === "saved" && <span className="text-sm font-semibold text-emerald-600">Saved ✓</span>}
-            {status === "error" && <span className="text-sm font-semibold text-red-600">Failed to save</span>}
-            {dirty && status === "idle" && <span className="text-sm font-medium text-amber-600">Unsaved changes</span>}
-            {!dirty && status === "idle" && (
-              <span className="text-sm font-medium text-muted">Open an entry to edit, then Save inside it.</span>
-            )}
+        <div className="sticky top-0 z-20 -mx-1 mb-5 flex flex-col gap-3 rounded-2xl border border-line bg-card/90 p-4 shadow-sm backdrop-blur">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              {status === "saved" && <span className="text-sm font-semibold text-emerald-600">Saved ✓</span>}
+              {status === "error" && <span className="text-sm font-semibold text-red-600">Failed to save</span>}
+              {dirty && status === "idle" && <span className="text-sm font-medium text-amber-600">Unsaved changes</span>}
+              {!dirty && status === "idle" && (
+                <span className="text-xs font-semibold text-muted">
+                  Total: <b className="text-ink">{(data as JsonValue[]).length}</b> entries
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={() => setOpenIdx(openIdx === null ? 0 : null)}
+                className="rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise hover:text-ink"
+              >
+                {openIdx === null ? "Expand First" : "Collapse All"}
+              </button>
+              <button
+                type="button"
+                onClick={openAddModal}
+                className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-bold text-white shadow-xs transition-transform hover:scale-[1.02]"
+              >
+                <span>+</span>
+                <span>Add new entry</span>
+              </button>
+            </div>
           </div>
-          <button
-            onClick={openAddModal}
-            className="rounded-full border border-line px-4 py-2 text-sm font-semibold transition-colors hover:bg-paper-raise"
-          >
-            + Add new entry
-          </button>
+
+          {/* Search bar & pagination controls for list collections */}
+          {(data as JsonValue[]).length > 3 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line/70 pt-3">
+              <div className="relative min-w-[220px] flex-1 max-w-md">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  placeholder="Filter by title, name, content…"
+                  className="w-full rounded-xl border border-line bg-paper px-3.5 py-1.5 text-xs text-ink placeholder:text-muted/60 outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/15"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-ink"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 text-xs text-muted">
+                {searchQuery && (
+                  <span>
+                    Found <b className="text-ink">{filteredItems.length}</b> matches
+                  </span>
+                )}
+                {(data as JsonValue[]).length > 20 && (
+                  <div className="flex items-center gap-1.5">
+                    <span>Show:</span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(e.target.value as "20" | "50" | "all");
+                        setCurrentPage(1);
+                      }}
+                      className="rounded-lg border border-line bg-paper px-2 py-1 text-xs font-semibold text-ink outline-none"
+                    >
+                      <option value="20">20</option>
+                      <option value="50">50</option>
+                      <option value="all">All</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1149,63 +1236,88 @@ export default function CollectionEditor({
               No entries yet. Click “+ Add new entry” to create one.
             </p>
           )}
-          {(data as JsonValue[]).map((item, i) => {
-            const isOpen = openIdx === i;
+
+          {filteredItems.length === 0 && (data as JsonValue[]).length > 0 && (
+            <div className="rounded-2xl border border-line bg-card p-8 text-center">
+              <p className="text-sm text-muted">No entries match your search &ldquo;{searchQuery}&rdquo;</p>
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="mt-3 rounded-full border border-line px-4 py-1.5 text-xs font-semibold hover:bg-paper-raise"
+              >
+                Clear filter
+              </button>
+            </div>
+          )}
+
+          {displayedItems.map(({ item, originalIndex }) => {
+            const isOpen = openIdx === originalIndex;
+            const title = entryTitle(item, `Entry #${originalIndex + 1}`);
             return (
-              <div key={i} className="overflow-hidden rounded-2xl border border-line bg-card">
+              <div key={originalIndex} className="overflow-hidden rounded-2xl border border-line bg-card transition-all hover:border-line">
                 <div className="flex items-center gap-3 px-4 py-3">
                   <button
                     type="button"
-                    onClick={() => toggle(i)}
-                    className="flex flex-1 items-center gap-3 text-left"
+                    onClick={() => toggle(originalIndex)}
+                    className="flex flex-1 items-center gap-3 text-left min-w-0"
                   >
                     <span className={`text-muted transition-transform ${isOpen ? "rotate-90" : ""}`}>▸</span>
                     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-paper-raise text-[11px] font-bold text-muted">
-                      {i + 1}
+                      {originalIndex + 1}
                     </span>
-                    <span className="truncate text-sm font-bold">{entryTitle(item, `Entry #${i + 1}`)}</span>
+                    <span className="truncate text-sm font-bold text-ink">{title}</span>
                   </button>
-                  {(data as JsonValue[]).length > 1 && (
-                    <div className="flex shrink-0 items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => moveEntry(i, -1)}
-                        disabled={i === 0 || reorderBusy}
-                        title="Move up"
-                        aria-label="Move up"
-                        className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        ▲
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => moveEntry(i, 1)}
-                        disabled={i === (data as JsonValue[]).length - 1 || reorderBusy}
-                        title="Move down"
-                        aria-label="Move down"
-                        className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        ▼
-                      </button>
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => handleRemove(i, entryTitle(item, `Entry #${i + 1}`))}
-                    className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-[12px] text-red-600 transition-colors hover:bg-red-50"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleDuplicate(originalIndex)}
+                      title="Duplicate entry as template"
+                      className="rounded-lg border border-line px-2.5 py-1 text-[11.5px] font-medium text-muted transition-colors hover:bg-paper-raise hover:text-ink"
+                    >
+                      Duplicate
+                    </button>
+                    {(data as JsonValue[]).length > 1 && !searchQuery && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => moveEntry(originalIndex, -1)}
+                          disabled={originalIndex === 0 || reorderBusy}
+                          title="Move up"
+                          aria-label="Move up"
+                          className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          ▲
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveEntry(originalIndex, 1)}
+                          disabled={originalIndex === (data as JsonValue[]).length - 1 || reorderBusy}
+                          title="Move down"
+                          aria-label="Move down"
+                          className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          ▼
+                        </button>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleRemove(originalIndex, title)}
+                      className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-[12px] text-red-600 transition-colors hover:bg-red-50"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
                 {isOpen && (
                   <div className="border-t border-line p-5">
-                    <TabbedFields value={item as JsonObject} path={[i]} root={data} setRoot={edit} />
+                    <TabbedFields value={item as JsonObject} path={[originalIndex]} root={data} setRoot={edit} />
                     <div className="mt-4 flex items-center justify-end gap-3 border-t border-line pt-4">
                       {status === "saved" && <span className="text-[13px] font-semibold text-emerald-600">Saved ✓</span>}
                       {status === "error" && <span className="text-[13px] font-semibold text-red-600">Failed to save</span>}
                       <button
                         type="button"
-                        onClick={() => handleSave(i)}
+                        onClick={() => handleSave(originalIndex)}
                         disabled={pending || !dirty}
                         className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
                       >
@@ -1217,6 +1329,50 @@ export default function CollectionEditor({
               </div>
             );
           })}
+
+          {/* Pagination bar */}
+          {pageSize !== "all" && totalPages > 1 && (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-card p-4">
+              <span className="text-xs text-muted">
+                Showing Page <b className="text-ink">{safeCurrentPage}</b> of <b className="text-ink">{totalPages}</b> ({filteredItems.length} entries)
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={safeCurrentPage <= 1}
+                  className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise disabled:opacity-40"
+                >
+                  ← Prev
+                </button>
+                {Array.from({ length: totalPages }).slice(0, 7).map((_, idx) => {
+                  const pNum = idx + 1;
+                  const isActive = pNum === safeCurrentPage;
+                  return (
+                    <button
+                      key={pNum}
+                      type="button"
+                      onClick={() => setCurrentPage(pNum)}
+                      className={`grid h-7 w-7 place-items-center rounded-lg text-xs font-semibold transition-colors ${
+                        isActive ? "bg-accent text-white" : "border border-line text-muted hover:bg-paper-raise"
+                      }`}
+                    >
+                      {pNum}
+                    </button>
+                  );
+                })}
+                {totalPages > 7 && <span className="px-1 text-xs text-muted">…</span>}
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={safeCurrentPage >= totalPages}
+                  className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise disabled:opacity-40"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <>

@@ -16,7 +16,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 }
 
 const inputClass =
-  "w-full rounded-lg border border-line bg-paper px-4 py-2.5 text-sm outline-none focus:border-accent";
+  "w-full rounded-xl border border-line bg-paper px-4 py-2.5 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/20";
 
 // The dropdown values are what the counselor reads in the CMS inbox, so they stay in the
 // visitor's language — a lead that says "Jepang" is no harder to act on than one that says

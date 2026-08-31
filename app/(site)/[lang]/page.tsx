@@ -35,10 +35,11 @@ function StatusPill({ status, labels }: { status: string; labels: { open: string
   const isOpen = status === "open";
   return (
     <span
-      className={`inline-block rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-wide ${
-        isOpen ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
+        isOpen ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/20 text-amber-300 border border-amber-500/30"
       }`}
     >
+      <span className={`h-1.5 w-1.5 rounded-full ${isOpen ? "bg-emerald-400 animate-pulse" : "bg-amber-400"}`} />
       {isOpen ? labels.open : labels.seats}
     </span>
   );
@@ -81,6 +82,12 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <section className="pt-14">
           <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-7 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
+              {/* Trust Kicker Badge */}
+              <div className="inline-flex items-center gap-2 rounded-full border border-line bg-paper-raise/80 px-3.5 py-1.5 text-xs font-semibold text-ink backdrop-blur mb-5 shadow-xs">
+                <span className="text-accent">✨</span>
+                <span>{lang === "id" ? "Konsultan Pendidikan Luar Negeri & Bahasa Terpercaya" : "Trusted Overseas Education & Language Consultant"}</span>
+              </div>
+
               {/* The hero title is CMS-editable text with one `**...**` span rendered in the
                   accent colour, so non-technical editors can change the wording (per language)
                   without touching code while keeping the highlighted phrase. */}
@@ -90,18 +97,18 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
               <p className="mb-8 max-w-md text-[17px] leading-relaxed text-muted">
                 {SETTINGS.heroSubtitle}
               </p>
-              <div className="mb-9 flex items-center gap-3.5">
-                <a href={p("/study-abroad")} className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-transform hover:scale-[1.03]">
+              <div className="mb-9 flex flex-wrap items-center gap-3.5">
+                <a href={p("/study-abroad")} className="rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:scale-[1.03] hover:shadow-accent/40">
                   {d.home.findCourse}
                 </a>
-                <a href="#consultation" className="rounded-full border border-line px-6 py-3 text-sm font-semibold hover:bg-paper-raise">
+                <a href="#consultation" className="rounded-full border border-line bg-card/80 px-6 py-3 text-sm font-semibold text-ink shadow-xs transition-colors hover:bg-paper-raise">
                   {d.home.bookFreeSession}
                 </a>
               </div>
-              <div className="flex gap-9 font-mono tabular-nums">
+              <div className="flex flex-wrap gap-8 font-mono tabular-nums sm:gap-9">
                 {SETTINGS.stats.map((stat) => (
-                  <div key={stat.label}>
-                    <b className="block text-2xl font-extrabold text-ink">{stat.value}</b>
+                  <div key={stat.label} className="group">
+                    <b className="block text-2xl font-extrabold text-ink transition-colors group-hover:text-accent sm:text-3xl">{stat.value}</b>
                     <span className="text-[12.5px] uppercase tracking-wide text-muted">{stat.label}</span>
                   </div>
                 ))}
@@ -109,15 +116,15 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             </div>
 
             <div className="relative mx-auto w-full max-w-md lg:max-w-lg">
-              <div className="absolute -right-5 -top-6 h-36 w-36 rounded-full bg-accent/15" />
-              <div className="absolute -bottom-8 -left-6 h-44 w-44 rounded-full bg-[#E8722C]/15" />
+              <div className="absolute -right-5 -top-6 h-36 w-36 rounded-full bg-accent/15 blur-xl" />
+              <div className="absolute -bottom-8 -left-6 h-44 w-44 rounded-full bg-[#E8722C]/15 blur-xl" />
               <div className="relative flex items-end gap-3.5 sm:gap-4.5">
                 <Image
                   src="/hero-male.jpg"
                   alt={d.home.heroImageAlt}
                   width={700}
                   height={900}
-                  className="w-1/2 rounded-3xl object-cover shadow-xl shadow-ink/10"
+                  className="w-1/2 rounded-3xl object-cover shadow-xl shadow-ink/10 transition-transform duration-300 hover:scale-[1.02]"
                 />
                 <Image
                   src="/hero-female.jpg"
@@ -125,7 +132,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                   width={700}
                   height={900}
                   priority
-                  className="w-1/2 translate-y-5 rounded-3xl object-cover shadow-xl shadow-ink/10"
+                  className="w-1/2 translate-y-5 rounded-3xl object-cover shadow-xl shadow-ink/10 transition-transform duration-300 hover:scale-[1.02]"
                 />
               </div>
             </div>
@@ -139,7 +146,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             <div className="mx-auto max-w-[1400px] px-7">
               <Link
                 href={p("/webinars")}
-                className="group flex flex-col gap-5 overflow-hidden rounded-3xl border border-line bg-card p-6 transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-7 sm:p-7"
+                className="group flex flex-col gap-5 overflow-hidden rounded-3xl border border-line bg-card p-6 shadow-xs transition-all hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-md sm:flex-row sm:items-center sm:gap-7 sm:p-7"
               >
                 {/* Poster if one was uploaded, else the attached video's YouTube frame. A 16:9
                     box either way, so the row keeps its shape whichever one it gets. */}
