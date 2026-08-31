@@ -73,20 +73,22 @@ export default function Sidebar({ leadTimes }: { leadTimes: string[] }) {
         key={href}
         href={href}
         onClick={() => setOpen(false)}
-        className={`group flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+        className={`group flex items-start gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
           active
             ? "bg-accent/10 text-accent-ink"
             : "text-muted hover:bg-paper-raise hover:text-ink"
         }`}
       >
         <span
-          className={`grid h-6 w-6 place-items-center rounded-md text-[13px] ${
+          className={`grid h-6 w-6 shrink-0 place-items-center rounded-md text-[13px] ${
             active ? "bg-accent/15" : "bg-paper-raise group-hover:bg-card"
           }`}
         >
           {icon}
         </span>
-        <span className="truncate">{label}</span>
+        {/* Wraps rather than truncating: "Consultation & Contac…" and "Study Abroad Countri…"
+            hid exactly the words that told them apart. Two lines cost less than a guess. */}
+        <span className="min-w-0 leading-snug">{label}</span>
         {badge > 0 && (
           <span
             aria-label={`${badge} baru`}
