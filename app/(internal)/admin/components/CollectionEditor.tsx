@@ -1015,7 +1015,7 @@ function isObject(v: JsonValue): v is JsonObject {
 // content/*.json — `image`, `slug` and `source` are long too but are URLs with their own
 // widgets, and `title`/`value`/`q` stay single-line on purpose.
 const PROSE_KEY =
-  /^(a|aboutStory|accommodation|admission|benefit|bio|body|career|content|culture|desc|description|excerpt|heroSubtitle|html|intro|livingCost|note|overview|quote|whyStudy)$/i;
+  /^(a|aboutStory|accommodation|admission|benefit|bio|body|career|checklistPrompt|content|culture|desc|description|excerpt|heroSubtitle|webinarHeroSubtitle|html|intro|livingCost|note|overview|quote|whyStudy)$/i;
 // "Value" is ambiguous: a Key Facts row ("AUD 20,000 – AUD 45,000 / year") and a homepage stat
 // ("9.3K") are the same {label, value} shape with very different content. They don't overlap
 // in length in the data on this site (stats top out at 4 chars, Key Facts values start at 7),
@@ -1272,6 +1272,33 @@ function FieldEditor({
   return null;
 }
 
+const FRIENDLY_FIELD_INFO: Record<string, { label: string; hint?: string }> = {
+  pitfallsTitle: {
+    label: "Judul Bagian Penolakan Visa (Visa Rejection Title)",
+    hint: "Judul pada kotak alasan penolakan visa di halaman /services",
+  },
+  pitfalls: {
+    label: "Alasan Penolakan Visa (Daftar Poin / Bullet Points)",
+    hint: "Daftar poin alasan visa ditolak yang ditampilkan di halaman /services",
+  },
+  checklistPrompt: {
+    label: "Teks Ajakan Formulir Checklist (Checklist Form Prompt)",
+    hint: "Teks ajakan di samping formulir permintaan checklist dokumen visa",
+  },
+  webinarHeroKicker: {
+    label: "Badge / Kicker Header Webinar",
+    hint: "Teks label kecil di atas judul utama (contoh: WEBINAR)",
+  },
+  webinarHeroTitle: {
+    label: "Judul Utama Header Webinar (Hero Title)",
+    hint: "Gunakan **kata** untuk teks warna aksen/pink (contoh: Ask your questions to people who **already went**.)",
+  },
+  webinarHeroSubtitle: {
+    label: "Deskripsi Singkat Header Webinar (Hero Subtitle)",
+    hint: "Teks penjelasan di bawah judul utama webinar",
+  },
+};
+
 function ObjectFields({
   value,
   path,
@@ -1291,12 +1318,19 @@ function ObjectFields({
       {/* isMediaish, not isMediaKey: "youtubeId" doesn't match the media-key regex, so it was
           the one tall field still sharing a row. Half of the 672px Add-entry modal left its
           guidance panel 170px wide, wrapping the text three words to a line. */}
-      {(keys ?? Object.keys(value)).map((key) => (
-        <div key={key} className={isWideField(value[key], key) || isMediaish(key) ? "sm:col-span-2" : ""}>
-          <label className="mb-1 block text-[12.5px] font-bold text-muted">{humanize(key)}</label>
-          <FieldEditor value={value[key]} path={[...path, key]} root={root} setRoot={setRoot} label={key} />
-        </div>
-      ))}
+      {(keys ?? Object.keys(value)).map((key) => {
+        const info = FRIENDLY_FIELD_INFO[key];
+        const displayLabel = info?.label ?? humanize(key);
+        return (
+          <div key={key} className={isWideField(value[key], key) || isMediaish(key) ? "sm:col-span-2" : ""}>
+            <div className="mb-1">
+              <label className="block text-[12.5px] font-bold text-muted">{displayLabel}</label>
+              {info?.hint && <p className="mt-0.5 text-[11px] text-muted/80">{info.hint}</p>}
+            </div>
+            <FieldEditor value={value[key]} path={[...path, key]} root={root} setRoot={setRoot} label={key} />
+          </div>
+        );
+      })}
     </div>
   );
 }

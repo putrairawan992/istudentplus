@@ -27,7 +27,13 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/services">
 type VisaService = MediaValue & { name: string; intro: string; points: string[]; icon?: string };
 type AdmissionStep = { title: string; description: string };
 type Faq = { q: string; a: string; link?: { text: string; href: string } };
-type ServicesPageContent = MediaValue & { pitfalls: string[]; admissionSteps: AdmissionStep[]; faqs: Faq[] };
+type ServicesPageContent = MediaValue & {
+  pitfallsTitle?: string;
+  checklistPrompt?: string;
+  pitfalls: string[];
+  admissionSteps: AdmissionStep[];
+  faqs: Faq[];
+};
 
 export default async function ServicesPage({ params }: PageProps<"/[lang]/services">) {
   const { lang } = await params;
@@ -145,14 +151,14 @@ export default async function ServicesPage({ params }: PageProps<"/[lang]/servic
             </div>
 
             <div className="rounded-2xl border border-line bg-card p-6">
-              <h3 className="mb-3 font-bold">{d.services.pitfallsTitle}</h3>
+              <h3 className="mb-3 font-bold">{PAGE.pitfallsTitle || d.services.pitfallsTitle}</h3>
               <ul className="mb-5 flex flex-col gap-1.5 text-[13.5px] text-muted">
                 {PITFALLS.map((pitfall) => (
                   <li key={pitfall}>• {pitfall}</li>
                 ))}
               </ul>
               <div className="flex flex-col gap-3 rounded-xl border border-dashed border-line bg-paper-raise p-5 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-[13.5px] font-semibold">{d.services.checklistPrompt}</p>
+                <p className="text-[13.5px] font-semibold">{PAGE.checklistPrompt || d.services.checklistPrompt}</p>
                 <ChecklistForm
                   lang={lang}
                   copy={d.forms.checklist}

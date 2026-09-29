@@ -73,6 +73,43 @@ export default async function CollectionPage({
         </div>
       )}
 
+      {collection === "webinars" && (
+        <div className="mb-6 rounded-2xl border border-accent/25 bg-accent/5 p-4 sm:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent">
+                <span>🎥</span> Header Halaman Webinar
+              </div>
+              <h3 className="mt-1 text-sm font-extrabold text-ink sm:text-base">
+                Ingin mengubah Judul, Badge, atau Subjudul Utama Webinar?
+              </h3>
+              <p className="mt-0.5 text-xs text-muted">
+                Teks banner utama di halaman /webinars (seperti <em>&quot;Ask your questions to people who already went&quot;</em>) dapat dikelola langsung di menu <strong>Site Settings</strong> pada tab <strong>Webinar Hero</strong>.
+              </p>
+            </div>
+            <Link
+              href={lang === DEFAULT_LOCALE ? "/admin/settings" : `/admin/settings?lang=${lang}`}
+              className="inline-flex items-center justify-center shrink-0 rounded-xl bg-accent px-4 py-2 text-xs font-bold text-white shadow-sm shadow-accent/20 transition-all hover:bg-accent/90"
+            >
+              Edit Header Webinar →
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {collection === "servicesPage" && (
+        <div className="mb-6 rounded-2xl border border-line bg-paper-raise/70 p-4 sm:p-5">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent">
+            <span>🛂</span> Tips Pengelolaan Halaman Layanan (/services)
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-muted">
+            • Tab <strong>Visa Pitfalls &amp; Checklist</strong>: untuk mengubah judul penolakan visa (<em>&quot;Avoid the most common visa rejection reasons&quot;</em>), 4 poin alasan penolakan visa, dan teks ajakan formulir checklist dokumen.<br/>
+            • Tab <strong>Admission Steps</strong>: untuk tahapan pendaftaran kuliah.<br/>
+            • Tab <strong>Faqs</strong>: untuk pertanyaan umum seputar visa dan studi.
+          </p>
+        </div>
+      )}
+
       {/* The editor is keyed by language so switching swaps the form's state instead of
           carrying the previous language's unsaved edits across. */}
       <CollectionEditor

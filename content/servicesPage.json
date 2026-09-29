@@ -37,6 +37,8 @@
       }
     }
   ],
+  "pitfallsTitle": "Avoid the most common visa rejection reasons",
+  "checklistPrompt": "Inquire this document checklist as your visa guidance.",
   "pitfalls": [
     "Incomplete or inconsistent information",
     "Insufficient financial evidence",

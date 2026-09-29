@@ -29,14 +29,33 @@ export function sectionsOf(
     return Array.isArray(v) || (v !== null && typeof v === "object");
   };
 
-  const complex = allKeys.filter(isComplex);
+  const claimed = new Set<string>();
+  const customSections: Section[] = [];
+
+  // Group webinar hero fields on their own tab in settings
+  const webinarHeroKeys = allKeys.filter((k) => k.startsWith("webinarHero"));
+  if (webinarHeroKeys.length > 0) {
+    customSections.push({ label: "Webinar Hero", keys: webinarHeroKeys });
+    webinarHeroKeys.forEach((k) => claimed.add(k));
+  }
+
+  // Keep visa pitfalls title, list, and checklist prompt together on one tab
+  const pitfallsKeys = ["pitfallsTitle", "pitfalls", "checklistPrompt"].filter((k) => allKeys.includes(k));
+  if (pitfallsKeys.length > 1) {
+    customSections.push({ label: "Visa Pitfalls & Checklist", keys: pitfallsKeys });
+    pitfallsKeys.forEach((k) => claimed.add(k));
+  }
+
+  const unclaimedKeys = allKeys.filter((k) => !claimed.has(k));
+  const complex = unclaimedKeys.filter(isComplex);
   const mediaCandidates =
-    allKeys.length >= minKeysForMediaTab ? allKeys.filter((k) => !isComplex(k) && isMediaish(k)) : [];
+    unclaimedKeys.length >= minKeysForMediaTab ? unclaimedKeys.filter((k) => !isComplex(k) && isMediaish(k)) : [];
   const media = mediaCandidates.length >= 2 ? mediaCandidates : [];
-  const general = allKeys.filter((k) => !isComplex(k) && !media.includes(k));
+  const general = unclaimedKeys.filter((k) => !isComplex(k) && !media.includes(k));
 
   const sections: Section[] = [];
   if (general.length > 0) sections.push({ label: "General", keys: general });
+  sections.push(...customSections);
   if (media.length > 0) sections.push({ label: "Media", keys: media });
   for (const key of complex) sections.push({ label: humanizeKey(key), keys: [key] });
   return sections;

@@ -211,6 +211,11 @@ export default async function WebinarsPage({ params }: PageProps<"/[lang]/webina
   const d = await getDictionary(lang);
 
   const webinars = await readContent<Webinar[]>("webinars", lang);
+  const settings = await readContent<{
+    webinarHeroKicker?: string;
+    webinarHeroTitle?: string;
+    webinarHeroSubtitle?: string;
+  }>("settings", lang);
   const { upcoming, past } = await splitByDate(webinars);
   const events = [...upcoming, ...past].map((w) => eventJsonLd(w, lang)).filter(Boolean);
 
@@ -232,7 +237,12 @@ export default async function WebinarsPage({ params }: PageProps<"/[lang]/webina
         <WebinarHero
           featured={featured ?? null}
           lang={lang}
-          copy={d.webinars}
+          copy={{
+            ...d.webinars,
+            heroKicker: settings.webinarHeroKicker || d.webinars.heroKicker,
+            heroTitle: settings.webinarHeroTitle || d.webinars.heroTitle,
+            heroSubtitle: settings.webinarHeroSubtitle || d.webinars.heroSubtitle,
+          }}
           leadLabels={d.forms.webinarLead}
           hasPast={past.length > 0}
         />

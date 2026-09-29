@@ -43,6 +43,31 @@ s = sectionsOf(servicesLike, isMediaish);
 assert.deepEqual(labels(s), ["Faqs", "Pitfalls", "Admission Steps"]);
 assertCovers(servicesLike, s, "services-like");
 
+// services with pitfalls title & checklist prompt grouped together
+const servicesWithPitfallsHeader: JsonObject = {
+  pitfallsTitle: "Avoid reasons",
+  pitfalls: ["reason 1"],
+  checklistPrompt: "Ask for checklist",
+  faqs: [],
+  admissionSteps: [],
+};
+s = sectionsOf(servicesWithPitfallsHeader, isMediaish);
+assert.deepEqual(labels(s), ["Visa Pitfalls & Checklist", "Faqs", "Admission Steps"]);
+assert.deepEqual(s[0].keys, ["pitfallsTitle", "pitfalls", "checklistPrompt"]);
+assertCovers(servicesWithPitfallsHeader, s, "services-with-pitfalls-header");
+
+// settings with webinar hero section
+const settingsWithWebinarHero: JsonObject = {
+  ...settingsLike,
+  webinarHeroKicker: "WEBINAR",
+  webinarHeroTitle: "Ask questions",
+  webinarHeroSubtitle: "Free online sessions",
+};
+s = sectionsOf(settingsWithWebinarHero, isMediaish);
+assert.deepEqual(labels(s), ["General", "Webinar Hero", "Stats", "Offices", "About Story"]);
+assert.deepEqual(s[1].keys, ["webinarHeroKicker", "webinarHeroTitle", "webinarHeroSubtitle"]);
+assertCovers(settingsWithWebinarHero, s, "settings-with-webinar-hero");
+
 // a webinar entry: no lists at all, but three media/recording fields worth their own tab
 const webinarLike: JsonObject = {
   date: "2026-04-18T12:00:00+07:00",
