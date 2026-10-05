@@ -13,7 +13,9 @@ const UPLOADS_DIR = path.join(process.cwd(), "uploads");
 const API_URL = process.env.CONTENT_API_URL;
 const API_TOKEN = process.env.CONTENT_API_TOKEN;
 
-const SOURCES = ["consultation", "contact", "webinar", "checklist", "inquiry"] as const;
+// "ads" belongs to the paid-traffic landing page (/consultation); keeping it distinct lets
+// the CMS inbox tell campaign leads apart from the site's own forms.
+const SOURCES = ["consultation", "ads", "contact", "webinar", "checklist", "inquiry"] as const;
 
 type Lead = {
   id: string;
