@@ -234,14 +234,10 @@ export default async function AdsConsultationPage({
                     <p>
                         <strong>iStudentPlus</strong> is operated by PT Wacana Belajar Internasional.
                     </p>
-                    {/* TODO(go-live): real office addresses, contact email and phone before the campaign
-              runs. Nothing in the CMS carries them yet. */}
-                    <p>
-                        Pangkalpinang office: [FULL STREET ADDRESS]
-                        <br />
-                        Makassar office: [FULL STREET ADDRESS]
-                    </p>
-                    <p>Email: [CONTACT EMAIL] &nbsp; Phone: [OFFICE PHONE]</p>
+                    {/* The mock had street addresses, a contact email and an office phone here. None
+                        of them exists in the CMS or anywhere on the live site (what's published are
+                        the WhatsApp numbers and socials), so the lines are dropped rather than left
+                        as placeholders. Add them back once the client supplies real values. */}
                     <p>
                         iStudentPlus is a private education consultancy. We are not affiliated with, endorsed
                         by, or acting on behalf of the Australian Government or any other government agency.
