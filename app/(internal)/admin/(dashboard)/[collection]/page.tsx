@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { readContent, readRawContent, type CollectionKey } from "@/lib/content";
+import { readRawContent, type CollectionKey } from "@/lib/content";
 import { getCollectionMeta } from "@/lib/collections";
 import type { JsonValue } from "@/lib/json-tree";
 import { DEFAULT_LOCALE, hasLocale, LOCALES, type Locale } from "@/lib/i18n";
@@ -37,11 +37,14 @@ export default async function CollectionPage({
   const lang: Locale = translatable && hasLocale(rawLang ?? "") ? (rawLang as Locale) : DEFAULT_LOCALE;
 
   const key = collection as CollectionKey;
-  const data =
-    lang === DEFAULT_LOCALE
-      ? await readContent<unknown>(key)
-      : ((await readRawContent<unknown>(key, lang)) ?? (await readContent<unknown>(key)));
-  const started = lang === DEFAULT_LOCALE || (await readRawContent<unknown>(key, lang)) !== null;
+  // A brand-new collection reaches the API only when its first save happens (the backend's seed
+  // catches up on its next deploy), so a missing document must not take the editor down: it
+  // opens empty, the ALWAYS_FIELDS defaults fill the form, and saving creates the document.
+  // Only a genuinely absent document is tolerated — an unreachable API still throws.
+  const en = await readRawContent<unknown>(key, DEFAULT_LOCALE);
+  const translated = lang === DEFAULT_LOCALE ? null : await readRawContent<unknown>(key, lang);
+  const data = (lang === DEFAULT_LOCALE ? en : (translated ?? en)) ?? (meta.kind === "list" ? [] : {});
+  const started = lang === DEFAULT_LOCALE || translated !== null;
 
   return (
     <div>
@@ -55,9 +58,8 @@ export default async function CollectionPage({
               <Link
                 key={l}
                 href={l === DEFAULT_LOCALE ? `/admin/${collection}` : `/admin/${collection}?lang=${l}`}
-                className={`rounded-full px-3 py-1 ${
-                  l === lang ? "bg-ink text-white" : "text-muted hover:text-ink"
-                }`}
+                className={`rounded-full px-3 py-1 ${l === lang ? "bg-ink text-white" : "text-muted hover:text-ink"
+                  }`}
               >
                 {LOCALE_NAMES[l]}
               </Link>
@@ -103,9 +105,23 @@ export default async function CollectionPage({
             <span>🛂</span> Tips Pengelolaan Halaman Layanan (/services)
           </div>
           <p className="mt-1 text-xs leading-relaxed text-muted">
-            • Tab <strong>Visa Pitfalls &amp; Checklist</strong>: untuk mengubah judul penolakan visa (<em>&quot;Avoid the most common visa rejection reasons&quot;</em>), 4 poin alasan penolakan visa, dan teks ajakan formulir checklist dokumen.<br/>
-            • Tab <strong>Admission Steps</strong>: untuk tahapan pendaftaran kuliah.<br/>
+            • Tab <strong>Visa Pitfalls &amp; Checklist</strong>: untuk mengubah judul penolakan visa (<em>&quot;Avoid the most common visa rejection reasons&quot;</em>), 4 poin alasan penolakan visa, dan teks ajakan formulir checklist dokumen.<br />
+            • Tab <strong>Admission Steps</strong>: untuk tahapan pendaftaran kuliah.<br />
             • Tab <strong>Faqs</strong>: untuk pertanyaan umum seputar visa dan studi.
+          </p>
+        </div>
+      )}
+
+      {collection === "adsPage" && (
+        <div className="mb-6 rounded-2xl border border-line bg-paper-raise/70 p-4 sm:p-5">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent">
+            <span>🎨</span> Gaya Halaman Iklan (/consultation)
+          </div>
+          <p className="mt-1 text-xs leading-relaxed text-muted">
+            Logo, warna, dan font untuk halaman iklan <strong>/consultation</strong> — perubahan
+            langsung tampil setelah disimpan, tanpa deploy ulang. Warna brand ISP: navy{" "}
+            <strong>#14304C</strong> dan pink <strong>#EC4899</strong>. Kosongkan logo untuk
+            kembali ke tulisan iStudentPlus.
           </p>
         </div>
       )}

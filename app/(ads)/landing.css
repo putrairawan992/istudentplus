@@ -1,9 +1,10 @@
 /* Paid-ads landing page styling, ported from the approved mock. Loaded only by the (ads)
    root layout, which sits outside both the marketing site's and the CMS's layouts, so these
-   (deliberately global) element rules can never touch another page. Two small deviations
-   from the mock: the font stack is wired to next/font's --font-jakarta variable, and the
-   `.thanks` / `.form-status` blocks drop `display:none` — React renders them only when the
-   state calls for it. */
+   (deliberately global) element rules can never touch another page. Deviations from the mock:
+   the font stack reads the CMS-overridable --font-lp / next/font's --font-jakarta variable,
+   the theme colours are overridable CSS variables (the page emits :root overrides from the
+   CMS), and the `.thanks` / `.form-status` blocks drop `display:none` — React renders them
+   only when the state calls for it. */
 
 :root{
   --ink:#13294B;        /* deep navy, headings and text */
@@ -23,7 +24,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{font-family:var(--font-jakarta),system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink-soft);background:var(--paper);line-height:1.6;font-size:17px;padding-bottom:env(safe-area-inset-bottom,0px)}
+body{font-family:var(--font-lp,var(--font-jakarta)),system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink-soft);background:var(--paper);line-height:1.6;font-size:17px;padding-bottom:env(safe-area-inset-bottom,0px)}
 img{max-width:100%}
 a{color:var(--gum)}
 :focus-visible{outline:3px solid var(--sun);outline-offset:2px;border-radius:4px}
@@ -36,13 +37,14 @@ p{max-width:62ch}
 /* Header */
 .top{background:var(--white);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;padding-top:env(safe-area-inset-top,0px)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:16px}
-.brand{font-weight:800;font-size:1.2rem;color:var(--ink);text-decoration:none;letter-spacing:-0.02em}
+.brand{display:inline-flex;align-items:center;font-weight:800;font-size:1.2rem;color:var(--ink);text-decoration:none;letter-spacing:-0.02em}
 .brand span{color:var(--gum)}
+.brand-logo{display:block;height:36px;width:auto}
 .top-actions{display:flex;gap:10px}
 
 /* Buttons */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;font-size:1rem;border:0;border-radius:999px;padding:14px 24px;cursor:pointer;text-decoration:none;transition:background .15s}
-.btn-primary{background:var(--sun);color:var(--ink)}
+.btn-primary{background:var(--sun);color:var(--on-action,var(--ink))}
 .btn-primary:hover{background:var(--sun-deep)}
 .btn-wa{background:var(--wa);color:var(--white)}
 .btn-wa:hover{background:#178a45}
@@ -96,7 +98,7 @@ p{max-width:62ch}
 .steps::before{content:"";position:absolute;left:22px;right:22px;top:21px;height:3px;background:repeating-linear-gradient(90deg,var(--sun) 0 14px,transparent 14px 24px)}
 .steps li{position:relative;counter-increment:step}
 .steps li::before{content:counter(step);display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:var(--gum);color:var(--white);font-weight:800;position:relative;border:3px solid var(--ink);margin-bottom:16px}
-.steps li:last-child::before{background:var(--sun);color:var(--ink)}
+.steps li:last-child::before{background:var(--sun);color:var(--on-action,var(--ink))}
 .steps h3{color:var(--white);margin-bottom:6px;font-size:1.02rem}
 .steps p{font-size:.93rem}
 

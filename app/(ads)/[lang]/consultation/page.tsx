@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { readContent } from "@/lib/content";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { hasLocale } from "@/lib/i18n";
 import AdsTracking from "./AdsTracking";
@@ -36,6 +37,50 @@ const TOPIC_INTERESTS: Record<string, string> = {
     ielts: "ielts",
 };
 
+// Style overrides come from the "adsPage" collection (CMS → Ads Landing Page): the logo, three
+// theme colours and a font choice. Every value is re-validated here — only a proper 6-digit hex
+// can reach the stylesheet — so a bad paste can never break the page; anything invalid simply
+// falls back to the default it replaced.
+type AdsPageStyle = {
+    logo?: string | null;
+    primaryColor?: string | null;
+    actionColor?: string | null;
+    inkColor?: string | null;
+    font?: string | null;
+};
+
+const HEX = /^#[0-9a-fA-F]{6}$/;
+
+function cssHex(value: unknown, fallback: string): string {
+    return typeof value === "string" && HEX.test(value.trim()) ? value.trim().toUpperCase() : fallback;
+}
+
+/** Mixes a hex colour toward white or black — the tints and hover shades the design derives
+    from the three theme colours. */
+function mixHex(hex: string, target: "white" | "black", amount: number): string {
+    const n = parseInt(hex.slice(1), 16);
+    const to = target === "white" ? 255 : 0;
+    const ch = (shift: number) => {
+        const c = (n >> shift) & 0xff;
+        return Math.round(c + (to - c) * amount);
+    };
+    return `#${((ch(16) << 16) | (ch(8) << 8) | ch(0)).toString(16).padStart(6, "0").toUpperCase()}`;
+}
+
+/** Matches the main site's own font stack (globals.css) — the CMS's "system" font choice. */
+const SYSTEM_FONT_STACK = `-apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif`;
+
+/** Readable text for a filled button: white on a dark action colour, the theme's ink on a
+    light one — a dark brand colour for the buttons used to render navy-on-navy text. YIQ is
+    deliberately simple; it only picks between two presets and gets the common cases right. */
+function onAction(hex: string, ink: string): string {
+    const n = parseInt(hex.slice(1), 16);
+    const r = (n >> 16) & 0xff;
+    const g = (n >> 8) & 0xff;
+    const b = n & 0xff;
+    return (r * 299 + g * 587 + b * 114) / 1000 < 128 ? "#FFFFFF" : ink;
+}
+
 export default async function AdsConsultationPage({
     params,
     searchParams,
@@ -47,16 +92,48 @@ export default async function AdsConsultationPage({
     const topicParam = Array.isArray(topic) ? topic[0] : topic;
     const defaultInterest = TOPIC_INTERESTS[(topicParam ?? "").toLowerCase()] ?? "";
 
+    // Tolerant read: the collection is created by its first CMS save (or the backend's next
+    // seed run), and until then this page must keep advertising — the defaults below match
+    // content/adsPage.json, so the look is identical whichever side wins.
+    const style = (await readContent<AdsPageStyle>("adsPage").catch(() => null)) ?? {};
+    const primary = cssHex(style.primaryColor, "#2F6F5E");
+    const action = cssHex(style.actionColor, "#F2B544");
+    const ink = cssHex(style.inkColor, "#13294B");
+    const font =
+        typeof style.font === "string" && style.font.trim().toLowerCase() === "system" ? "system" : "jakarta";
+    // A cleared logo field means "use the wordmark again"; a missing one gets the brand mark.
+    const logo = style.logo === undefined ? "/icon-istudentplus.png" : (style.logo ?? "").trim();
+
+    const cssVars = [
+        `--ink:${ink}`,
+        `--gum:${primary}`,
+        `--gum-tint:${mixHex(primary, "white", 0.88)}`,
+        `--sun:${action}`,
+        `--sun-deep:${mixHex(action, "black", 0.12)}`,
+        `--on-action:${onAction(action, ink)}`,
+        ...(font === "system" ? [`--font-lp:${SYSTEM_FONT_STACK}`] : []),
+    ].join(";");
+
     const whatsappHref = withWhatsAppText(await getWhatsAppUrl());
 
     return (
         <>
+            {/* The CMS style overrides, as plain CSS variables the landing stylesheet reads.
+                Rendered here rather than in the layout so the theme stays one server-side read. */}
+            <style dangerouslySetInnerHTML={{ __html: `:root{${cssVars}}` }} />
             <AdsTracking />
 
             <header className="top">
                 <div className="wrap">
                     <a className="brand" href="https://www.istudentplus.com/" aria-label="iStudentPlus home">
-                        iStudent<span>Plus</span>
+                        {logo ? (
+                            /* eslint-disable-next-line @next/next/no-img-element -- CMS-uploaded logo: uploads can be SVG or any host, and a 36px header mark doesn't need the optimizer */
+                            <img src={logo} alt="iStudentPlus" width={986} height={338} className="brand-logo" />
+                        ) : (
+                            <>
+                                iStudent<span>Plus</span>
+                            </>
+                        )}
                     </a>
                     <div className="top-actions">
                         <a

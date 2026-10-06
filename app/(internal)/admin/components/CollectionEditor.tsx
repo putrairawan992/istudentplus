@@ -57,14 +57,17 @@ const CollectionContext = createContext<string | undefined>(undefined);
 const ModelContext = createContext<JsonObject>({});
 
 /**
- * Two collections are left out of the media trio (lib/media.ts):
+ * Three collections are left out of the media trio (lib/media.ts):
  *  - `leads` is an inbox of visitor submissions, not content. An upload box on a lead record
  *    invites someone to attach a file to a stranger's enquiry, which is not a thing.
  *  - `webinars` already carries all three concepts under its own names (`image`,
  *    `recordingYoutubeId`, `recordingVideoFile`); adding the trio would give it five media
  *    fields and no way to guess which pair wins.
+ *  - `adsPage` is a style sheet (logo + colours + font). Its one media field is `logo`, which
+ *    already renders an upload box from its name; the generic trio would just bolt YouTube and
+ *    Video File boxes onto a page that has nothing to play.
  */
-const NO_MEDIA_TRIO = new Set(["leads", "webinars"]);
+const NO_MEDIA_TRIO = new Set(["leads", "webinars", "adsPage"]);
 function hasMediaTrio(collection?: string) {
   return !!collection && !NO_MEDIA_TRIO.has(collection);
 }
@@ -480,9 +483,8 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
           <button
             type="button"
             onClick={() => setMode("visual")}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${
-              mode === "visual" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
-            }`}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${mode === "visual" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
+              }`}
           >
             <span>🎨</span>
             <span>Editor Visual</span>
@@ -490,9 +492,8 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
           <button
             type="button"
             onClick={() => setMode("html")}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${
-              mode === "html" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
-            }`}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${mode === "html" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
+              }`}
           >
             <span>💻</span>
             <span>Kode HTML</span>
@@ -500,9 +501,8 @@ function HtmlBodyField({ value, onChange }: { value: string | null; onChange: (v
           <button
             type="button"
             onClick={() => setMode("preview")}
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${
-              mode === "preview" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
-            }`}
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition-all ${mode === "preview" ? "bg-card text-ink shadow-xs" : "text-muted hover:text-ink"
+              }`}
           >
             <span>👁️</span>
             <span>Pratinjau</span>
@@ -1001,6 +1001,72 @@ function BgColorField({ value, onChange }: { value: string; onChange: (v: string
   );
 }
 
+// A bare hex colour, e.g. "#2F6F5E" — the CSS-variable values the ads landing page is themed
+// with. Detected by value shape, plus any key ending in "Color" so a brand-new field gets the
+// picker before it has ever held a value. The text box stays next to the swatch so a value
+// pasted from a brand guideline keeps its exact spelling.
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
+function isColorField(key: string | undefined, value: string | null) {
+  if (typeof value === "string" && HEX_COLOR.test(value)) return true;
+  return !!key && /color$/i.test(key);
+}
+
+function ColorField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const hex = HEX_COLOR.test(value) ? value : "#000000";
+  return (
+    <div className="flex items-center gap-3">
+      <input
+        type="color"
+        value={hex}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-10 w-14 shrink-0 cursor-pointer rounded-lg border border-line bg-paper p-1"
+        title="Pick a color"
+      />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+      />
+    </div>
+  );
+}
+
+// Fields that are a fixed set of choices rather than free text, keyed "<collection>.<field>" so
+// only the intended field gets the dropdown — a value the page doesn't recognise falls back to
+// the default, so a typo into a plain text box would read as "my change did nothing".
+const CHOICE_FIELDS: Partial<Record<string, { value: string; label: string }[]>> = {
+  "adsPage.font": [
+    { value: "jakarta", label: "Plus Jakarta Sans (font desain iklan)" },
+    { value: "system", label: "Font situs utama (mengikuti tipografi website)" },
+  ],
+};
+
+function SelectField({
+  value,
+  options,
+  onChange,
+}: {
+  value: string | null;
+  options: { value: string; label: string }[];
+  onChange: (v: string) => void;
+}) {
+  const current = value && options.some((o) => o.value === value) ? value : options[0]?.value ?? "";
+  return (
+    <select
+      value={current}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-accent"
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  );
+}
+
 function isObject(v: JsonValue): v is JsonObject {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
@@ -1147,11 +1213,14 @@ function FieldEditor({
     if (isMediaKey(label)) return <ImageField value={value} onChange={update} field={label} />;
     if (label && YOUTUBE_KEY.test(label)) return <VideoField value={value} onChange={update} />;
     if (isBgColorField(label, value)) return <BgColorField value={value ?? ""} onChange={update} />;
+    if (isColorField(label, value)) return <ColorField value={value ?? ""} onChange={update} />;
     // A value no picker can represent (someone typed "besok pagi") keeps the text box, so it can
     // be read and corrected rather than silently blanked by a control that can't hold it.
     if (isDateKey(label) && isPickable(value)) {
       return <DateField value={value} onChange={update} collection={collection} />;
     }
+    const choices = collection && label ? CHOICE_FIELDS[`${collection}.${label}`] : undefined;
+    if (choices) return <SelectField value={value} options={choices} onChange={update} />;
     return <StringField value={value} onChange={update} placeholder={placeholder} label={label} />;
   }
 
@@ -1297,6 +1366,26 @@ const FRIENDLY_FIELD_INFO: Record<string, { label: string; hint?: string }> = {
     label: "Deskripsi Singkat Header Webinar (Hero Subtitle)",
     hint: "Teks penjelasan di bawah judul utama webinar",
   },
+  logo: {
+    label: "Logo Halaman Iklan (Ads Logo)",
+    hint: "Tampil di header halaman /consultation. Pakai PNG/SVG transparan. Kosongkan untuk kembali ke tulisan iStudentPlus.",
+  },
+  primaryColor: {
+    label: "Warna Aksen Halaman Iklan (Primary Color)",
+    hint: "Garis, ikon, dan aksen di /consultation. Default hijau eucalyptus #2F6F5E.",
+  },
+  actionColor: {
+    label: "Warna Tombol Utama (Action Color)",
+    hint: "Tombol Book a free consultation dan garis langkah di bagian How it works. Default kuning #F2B544.",
+  },
+  inkColor: {
+    label: "Warna Judul & Latar Gelap (Ink Color)",
+    hint: "Judul dan bagian gelap How it works. Default navy #13294B. Brand ISP memakai #14304C.",
+  },
+  font: {
+    label: "Font Halaman Iklan (Ads Font)",
+    hint: "Berlaku untuk seluruh halaman /consultation.",
+  },
 };
 
 function ObjectFields({
@@ -1381,9 +1470,8 @@ function TabbedFields({
               role="tab"
               aria-selected={selected}
               onClick={() => setActive(i)}
-              className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${
-                selected ? "bg-ink text-white" : "border border-line text-muted hover:bg-paper-raise"
-              }`}
+              className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${selected ? "bg-ink text-white" : "border border-line text-muted hover:bg-paper-raise"
+                }`}
             >
               {section.label}
               {section.keys.length === 1 && Array.isArray(merged[section.keys[0]]) && (
@@ -1605,328 +1693,327 @@ export default function CollectionEditor({
 
   return (
     <CollectionContext.Provider value={collection}>
-    <ModelContext.Provider value={model}>
-    <div>
-      {/* Top bar — only for lists: search, filter, add entries + status */}
-      {isList && (
-        <div className="sticky top-0 z-20 -mx-1 mb-5 flex flex-col gap-3 rounded-2xl border border-line bg-card/90 p-4 shadow-sm backdrop-blur">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              {status === "saved" && <span className="text-sm font-semibold text-emerald-600">Saved ✓</span>}
-              {status === "error" && <span className="text-sm font-semibold text-red-600">Failed to save</span>}
-              {dirty && status === "idle" && <span className="text-sm font-medium text-amber-600">Unsaved changes</span>}
-              {!dirty && status === "idle" && (
-                <span className="text-xs font-semibold text-muted">
-                  Total: <b className="text-ink">{(data as JsonValue[]).length}</b> entries
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setOpenIdx(openIdx === null ? 0 : null)}
-                className="rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise hover:text-ink"
-              >
-                {openIdx === null ? "Expand First" : "Collapse All"}
-              </button>
-              <button
-                type="button"
-                onClick={openAddModal}
-                className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-bold text-white shadow-xs transition-transform hover:scale-[1.02]"
-              >
-                <span>+</span>
-                <span>Add new entry</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Search bar & pagination controls for list collections */}
-          {(data as JsonValue[]).length > 3 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line/70 pt-3">
-              <div className="relative min-w-[220px] flex-1 max-w-md">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  placeholder="Filter by title, name, content…"
-                  className="w-full rounded-xl border border-line bg-paper px-3.5 py-1.5 text-xs text-ink placeholder:text-muted/60 outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/15"
-                />
-                {searchQuery && (
+      <ModelContext.Provider value={model}>
+        <div>
+          {/* Top bar — only for lists: search, filter, add entries + status */}
+          {isList && (
+            <div className="sticky top-0 z-20 -mx-1 mb-5 flex flex-col gap-3 rounded-2xl border border-line bg-card/90 p-4 shadow-sm backdrop-blur">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {status === "saved" && <span className="text-sm font-semibold text-emerald-600">Saved ✓</span>}
+                  {status === "error" && <span className="text-sm font-semibold text-red-600">Failed to save</span>}
+                  {dirty && status === "idle" && <span className="text-sm font-medium text-amber-600">Unsaved changes</span>}
+                  {!dirty && status === "idle" && (
+                    <span className="text-xs font-semibold text-muted">
+                      Total: <b className="text-ink">{(data as JsonValue[]).length}</b> entries
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-ink"
+                    onClick={() => setOpenIdx(openIdx === null ? 0 : null)}
+                    className="rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise hover:text-ink"
+                  >
+                    {openIdx === null ? "Expand First" : "Collapse All"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openAddModal}
+                    className="flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-bold text-white shadow-xs transition-transform hover:scale-[1.02]"
+                  >
+                    <span>+</span>
+                    <span>Add new entry</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Search bar & pagination controls for list collections */}
+              {(data as JsonValue[]).length > 3 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line/70 pt-3">
+                  <div className="relative min-w-[220px] flex-1 max-w-md">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      placeholder="Filter by title, name, content…"
+                      className="w-full rounded-xl border border-line bg-paper px-3.5 py-1.5 text-xs text-ink placeholder:text-muted/60 outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/15"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted hover:text-ink"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3 text-xs text-muted">
+                    {searchQuery && (
+                      <span>
+                        Found <b className="text-ink">{filteredItems.length}</b> matches
+                      </span>
+                    )}
+                    {(data as JsonValue[]).length > 20 && (
+                      <div className="flex items-center gap-1.5">
+                        <span>Show:</span>
+                        <select
+                          value={pageSize}
+                          onChange={(e) => {
+                            setPageSize(e.target.value as "20" | "50" | "all");
+                            setCurrentPage(1);
+                          }}
+                          className="rounded-lg border border-line bg-paper px-2 py-1 text-xs font-semibold text-ink outline-none"
+                        >
+                          <option value="20">20</option>
+                          <option value="50">50</option>
+                          <option value="all">All</option>
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Confirm delete modal */}
+          <ConfirmModal
+            open={confirmRemove !== null}
+            title="Delete entry"
+            message={
+              confirmRemove
+                ? `Are you sure you want to delete "${confirmRemove.title}"? This action cannot be undone.`
+                : ""
+            }
+            confirmLabel="Delete"
+            variant="danger"
+            busy={removeBusy}
+            onConfirm={confirmRemoveEntry}
+            onCancel={() => setConfirmRemove(null)}
+          />
+
+          {isList && showAddModal && (
+            <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-5" onClick={cancelAddEntry}>
+              <div
+                className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-2xl bg-card shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between border-b border-line px-6 py-4">
+                  <h3 className="text-lg font-extrabold">Add new entry</h3>
+                  <button
+                    type="button"
+                    onClick={cancelAddEntry}
+                    aria-label="Close"
+                    className="rounded-lg p-1.5 text-muted hover:bg-paper-raise"
                   >
                     ✕
                   </button>
-                )}
-              </div>
-
-              <div className="flex items-center gap-3 text-xs text-muted">
-                {searchQuery && (
-                  <span>
-                    Found <b className="text-ink">{filteredItems.length}</b> matches
-                  </span>
-                )}
-                {(data as JsonValue[]).length > 20 && (
-                  <div className="flex items-center gap-1.5">
-                    <span>Show:</span>
-                    <select
-                      value={pageSize}
-                      onChange={(e) => {
-                        setPageSize(e.target.value as "20" | "50" | "all");
-                        setCurrentPage(1);
-                      }}
-                      className="rounded-lg border border-line bg-paper px-2 py-1 text-xs font-semibold text-ink outline-none"
-                    >
-                      <option value="20">20</option>
-                      <option value="50">50</option>
-                      <option value="all">All</option>
-                    </select>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Confirm delete modal */}
-      <ConfirmModal
-        open={confirmRemove !== null}
-        title="Delete entry"
-        message={
-          confirmRemove
-            ? `Are you sure you want to delete "${confirmRemove.title}"? This action cannot be undone.`
-            : ""
-        }
-        confirmLabel="Delete"
-        variant="danger"
-        busy={removeBusy}
-        onConfirm={confirmRemoveEntry}
-        onCancel={() => setConfirmRemove(null)}
-      />
-
-      {isList && showAddModal && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-5" onClick={cancelAddEntry}>
-          <div
-            className="flex max-h-[85vh] w-full max-w-2xl flex-col rounded-2xl bg-card shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b border-line px-6 py-4">
-              <h3 className="text-lg font-extrabold">Add new entry</h3>
-              <button
-                type="button"
-                onClick={cancelAddEntry}
-                aria-label="Close"
-                className="rounded-lg p-1.5 text-muted hover:bg-paper-raise"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto overflow-x-hidden bg-paper-raise p-6">
-              {isObject(draft) && Object.keys(draft).length > 0 ? (
-                <TabbedFields value={draft} path={[]} root={draft} setRoot={setDraft} />
-              ) : (
-                <p className="text-sm text-muted">
-                  This collection has no existing entries to model a new one on yet.
-                </p>
-              )}
-            </div>
-            <div className="flex justify-end gap-3 border-t border-line px-6 py-4">
-              <button
-                type="button"
-                onClick={cancelAddEntry}
-                className="rounded-full border border-line px-5 py-2 text-sm font-semibold hover:bg-paper-raise"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={confirmAddEntry}
-                disabled={pending}
-                className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
-              >
-                {pending ? "Adding…" : "Add entry"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isList ? (
-        <div className="flex flex-col gap-3">
-          {(data as JsonValue[]).length === 0 && (
-            <p className="rounded-2xl border border-dashed border-line bg-card/50 p-8 text-center text-sm text-muted">
-              No entries yet. Click “+ Add new entry” to create one.
-            </p>
-          )}
-
-          {filteredItems.length === 0 && (data as JsonValue[]).length > 0 && (
-            <div className="rounded-2xl border border-line bg-card p-8 text-center">
-              <p className="text-sm text-muted">No entries match your search &ldquo;{searchQuery}&rdquo;</p>
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="mt-3 rounded-full border border-line px-4 py-1.5 text-xs font-semibold hover:bg-paper-raise"
-              >
-                Clear filter
-              </button>
-            </div>
-          )}
-
-          {displayedItems.map(({ item, originalIndex }) => {
-            const isOpen = openIdx === originalIndex;
-            const title = entryTitle(item, `Entry #${originalIndex + 1}`);
-            return (
-              <div key={originalIndex} className="overflow-hidden rounded-2xl border border-line bg-card transition-all hover:border-line">
-                <div className="flex items-center gap-3 px-4 py-3">
+                </div>
+                <div className="flex-1 overflow-y-auto overflow-x-hidden bg-paper-raise p-6">
+                  {isObject(draft) && Object.keys(draft).length > 0 ? (
+                    <TabbedFields value={draft} path={[]} root={draft} setRoot={setDraft} />
+                  ) : (
+                    <p className="text-sm text-muted">
+                      This collection has no existing entries to model a new one on yet.
+                    </p>
+                  )}
+                </div>
+                <div className="flex justify-end gap-3 border-t border-line px-6 py-4">
                   <button
                     type="button"
-                    onClick={() => toggle(originalIndex)}
-                    className="flex flex-1 items-center gap-3 text-left min-w-0"
+                    onClick={cancelAddEntry}
+                    className="rounded-full border border-line px-5 py-2 text-sm font-semibold hover:bg-paper-raise"
                   >
-                    <span className={`text-muted transition-transform ${isOpen ? "rotate-90" : ""}`}>▸</span>
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-paper-raise text-[11px] font-bold text-muted">
-                      {originalIndex + 1}
-                    </span>
-                    <span className="truncate text-sm font-bold text-ink">{title}</span>
+                    Cancel
                   </button>
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleDuplicate(originalIndex)}
-                      title="Duplicate entry as template"
-                      className="rounded-lg border border-line px-2.5 py-1 text-[11.5px] font-medium text-muted transition-colors hover:bg-paper-raise hover:text-ink"
-                    >
-                      Duplicate
-                    </button>
-                    {(data as JsonValue[]).length > 1 && !searchQuery && (
-                      <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={confirmAddEntry}
+                    disabled={pending}
+                    className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
+                  >
+                    {pending ? "Adding…" : "Add entry"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isList ? (
+            <div className="flex flex-col gap-3">
+              {(data as JsonValue[]).length === 0 && (
+                <p className="rounded-2xl border border-dashed border-line bg-card/50 p-8 text-center text-sm text-muted">
+                  No entries yet. Click “+ Add new entry” to create one.
+                </p>
+              )}
+
+              {filteredItems.length === 0 && (data as JsonValue[]).length > 0 && (
+                <div className="rounded-2xl border border-line bg-card p-8 text-center">
+                  <p className="text-sm text-muted">No entries match your search &ldquo;{searchQuery}&rdquo;</p>
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="mt-3 rounded-full border border-line px-4 py-1.5 text-xs font-semibold hover:bg-paper-raise"
+                  >
+                    Clear filter
+                  </button>
+                </div>
+              )}
+
+              {displayedItems.map(({ item, originalIndex }) => {
+                const isOpen = openIdx === originalIndex;
+                const title = entryTitle(item, `Entry #${originalIndex + 1}`);
+                return (
+                  <div key={originalIndex} className="overflow-hidden rounded-2xl border border-line bg-card transition-all hover:border-line">
+                    <div className="flex items-center gap-3 px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => toggle(originalIndex)}
+                        className="flex flex-1 items-center gap-3 text-left min-w-0"
+                      >
+                        <span className={`text-muted transition-transform ${isOpen ? "rotate-90" : ""}`}>▸</span>
+                        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-paper-raise text-[11px] font-bold text-muted">
+                          {originalIndex + 1}
+                        </span>
+                        <span className="truncate text-sm font-bold text-ink">{title}</span>
+                      </button>
+                      <div className="flex shrink-0 items-center gap-1.5">
                         <button
                           type="button"
-                          onClick={() => moveEntry(originalIndex, -1)}
-                          disabled={originalIndex === 0 || reorderBusy}
-                          title="Move up"
-                          aria-label="Move up"
-                          className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                          onClick={() => handleDuplicate(originalIndex)}
+                          title="Duplicate entry as template"
+                          className="rounded-lg border border-line px-2.5 py-1 text-[11.5px] font-medium text-muted transition-colors hover:bg-paper-raise hover:text-ink"
                         >
-                          ▲
+                          Duplicate
                         </button>
+                        {(data as JsonValue[]).length > 1 && !searchQuery && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => moveEntry(originalIndex, -1)}
+                              disabled={originalIndex === 0 || reorderBusy}
+                              title="Move up"
+                              aria-label="Move up"
+                              className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              ▲
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveEntry(originalIndex, 1)}
+                              disabled={originalIndex === (data as JsonValue[]).length - 1 || reorderBusy}
+                              title="Move down"
+                              aria-label="Move down"
+                              className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              ▼
+                            </button>
+                          </div>
+                        )}
                         <button
                           type="button"
-                          onClick={() => moveEntry(originalIndex, 1)}
-                          disabled={originalIndex === (data as JsonValue[]).length - 1 || reorderBusy}
-                          title="Move down"
-                          aria-label="Move down"
-                          className="grid h-7 w-7 place-items-center rounded-lg border border-line text-muted transition-colors hover:bg-paper-raise disabled:cursor-not-allowed disabled:opacity-40"
+                          onClick={() => handleRemove(originalIndex, title)}
+                          className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-[12px] text-red-600 transition-colors hover:bg-red-50"
                         >
-                          ▼
+                          Remove
                         </button>
                       </div>
+                    </div>
+                    {isOpen && (
+                      <div className="border-t border-line p-5">
+                        <TabbedFields value={item as JsonObject} path={[originalIndex]} root={data} setRoot={edit} />
+                        <div className="mt-4 flex items-center justify-end gap-3 border-t border-line pt-4">
+                          {status === "saved" && <span className="text-[13px] font-semibold text-emerald-600">Saved ✓</span>}
+                          {status === "error" && <span className="text-[13px] font-semibold text-red-600">Failed to save</span>}
+                          <button
+                            type="button"
+                            onClick={() => handleSave(originalIndex)}
+                            disabled={pending || !dirty}
+                            className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
+                          >
+                            {pending ? "Saving…" : dirty ? "Save changes" : "Saved"}
+                          </button>
+                        </div>
+                      </div>
                     )}
+                  </div>
+                );
+              })}
+
+              {/* Pagination bar */}
+              {pageSize !== "all" && totalPages > 1 && (
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-card p-4">
+                  <span className="text-xs text-muted">
+                    Showing Page <b className="text-ink">{safeCurrentPage}</b> of <b className="text-ink">{totalPages}</b> ({filteredItems.length} entries)
+                  </span>
+                  <div className="flex items-center gap-1.5">
                     <button
                       type="button"
-                      onClick={() => handleRemove(originalIndex, title)}
-                      className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-[12px] text-red-600 transition-colors hover:bg-red-50"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={safeCurrentPage <= 1}
+                      className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise disabled:opacity-40"
                     >
-                      Remove
+                      ← Prev
+                    </button>
+                    {Array.from({ length: totalPages }).slice(0, 7).map((_, idx) => {
+                      const pNum = idx + 1;
+                      const isActive = pNum === safeCurrentPage;
+                      return (
+                        <button
+                          key={pNum}
+                          type="button"
+                          onClick={() => setCurrentPage(pNum)}
+                          className={`grid h-7 w-7 place-items-center rounded-lg text-xs font-semibold transition-colors ${isActive ? "bg-accent text-white" : "border border-line text-muted hover:bg-paper-raise"
+                            }`}
+                        >
+                          {pNum}
+                        </button>
+                      );
+                    })}
+                    {totalPages > 7 && <span className="px-1 text-xs text-muted">…</span>}
+                    <button
+                      type="button"
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={safeCurrentPage >= totalPages}
+                      className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise disabled:opacity-40"
+                    >
+                      Next →
                     </button>
                   </div>
                 </div>
-                {isOpen && (
-                  <div className="border-t border-line p-5">
-                    <TabbedFields value={item as JsonObject} path={[originalIndex]} root={data} setRoot={edit} />
-                    <div className="mt-4 flex items-center justify-end gap-3 border-t border-line pt-4">
-                      {status === "saved" && <span className="text-[13px] font-semibold text-emerald-600">Saved ✓</span>}
-                      {status === "error" && <span className="text-[13px] font-semibold text-red-600">Failed to save</span>}
-                      <button
-                        type="button"
-                        onClick={() => handleSave(originalIndex)}
-                        disabled={pending || !dirty}
-                        className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
-                      >
-                        {pending ? "Saving…" : dirty ? "Save changes" : "Saved"}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-
-          {/* Pagination bar */}
-          {pageSize !== "all" && totalPages > 1 && (
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-line bg-card p-4">
-              <span className="text-xs text-muted">
-                Showing Page <b className="text-ink">{safeCurrentPage}</b> of <b className="text-ink">{totalPages}</b> ({filteredItems.length} entries)
-              </span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={safeCurrentPage <= 1}
-                  className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise disabled:opacity-40"
-                >
-                  ← Prev
-                </button>
-                {Array.from({ length: totalPages }).slice(0, 7).map((_, idx) => {
-                  const pNum = idx + 1;
-                  const isActive = pNum === safeCurrentPage;
-                  return (
-                    <button
-                      key={pNum}
-                      type="button"
-                      onClick={() => setCurrentPage(pNum)}
-                      className={`grid h-7 w-7 place-items-center rounded-lg text-xs font-semibold transition-colors ${
-                        isActive ? "bg-accent text-white" : "border border-line text-muted hover:bg-paper-raise"
-                      }`}
-                    >
-                      {pNum}
-                    </button>
-                  );
-                })}
-                {totalPages > 7 && <span className="px-1 text-xs text-muted">…</span>}
-                <button
-                  type="button"
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={safeCurrentPage >= totalPages}
-                  className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted hover:bg-paper-raise disabled:opacity-40"
-                >
-                  Next →
-                </button>
-              </div>
+              )}
             </div>
+          ) : (
+            <>
+              <div className="rounded-2xl border border-line bg-card p-5 pb-6">
+                <TabbedFields value={data as JsonObject} path={[]} root={data} setRoot={edit} />
+              </div>
+              <div className="h-20" /> {/* spacer so the fixed bar never covers the last field */}
+              {/* Fixed bottom save bar — always visible; offset past the sidebar on desktop */}
+              <div className="pointer-events-none fixed inset-x-0 bottom-4 z-30 px-5 sm:px-8 lg:pl-64">
+                <div className="pointer-events-auto mx-auto flex max-w-5xl items-center justify-end gap-3 rounded-2xl border border-line bg-card/90 px-4 py-3 shadow-lg shadow-ink/10 backdrop-blur">
+                  {status === "saved" && <span className="text-sm font-semibold text-emerald-600">Saved ✓</span>}
+                  {status === "error" && <span className="text-sm font-semibold text-red-600">Failed to save</span>}
+                  {dirty && status === "idle" && <span className="text-sm font-medium text-amber-600">Unsaved changes</span>}
+                  <button
+                    onClick={() => handleSave()}
+                    disabled={pending || !dirty}
+                    className="rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
+                  >
+                    {pending ? "Saving…" : dirty ? "Save changes" : "Saved"}
+                  </button>
+                </div>
+              </div>
+            </>
           )}
         </div>
-      ) : (
-        <>
-          <div className="rounded-2xl border border-line bg-card p-5 pb-6">
-            <TabbedFields value={data as JsonObject} path={[]} root={data} setRoot={edit} />
-          </div>
-          <div className="h-20" /> {/* spacer so the fixed bar never covers the last field */}
-          {/* Fixed bottom save bar — always visible; offset past the sidebar on desktop */}
-          <div className="pointer-events-none fixed inset-x-0 bottom-4 z-30 px-5 sm:px-8 lg:pl-64">
-            <div className="pointer-events-auto mx-auto flex max-w-5xl items-center justify-end gap-3 rounded-2xl border border-line bg-card/90 px-4 py-3 shadow-lg shadow-ink/10 backdrop-blur">
-              {status === "saved" && <span className="text-sm font-semibold text-emerald-600">Saved ✓</span>}
-              {status === "error" && <span className="text-sm font-semibold text-red-600">Failed to save</span>}
-              {dirty && status === "idle" && <span className="text-sm font-medium text-amber-600">Unsaved changes</span>}
-              <button
-                onClick={() => handleSave()}
-                disabled={pending || !dirty}
-                className="rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-accent/25 transition-opacity disabled:opacity-50"
-              >
-                {pending ? "Saving…" : dirty ? "Save changes" : "Saved"}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-    </ModelContext.Provider>
+      </ModelContext.Provider>
     </CollectionContext.Provider>
   );
 }

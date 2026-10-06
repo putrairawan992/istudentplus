@@ -53,7 +53,7 @@ assert.ok(YOUTUBE_KEY.test("youtubeId"), "YouTube widget");
 // ship. Anything rendered through <Media> must have one.
 const specSrc = readFileSync(new URL("./image-specs.ts", import.meta.url), "utf8");
 const specced = new Set([...specSrc.matchAll(/"([a-zA-Z]+)\.(image|photo)":/g)].map((m) => `${m[1]}.${m[2]}`));
-const NO_TRIO = new Set(["leads", "webinars"]); // see CollectionEditor's NO_MEDIA_TRIO
+const NO_TRIO = new Set(["leads", "webinars", "adsPage"]); // see CollectionEditor's NO_MEDIA_TRIO
 // A local translation sibling (e.g. contactPage.id.json) is the same collection as its base —
 // baseCollectionKey collapses it back so the scan doesn't go looking for a "contactPage.id.image"
 // spec that was never meant to exist; the size standard applies per collection, not per locale.
