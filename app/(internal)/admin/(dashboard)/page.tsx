@@ -4,11 +4,18 @@ import { readContent } from "@/lib/content";
 
 export default async function AdminDashboardPage() {
   // Fetch every collection's data up front so we can show counts without awaiting inside JSX.
+  // A bucket the API can't serve — unreachable, or a newly added collection whose seed hasn't
+  // reached the backend yet — must not take the whole console down with it; it just shows no
+  // count. (The sidebar layout catches the same way for the leads badge.)
   const counts = new Map<string, number | null>(
     await Promise.all(
       COLLECTIONS.map(async (c): Promise<[string, number | null]> => {
-        const data = await readContent<unknown>(c.key);
-        return [c.key, Array.isArray(data) ? data.length : null];
+        try {
+          const data = await readContent<unknown>(c.key);
+          return [c.key, Array.isArray(data) ? data.length : null];
+        } catch {
+          return [c.key, null];
+        }
       })
     )
   );
