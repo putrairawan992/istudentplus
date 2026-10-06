@@ -21,7 +21,7 @@ export const COLLECTIONS: CollectionMeta[] = [
   { key: "visaServices", label: "Visa Services", description: "Visa & partner services list", kind: "list", usedOn: "Services", icon: "🛂", group: "Content" },
   { key: "servicesPage", label: "Services Page Extras", description: "Alasan penolakan visa (pitfalls), checklist dokumen, tahapan pendaftaran, dan FAQ", kind: "single", usedOn: "Services", icon: "📄", group: "Content" },
   { key: "contactPage", label: "Contact Page", description: "Hero badge, headline, proof points, and an optional photo or video", kind: "single", usedOn: "Contact", icon: "📞", group: "Content" },
-  { key: "adsPage", label: "Ads Landing Page", description: "Logo, warna tema, dan font halaman iklan /consultation", kind: "single", usedOn: "Consultation (ads)", icon: "🎨", group: "Content" },
+  { key: "adsPage", label: "Ads Landing Page", description: "Logo, warna tema, font, dan isi form halaman iklan /consultation", kind: "single", usedOn: "Consultation (ads)", icon: "🎨", group: "Content" },
   { key: "languagePrograms", label: "Language Programs", description: "General English, IELTS, Conversation, JLPT", kind: "list", usedOn: "Language Programs, Home", icon: "🗣️", group: "Content" },
   { key: "instructors", label: "Instructors", description: "Teacher profiles", kind: "list", usedOn: "Language Programs", icon: "🎓", group: "Content" },
   { key: "blog", label: "Blog Articles", description: "Blog post titles, excerpts, categories", kind: "list", usedOn: "Blog", icon: "✍️", group: "Content" },
@@ -46,7 +46,7 @@ export const COLLECTION_GROUPS: CollectionGroup[] = ["Inbox", "General", "Conten
  * hero and Featured column fall back to newest-with-a-picture, and the checkbox is how an
  * editor overrides that.
  */
-export const ALWAYS_FIELDS: Partial<Record<CollectionKey, Record<string, boolean | string>>> = {
+export const ALWAYS_FIELDS: Partial<Record<CollectionKey, Record<string, boolean | string | string[]>>> = {
   blog: { featured: false },
   settings: {
     webinarHeroKicker: "WEBINAR",
@@ -58,15 +58,32 @@ export const ALWAYS_FIELDS: Partial<Record<CollectionKey, Record<string, boolean
     pitfallsTitle: "Avoid the most common visa rejection reasons",
     checklistPrompt: "Inquire this document checklist as your visa guidance.",
   },
-  // The ads landing page's style sheet. The defaults double as the page's own fallbacks (see
-  // the (ads) route group), so the editor — and a first save, which creates the document —
-  // starts from the values the live page is actually rendering.
+  // The ads landing page's style sheet and form copy. The defaults double as the page's own
+  // fallbacks (see the (ads) route group), so the editor, and the first seed which creates the
+  // document, start from the values the live page is actually rendering.
   adsPage: {
     logo: "/icon-istudentplus.png",
     primaryColor: "#2F6F5E",
     actionColor: "#F2B544",
     inkColor: "#13294B",
     font: "jakarta",
+    formTitle: "Book a free consultation",
+    formIntro:
+      "Share your plans and a counsellor replies with a personalised recommendation. No obligation, no fees to talk.",
+    formSubmit: "Book a free consultation",
+    formSuccessTitle: "Thanks, we got your details",
+    formSuccessBody:
+      "A counsellor will review your plans and get back to you with a personalised recommendation.",
+    formInterests: [
+      "Study in Australia (not sure of level yet)",
+      "VET or diploma in Australia",
+      "Bachelor or master in Australia",
+      "Next course, already in Australia",
+      "General English or Conversation Class",
+      "IELTS Preparation",
+    ],
+    formLocations: ["Indonesia", "Australia", "Other country"],
+    formStarts: ["Within 6 months", "6 to 12 months", "More than 12 months", "Not sure yet"],
   },
 };
 

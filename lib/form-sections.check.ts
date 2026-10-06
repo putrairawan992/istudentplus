@@ -86,6 +86,36 @@ assert.deepEqual(labels(s), ["General", "Media"]);
 assert.deepEqual(s[1].keys, ["image", "recordingVideoFile", "recordingYoutubeId"]);
 assertCovers(webinarLike, s, "webinar-like");
 
+// the ads landing page: style fields in General, all form copy on one "Form Iklan" tab
+const adsLike: JsonObject = {
+  logo: "/logo.png",
+  primaryColor: "#2F6F5E",
+  actionColor: "#F2B544",
+  inkColor: "#13294B",
+  font: "jakarta",
+  formTitle: "Book a free consultation",
+  formIntro: "Share your plans",
+  formSubmit: "Book a free consultation",
+  formSuccessTitle: "Thanks, we got your details",
+  formSuccessBody: "A counsellor will get back to you",
+  formInterests: ["IELTS Preparation"],
+  formLocations: ["Indonesia"],
+  formStarts: ["Not sure yet"],
+};
+s = sectionsOf(adsLike, isMediaish);
+assert.deepEqual(labels(s), ["General", "Form Iklan"]);
+assert.deepEqual(s[1].keys, [
+  "formTitle",
+  "formIntro",
+  "formSubmit",
+  "formSuccessTitle",
+  "formSuccessBody",
+  "formInterests",
+  "formLocations",
+  "formStarts",
+]);
+assertCovers(adsLike, s, "ads-like");
+
 // a short entry stays one plain form — a tab strip over four fields is noise
 const videoLike: JsonObject = { series: "s", title: "t", youtubeId: "x", videoFile: null };
 s = sectionsOf(videoLike, isMediaish);

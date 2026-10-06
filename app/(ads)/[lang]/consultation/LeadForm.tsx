@@ -2,12 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ADS_CONFIG, adFormFields, adsConversion, setUserData, track } from "./tracking";
+import { type AdsFormCopy } from "./form-copy";
 
 /**
- * The landing page's one conversion point. Field set and copy come straight from the approved
- * mock; submissions land in the CMS inbox (/admin/leads) with source "ads" plus every ad
- * parameter the visitor arrived with. Inputs stay uncontrolled on purpose — the form is read
- * once via FormData on submit, with the mock's own inline validation.
+ * The landing page's one conversion point. Field set comes from the approved mock; the copy
+ * (title, button, success message, dropdown choices) is CMS-editable and arrives via `copy`.
+ * Submissions land in the CMS inbox (/admin/leads) with source "ads" plus every ad parameter
+ * the visitor arrived with. Inputs stay uncontrolled on purpose — the form is read once via
+ * FormData on submit, with the mock's own inline validation.
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,6 +22,8 @@ type Props = {
     whatsappHref: string;
     /** Interest preselected when the ad's URL carries ?topic=. */
     defaultInterest?: string;
+    /** CMS copy and choices — see form-copy.ts for the defaults the page falls back to. */
+    copy: AdsFormCopy;
 };
 
 function value(fd: FormData, key: string): string {
@@ -33,7 +37,7 @@ function fullPhone(dial: string, phone: string): string {
     return dial ? dial + number : number;
 }
 
-export default function LeadForm({ whatsappHref, defaultInterest = "" }: Props) {
+export default function LeadForm({ whatsappHref, defaultInterest = "", copy }: Props) {
     const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
     const [error, setError] = useState("");
     const [invalid, setInvalid] = useState<Record<string, boolean>>({});
@@ -108,8 +112,8 @@ export default function LeadForm({ whatsappHref, defaultInterest = "" }: Props) 
     if (status === "success") {
         return (
             <div className="thanks" ref={thanksRef} tabIndex={-1}>
-                <h2>Thanks, we got your details</h2>
-                <p>A counsellor will review your plans and get back to you with a personalised recommendation.</p>
+                <h2>{copy.successTitle}</h2>
+                <p>{copy.successBody}</p>
                 <a
                     className="btn btn-wa"
                     href={whatsappHref}
@@ -128,8 +132,8 @@ export default function LeadForm({ whatsappHref, defaultInterest = "" }: Props) 
 
     return (
         <form id="leadForm" noValidate onSubmit={handleSubmit} onInput={handleInput}>
-            <h2>Book a free consultation</h2>
-            <p>Share your plans and a counsellor replies with a personalised recommendation. No obligation, no fees to talk.</p>
+            <h2>{copy.title}</h2>
+            <p>{copy.intro}</p>
 
             <div className={"field" + (invalid.name ? " invalid" : "")}>
                 <label htmlFor="name">Full name</label>
@@ -161,12 +165,9 @@ export default function LeadForm({ whatsappHref, defaultInterest = "" }: Props) 
                 <label htmlFor="interest">What are you interested in?</label>
                 <select id="interest" name="interest" required defaultValue={defaultInterest}>
                     <option value="">Choose one</option>
-                    <option value="study-australia">Study in Australia (not sure of level yet)</option>
-                    <option value="vet-diploma">VET or diploma in Australia</option>
-                    <option value="bachelor-master">Bachelor or master in Australia</option>
-                    <option value="next-course">Next course, already in Australia</option>
-                    <option value="general-english">General English or Conversation Class</option>
-                    <option value="ielts">IELTS Preparation</option>
+                    {copy.interests.map((option) => (
+                        <option key={option}>{option}</option>
+                    ))}
                 </select>
                 <div className="error">Choose what you are interested in.</div>
             </div>
@@ -176,9 +177,9 @@ export default function LeadForm({ whatsappHref, defaultInterest = "" }: Props) 
                     <label htmlFor="location">Where are you now?</label>
                     <select id="location" name="location" required defaultValue="">
                         <option value="">Choose one</option>
-                        <option>Indonesia</option>
-                        <option>Australia</option>
-                        <option>Other country</option>
+                        {copy.locations.map((option) => (
+                            <option key={option}>{option}</option>
+                        ))}
                     </select>
                     <div className="error">Choose where you are now.</div>
                 </div>
@@ -186,10 +187,9 @@ export default function LeadForm({ whatsappHref, defaultInterest = "" }: Props) 
                     <label htmlFor="start">When do you plan to start?</label>
                     <select id="start" name="start" required defaultValue="">
                         <option value="">Choose one</option>
-                        <option>Within 6 months</option>
-                        <option>6 to 12 months</option>
-                        <option>More than 12 months</option>
-                        <option>Not sure yet</option>
+                        {copy.starts.map((option) => (
+                            <option key={option}>{option}</option>
+                        ))}
                     </select>
                     <div className="error">Choose when you plan to start.</div>
                 </div>
@@ -210,7 +210,7 @@ export default function LeadForm({ whatsappHref, defaultInterest = "" }: Props) 
             </div>
 
             <button className="btn btn-primary" type="submit" disabled={status === "loading"}>
-                {status === "loading" ? "Sending..." : "Book a free consultation"}
+                {status === "loading" ? "Sending..." : copy.submit}
             </button>
 
             <label className="consent" style={{ marginTop: 14 }}>

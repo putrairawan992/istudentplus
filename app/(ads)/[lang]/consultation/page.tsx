@@ -5,6 +5,7 @@ import { getWhatsAppUrl } from "@/lib/whatsapp";
 import { hasLocale } from "@/lib/i18n";
 import AdsTracking from "./AdsTracking";
 import LeadForm from "./LeadForm";
+import { DEFAULT_ADS_FORM_COPY, type AdsFormCopy } from "./form-copy";
 import { ADS_CONFIG, withWhatsAppText } from "./tracking";
 
 // The paid-traffic landing page. Deliberately the only page in the (ads) route group: the
@@ -27,32 +28,54 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/consultati
 
 // Lets an ad's URL (?topic=vet, ?topic=ielts, …) drop the visitor straight into the right
 // interest — same mechanism the mock had, but resolved on the server so the select renders
-// preselected instead of snapping after hydration.
+// preselected instead of snapping after hydration. The values are the default option labels
+// from form-copy.ts: an option renamed in the CMS simply no longer preselects.
 const TOPIC_INTERESTS: Record<string, string> = {
-    australia: "study-australia",
-    vet: "vet-diploma",
-    degree: "bachelor-master",
-    next: "next-course",
-    english: "general-english",
-    ielts: "ielts",
+    australia: "Study in Australia (not sure of level yet)",
+    vet: "VET or diploma in Australia",
+    degree: "Bachelor or master in Australia",
+    next: "Next course, already in Australia",
+    english: "General English or Conversation Class",
+    ielts: "IELTS Preparation",
 };
 
-// Style overrides come from the "adsPage" collection (CMS → Ads Landing Page): the logo, three
-// theme colours and a font choice. Every value is re-validated here — only a proper 6-digit hex
-// can reach the stylesheet — so a bad paste can never break the page; anything invalid simply
-// falls back to the default it replaced.
+// Style and form copy come from the "adsPage" collection (CMS → Ads Landing Page): the logo,
+// three theme colours, a font choice, and the lead form's texts and dropdown choices. Every
+// value is re-validated here — only a proper 6-digit hex can reach the stylesheet, and an
+// empty string falls back to the default it replaced — so a bad paste can never break the page.
 type AdsPageStyle = {
     logo?: string | null;
     primaryColor?: string | null;
     actionColor?: string | null;
     inkColor?: string | null;
     font?: string | null;
+    formTitle?: string | null;
+    formIntro?: string | null;
+    formSubmit?: string | null;
+    formSuccessTitle?: string | null;
+    formSuccessBody?: string | null;
+    formInterests?: string[] | null;
+    formLocations?: string[] | null;
+    formStarts?: string[] | null;
 };
 
 const HEX = /^#[0-9a-fA-F]{6}$/;
 
 function cssHex(value: unknown, fallback: string): string {
     return typeof value === "string" && HEX.test(value.trim()) ? value.trim().toUpperCase() : fallback;
+}
+
+/** A CMS string, or the mock's default when the field is empty — the page must never render a
+    blank heading because someone cleared a box in the CMS. */
+function text(value: unknown, fallback: string): string {
+    return typeof value === "string" && value.trim() !== "" ? value.trim() : fallback;
+}
+
+/** A CMS option list, or the default choices when the field is empty (or all blank entries). */
+function choices(value: unknown, fallback: string[]): string[] {
+    if (!Array.isArray(value)) return fallback;
+    const cleaned = value.filter((v): v is string => typeof v === "string" && v.trim() !== "").map((v) => v.trim());
+    return cleaned.length > 0 ? cleaned : fallback;
 }
 
 /** Mixes a hex colour toward white or black — the tints and hover shades the design derives
@@ -103,6 +126,17 @@ export default async function AdsConsultationPage({
         typeof style.font === "string" && style.font.trim().toLowerCase() === "system" ? "system" : "jakarta";
     // A cleared logo field means "use the wordmark again"; a missing one gets the brand mark.
     const logo = style.logo === undefined ? "/icon-istudentplus.png" : (style.logo ?? "").trim();
+
+    const copy: AdsFormCopy = {
+        title: text(style.formTitle, DEFAULT_ADS_FORM_COPY.title),
+        intro: text(style.formIntro, DEFAULT_ADS_FORM_COPY.intro),
+        submit: text(style.formSubmit, DEFAULT_ADS_FORM_COPY.submit),
+        successTitle: text(style.formSuccessTitle, DEFAULT_ADS_FORM_COPY.successTitle),
+        successBody: text(style.formSuccessBody, DEFAULT_ADS_FORM_COPY.successBody),
+        interests: choices(style.formInterests, DEFAULT_ADS_FORM_COPY.interests),
+        locations: choices(style.formLocations, DEFAULT_ADS_FORM_COPY.locations),
+        starts: choices(style.formStarts, DEFAULT_ADS_FORM_COPY.starts),
+    };
 
     const cssVars = [
         `--ink:${ink}`,
@@ -195,7 +229,7 @@ export default async function AdsConsultationPage({
                         </div>
 
                         <div className="form-card" id="consultation">
-                            <LeadForm whatsappHref={whatsappHref} defaultInterest={defaultInterest} />
+                            <LeadForm whatsappHref={whatsappHref} defaultInterest={defaultInterest} copy={copy} />
                         </div>
                     </div>
                 </section>

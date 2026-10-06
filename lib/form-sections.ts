@@ -46,6 +46,15 @@ export function sectionsOf(
     pitfallsKeys.forEach((k) => claimed.add(k));
   }
 
+  // Keep the ads landing page's form copy on one tab — one form, so its title, button, success
+  // message and the three option lists all belong together rather than scattered across the
+  // style sheet's General tab and a stack of one-array tabs.
+  const adsFormKeys = allKeys.filter((k) => k.startsWith("form"));
+  if (adsFormKeys.length > 0) {
+    customSections.push({ label: "Form Iklan", keys: adsFormKeys });
+    adsFormKeys.forEach((k) => claimed.add(k));
+  }
+
   const unclaimedKeys = allKeys.filter((k) => !claimed.has(k));
   const complex = unclaimedKeys.filter(isComplex);
   const mediaCandidates =

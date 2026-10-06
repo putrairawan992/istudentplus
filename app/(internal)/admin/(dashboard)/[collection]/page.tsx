@@ -115,13 +115,13 @@ export default async function CollectionPage({
       {collection === "adsPage" && (
         <div className="mb-6 rounded-2xl border border-line bg-paper-raise/70 p-4 sm:p-5">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent">
-            <span>🎨</span> Gaya Halaman Iklan (/consultation)
+            <span>🎨</span> Gaya &amp; Form Halaman Iklan (/consultation)
           </div>
           <p className="mt-1 text-xs leading-relaxed text-muted">
-            Logo, warna, dan font untuk halaman iklan <strong>/consultation</strong> — perubahan
-            langsung tampil setelah disimpan, tanpa deploy ulang. Warna brand ISP: navy{" "}
-            <strong>#14304C</strong> dan pink <strong>#EC4899</strong>. Kosongkan logo untuk
-            kembali ke tulisan iStudentPlus.
+            Logo, warna, font, dan isi form (judul, tombol, pesan sukses, pilihan dropdown) untuk
+            halaman iklan <strong>/consultation</strong>. Perubahan langsung tampil setelah
+            disimpan, tanpa deploy ulang. Warna brand ISP: navy <strong>#14304C</strong> dan pink{" "}
+            <strong>#EC4899</strong>. Kosongkan logo untuk kembali ke tulisan iStudentPlus.
           </p>
         </div>
       )}

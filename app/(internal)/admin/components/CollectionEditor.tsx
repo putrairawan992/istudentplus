@@ -1386,6 +1386,38 @@ const FRIENDLY_FIELD_INFO: Record<string, { label: string; hint?: string }> = {
     label: "Font Halaman Iklan (Ads Font)",
     hint: "Berlaku untuk seluruh halaman /consultation.",
   },
+  formTitle: {
+    label: "Judul Form (Form Title)",
+    hint: "Judul di atas form konsultasi di halaman /consultation.",
+  },
+  formIntro: {
+    label: "Deskripsi Form (Form Intro)",
+    hint: "Kalimat pembuka di bawah judul form.",
+  },
+  formSubmit: {
+    label: "Teks Tombol Kirim (Submit Button)",
+    hint: "Tombol utama di bawah form. Contoh: Book a free consultation.",
+  },
+  formSuccessTitle: {
+    label: "Pesan Sukses: Judul",
+    hint: "Muncul menggantikan form setelah pengunjung mengirim data.",
+  },
+  formSuccessBody: {
+    label: "Pesan Sukses: Isi",
+    hint: "Penjelasan singkat di bawah judul pesan sukses.",
+  },
+  formInterests: {
+    label: "Pilihan Minat (Dropdown: What are you interested in?)",
+    hint: "Daftar pilihan dropdown minat. Parameter ?topic= pada URL iklan mencocokkan persis teks pilihan di daftar ini.",
+  },
+  formLocations: {
+    label: "Pilihan Lokasi (Dropdown: Where are you now?)",
+    hint: "Daftar pilihan dropdown lokasi pemohon.",
+  },
+  formStarts: {
+    label: "Pilihan Waktu Mulai (Dropdown: When do you plan to start?)",
+    hint: "Daftar pilihan dropdown rencana waktu mulai.",
+  },
 };
 
 function ObjectFields({
