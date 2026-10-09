@@ -1,11 +1,11 @@
 // Ad instrumentation for the paid-traffic landing page. Client-side only — every function
 // here runs in the browser, and the module is imported by client components.
 //
-// Everything is optional by design: with the placeholder IDs below nothing loads and nothing
-// fires, exactly like the approved mock, but the dataLayer events still queue so the setup
-// can be verified before any campaign exists. Fill the IDs in before the ads go live:
-//   - Google Ads: Goals > Conversions (the tag ID is on the account, labels on each action)
-//   - GA4: Admin > Data Streams
+// NOTE: the (ads) layout now loads the site's GTM container (GTM-5DC3QD86) on this page, and
+// GTM is the intended home for the GA4 / Ads tags. Keep the ids below as placeholders unless
+// a page-local gtag.js is genuinely wanted — filling them in while GTM also carries the same
+// tags would fire everything twice. The dataLayer events ("generate_lead", "whatsapp_click")
+// and the gclid/UTM capture below stay useful either way: GTM triggers are built on them.
 
 export const ADS_CONFIG = {
   /** Google Ads tag ID, e.g. "AW-123456789". */
