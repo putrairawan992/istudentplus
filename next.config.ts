@@ -68,6 +68,9 @@ function migratedPostRedirects() {
 }
 
 const nextConfig: NextConfig = {
+  // Deliberately not `output: "standalone"`. Its server re-runs proxy.ts on the path the proxy
+  // just rewrote, so "/" rewrites to /en, /en redirects back to "/", and every page is a
+  // redirect loop. `next start` applies the rewrite once and serves the page.
   images: { remotePatterns },
   experimental: {
     // Next.js caps Server Action request bodies at 1MB by default. The admin editor saves
