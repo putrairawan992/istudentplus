@@ -14,7 +14,8 @@ COPY . .
 RUN npm run build
 
 # `next start` writes image-optimization cache into .next/cache, so the runtime user owns it.
-RUN chown -R node:node /app
+# Only .next: chowning all of /app copies node_modules into a second layer and doubles the image.
+RUN chown -R node:node /app/.next
 USER node
 
 ENV NODE_ENV=production
